@@ -127,7 +127,7 @@ def row_text(n, refs):
         parts.append(f'<b class="title">{md(title, refs)}</b>')
     dur = n.get("duration")
     if dur not in (None, 0, "0"):
-        parts.append(f'<span class="dur">{html.escape(str(dur))}</span>')
+        parts.append(f'<span class="duration">{html.escape(str(dur))}</span>')
     if n.get("note"):
         parts.append(f'<span class="note">{md(str(n["note"]).strip(), refs)}</span>')
     return " - ".join(parts)
@@ -149,7 +149,7 @@ def resto_link(opt, refs):
         refs.add(key)
     lk = f'<a class="modal-link" href="#m-{key}">{nombre}</a>' if key else nombre
     precio = opt.get("precio")
-    return lk + (f" {html.escape(str(precio))}" if precio else "")
+    return lk + (f' <span class="precio">{html.escape(str(precio))}</span>' if precio else "")
 
 
 def render_fork(node, refs):
@@ -159,7 +159,7 @@ def render_fork(node, refs):
         cls = TIER_CLASS.get(tier.get("title", ""), "hood")
         label = html.escape(tier.get("title", ""))
         inner = " · ".join(resto_link(o, refs) for o in tier.get("options", []))
-        groups.append(f'<li class="tier-{cls}"><b>{label}</b>{inner}</li>')
+        groups.append(f'<li class="tier-{cls}" data-tier="{label}"><b>{label}</b>{inner}</li>')
     return '<ul class="fork">' + "".join(groups) + "</ul>"
 
 
@@ -187,8 +187,14 @@ def render_li(n, refs, row_id=None):
     # los trayectos van en gris para que resalten los lugares
     if "transit" in n and "options" not in n:
         body = f'<span class="transit">{body}</span>'
-    rid = f' id="{row_id}"' if row_id else ""
-    return f'    <li{rid}>{time_cell(n)}<div class="body">{body}</div></li>'
+    # la fila lleva su clave YAML (location/transit) como data-* — el HTML es
+    # una proyección legible del YAML
+    attrs = f' id="{row_id}"' if row_id else ""
+    if n.get("location"):
+        attrs += f' data-location="{html.escape(str(n["location"]))}"'
+    elif n.get("transit"):
+        attrs += f' data-transit="{html.escape(str(n["transit"]))}"'
+    return f'    <li{attrs}>{time_cell(n)}<div class="body">{body}</div></li>'
 
 
 def render_day(day, refs, num):
@@ -199,8 +205,8 @@ def render_day(day, refs, num):
     fecha = day.get("date")
     fecha = fecha.isoformat() if hasattr(fecha, "isoformat") else str(fecha)
     head = (f'<header class="day-head"><h3>{titulo}</h3>'
-            f'<span class="day-theme">{note}</span>'
-            f'<span class="day-anchor">Ancla: {ancla}</span></header>')
+            f'<span class="note">{note}</span>'
+            f'<span class="ancla">Ancla: {ancla}</span></header>')
     visible = [s for s in day.get("steps", []) if not s.get("hidden-summary")]
     lis = "\n".join(render_li(s, refs, f"d{num}-r{i + 1:02d}") for i, s in enumerate(visible))
     return (f'  <section class="day" id="d{num}" data-fecha="{fecha}">{head}\n'
@@ -369,8 +375,8 @@ a { color: var(--shu); }
 .day { margin-top: 22px; scroll-margin-top: 54px; }
 .day-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; border-bottom: 2px solid var(--ink); padding-bottom: 5px; }
 .day-head h3 { margin: 0; font-size: 17.5px; font-weight: 600; }
-.day-theme { color: var(--ink-soft); font-size: 13.5px; font-style: italic; }
-.day-anchor { margin-left: auto; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); border: 1px solid var(--gold); border-radius: 999px; padding: 2px 10px; white-space: nowrap; }
+.day-head .note { color: var(--ink-soft); font-size: 13.5px; font-style: italic; }
+.day-head .ancla { margin-left: auto; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); border: 1px solid var(--gold); border-radius: 999px; padding: 2px 10px; white-space: nowrap; }
 
 /* ---------- pasos (una fila por hora) ---------- */
 .steps { margin: 6px 0 0; padding: 0; list-style: none; }
