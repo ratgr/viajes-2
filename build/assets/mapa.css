@@ -77,6 +77,13 @@ body.show-free .panel .steps > li[data-free]::after { content: '⏳ ' attr(data-
 .panel .steps li .eye-toggle:hover { opacity: 1; }
 .panel .options.eye-ghost:has(.group-choice:checked) > li:not(:has(.group-choice:checked)) { opacity: .35; }
 .panel .options.eye-hide:has(.group-choice:checked) > li:not(:has(.group-choice:checked)) { display: none; }
+/* elección anidada: el radio vive en cada opción; el ojo actúa a ese nivel */
+.panel .options .option-choice { margin: 0 5px 0 0; accent-color: var(--shu); vertical-align: -1px; }
+.panel .options .option:has(.option-choice:checked) a { color: var(--shu); font-weight: 700; }
+.panel .options.eye-ghost:has(.option-choice:checked) .option:not(:has(.option-choice:checked)) { opacity: .35; }
+.panel .options.eye-hide:has(.option-choice:checked) .option:not(:has(.option-choice:checked)) { display: none; }
+.panel .options.eye-ghost:has(.option-choice:checked) > li[data-tier]:not(:has(.option-choice:checked)) { opacity: .35; }
+.panel .options.eye-hide:has(.option-choice:checked) > li[data-tier]:not(:has(.option-choice:checked)) { display: none; }
 
 /* options en columna única dentro de la barra */
 .panel .options { grid-template-columns: 1fr; }

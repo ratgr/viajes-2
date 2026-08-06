@@ -238,21 +238,45 @@
       caret.className = 'group-caret';
       caret.textContent = '▼';
       label.insertBefore(caret, label.firstChild);
-      var radio = document.createElement('input');
-      radio.type = 'radio';
-      radio.name = 'choice-' + si;
-      radio.className = 'group-choice';
-      label.insertBefore(radio, caret);
       caret.addEventListener('click', function (e) {
         e.stopPropagation();          // colapsar NO elige
         g.classList.toggle('closed');
       });
-      label.addEventListener('click', function (e) {
-        e.stopPropagation();
-        radio.checked = true;
-        selectGroup(g);
-        closePanelIfNarrow();
-      });
+      var isPlan = !!g.querySelector(':scope > ul.steps');
+      if (isPlan) {
+        // plan: la elección es el GRUPO (sus sub-pasos son su itinerario)
+        var radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = 'choice-' + si;
+        radio.className = 'group-choice';
+        label.insertBefore(radio, caret);
+        label.addEventListener('click', function (e) {
+          e.stopPropagation();
+          radio.checked = true;
+          selectGroup(g);
+          closePanelIfNarrow();
+        });
+      } else {
+        // elección anidada (tiers): la elección real es CADA opción de abajo —
+        // el radio va en el nivel inferior, compartido por TODO el conjunto
+        label.addEventListener('click', function (e) {
+          e.stopPropagation();
+          selectGroup(g);             // ver la geometría del tier completo
+          closePanelIfNarrow();
+        });
+        g.querySelectorAll(':scope > .option').forEach(function (opt) {
+          var r = document.createElement('input');
+          r.type = 'radio';
+          r.name = 'choice-' + si;
+          r.className = 'option-choice';
+          opt.insertBefore(r, opt.firstChild);
+          r.addEventListener('change', function () {
+            var a = opt.querySelector('a.modal-link');
+            var key = a && (a.getAttribute('href') || '').slice(3);
+            if (key) showOnMap(key, a.textContent);
+          });
+        });
+      }
     });
   });
   // popup con la tarjeta COMPLETA (en teléfono es la única vista); si es alta
