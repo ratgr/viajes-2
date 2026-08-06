@@ -118,7 +118,7 @@ def parse_flex(raw):
     inner = (m.group(1) or "").strip()
     if not inner:
         return (None, None)
-    parts = inner.split("-", 1)
+    parts = re.split(r"[-,]", inner, maxsplit=1)   # rango con - o con ,
     lo = dmin(parts[0]) or None if parts[0].strip() else None
     hi = dmin(parts[1]) or None if len(parts) > 1 and parts[1].strip() else None
     return (lo, hi)
@@ -359,7 +359,7 @@ def row_text(n, refs, sc=None):
             unit_lo = str(lo) if (lo < 60 and hi < 60) else fmt_dur(lo)
             val = f"~{unit_lo}–{fmt_dur(hi)}"
         elif lo:
-            val = f"{fmt_dur(lo)}+"
+            val = f">{fmt_dur(lo)}"
         elif hi:
             val = f"≤{fmt_dur(hi)}"
         else:
