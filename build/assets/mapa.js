@@ -156,6 +156,37 @@
     if (tempLayer && map) { map.removeLayer(tempLayer); tempLayer = null; }
   }
 
+  // halo de SELECCIÓN: resalta en el mapa la geometría de lo elegido en la
+  // barra (línea gorda translúcida / disco brillante), debajo de las capas
+  var haloLayer = null;
+  function clearHalo() {
+    if (haloLayer && map) { map.removeLayer(haloLayer); haloLayer = null; }
+  }
+  function haloFor(keys) {
+    clearHalo();
+    if (!map) return;
+    var parts = [];
+    keys.forEach(function (key) {
+      var loc = GEO.locations[key];
+      var tr = GEO.transits[key];
+      if (loc) {
+        parts.push(L.circleMarker(loc, {
+          radius: 14, color: '#b23a2a', weight: 0, fillColor: '#b23a2a',
+          fillOpacity: .3, interactive: false
+        }));
+      } else if (tr && tr.coords.length) {
+        parts.push(L.polyline(tr.coords, {
+          color: tr.color, weight: 13, opacity: .35,
+          lineCap: 'round', lineJoin: 'round', interactive: false
+        }));
+      }
+    });
+    if (parts.length) {
+      haloLayer = L.layerGroup(parts).addTo(map);
+      parts.forEach(function (p) { if (p.bringToBack) p.bringToBack(); });
+    }
+  }
+
   // ---------- grupos de options: colapsables y seleccionables ----------
   // elegir un grupo (plan o tier) enciende TODA su geometría de un golpe
   var selGroupEl = null;
@@ -174,6 +205,7 @@
   function showGroupGeometry(g) {
     if (!map) return;
     clearTemp();
+    haloFor(groupKeys(g));
     var layers = [];
     groupKeys(g).forEach(function (key) {
       var loc = GEO.locations[key];
@@ -345,6 +377,7 @@
     var loc = GEO.locations[key];
     var tr = GEO.transits[key];
     clearTemp();
+    haloFor([key]);
     if (loc) {
       map.flyTo(loc, Math.max(map.getZoom(), 15), { duration: .5 });
       openCardPopup(loc, content + dayPieces(key, activeRowId));
@@ -395,14 +428,39 @@
     }
     return ly;
   }
+  // estado fantasma: elemento marcado dentro de una opción NO elegida —
+  // con 👁 su geometría se dibuja atenuada; con 🙈 no se dibuja
+  function ghostState(el) {
+    var set = el.closest('.options');
+    if (!set) return 'full';
+    var chosen = set.querySelector('.option-choice:checked, .group-choice:checked');
+    if (!chosen) return 'full';
+    var container = el.closest('.option') || el.closest('.options > li');
+    if (!container || container.contains(chosen)) return 'full';
+    if (set.classList.contains('eye-hide')) return 'skip';
+    return set.classList.contains('eye-ghost') ? 'ghost' : 'full';
+  }
+  function applyLayerState(key, st) {
+    var ly = liveLayers[key];
+    if (!ly || !ly.setStyle) return;
+    var ghost = st === 'ghost';
+    if (GEO.transits[key]) {
+      ly.setStyle({ opacity: ghost ? .25 : .85 });
+    } else {
+      ly.setStyle({ opacity: ghost ? .3 : 1, fillOpacity: ghost ? .3 : 1 });
+    }
+  }
   function syncLayers() {
     if (!map) return;
-    var want = {};
+    var want = {};   // clave → 'full' | 'ghost'
     document.querySelectorAll('.panel [data-location], .panel [data-transit]').forEach(function (el) {
       var key = el.dataset.location || el.dataset.transit;
-      if (!key || want[key]) return;
+      if (!key || want[key] === 'full') return;
       var ck = el.querySelector(':scope > .ck');
-      if (ck && ck.checked) want[key] = true;
+      if (!ck || !ck.checked) return;
+      var st = ghostState(el);
+      if (st === 'skip') return;
+      if (st === 'full' || !want[key]) want[key] = st;
     });
     Object.keys(liveLayers).forEach(function (k) {
       if (!want[k]) {
@@ -418,6 +476,7 @@
           ly.addTo(map);
         }
       }
+      applyLayerState(k, want[k]);
     });
   }
   function fitToLayers() {
@@ -439,6 +498,7 @@
   // chips de día: tras el cambio exclusivo, sincronizar y encuadrar el día
   document.querySelectorAll('.day-nav a[href^="#d"]').forEach(function (a) {
     a.addEventListener('click', function () {
+      clearHalo();
       setTimeout(function () { syncLayers(); fitToLayers(); }, 60);
     });
   });
