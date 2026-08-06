@@ -80,15 +80,17 @@ body.show-free .panel .steps > li[data-free]::after { content: '⏳ ' attr(data-
    ya hay una elección — sin radio marcado no se atenúa ni oculta nada) */
 .panel .steps li .eye-toggle { position: absolute; top: 22px; right: 0; z-index: 2; border: none; background: none; font-size: 13px; line-height: 1; padding: 2px; cursor: pointer; opacity: .65; }
 .panel .steps li .eye-toggle:hover { opacity: 1; }
+/* 🙈 solo oculta en el MAPA: en la barra las opciones no elegidas siguen
+   visibles, apenas más apagadas que el fantasma de 👁 */
 .panel .options.eye-ghost:has(.group-choice:checked) > li:not(:has(.group-choice:checked)) { opacity: .35; }
-.panel .options.eye-hide:has(.group-choice:checked) > li:not(:has(.group-choice:checked)) { display: none; }
+.panel .options.eye-hide:has(.group-choice:checked) > li:not(:has(.group-choice:checked)) { opacity: .2; }
 /* elección anidada: el radio vive en cada opción; el ojo actúa a ese nivel */
 .panel .options .option-choice { margin: 0 5px 0 0; accent-color: var(--shu); vertical-align: -1px; }
 .panel .options .option:has(.option-choice:checked) a { color: var(--shu); font-weight: 700; }
 .panel .options.eye-ghost:has(.option-choice:checked) .option:not(:has(.option-choice:checked)) { opacity: .35; }
-.panel .options.eye-hide:has(.option-choice:checked) .option:not(:has(.option-choice:checked)) { display: none; }
+.panel .options.eye-hide:has(.option-choice:checked) .option:not(:has(.option-choice:checked)) { opacity: .2; }
 .panel .options.eye-ghost:has(.option-choice:checked) > li[data-tier]:not(:has(.option-choice:checked)) { opacity: .35; }
-.panel .options.eye-hide:has(.option-choice:checked) > li[data-tier]:not(:has(.option-choice:checked)) { display: none; }
+.panel .options.eye-hide:has(.option-choice:checked) > li[data-tier]:not(:has(.option-choice:checked)) { opacity: .2; }
 
 /* options en columna única dentro de la barra */
 .panel .options { grid-template-columns: 1fr; }
@@ -144,3 +146,15 @@ body.show-free .panel .steps > li[data-free]::after { content: '⏳ ' attr(data-
 .dev-drawer .dev-refs button:hover { border-color: var(--shu); color: var(--shu); }
 .dev-drawer .dev-entity { margin-top: 6px; min-height: 140px; }
 .dev-drawer .dev-entity-name { font: 11px ui-monospace, Consolas, monospace; color: var(--ink-soft); }
+
+/* ---------- geometría viva: insignias, flechas, estaciones, editor ---------- */
+/* insignia de cronología: número de visita del día sobre el lugar */
+.seq-badge { background: #b23a2a; color: #fff; border: 2px solid #fff; border-radius: 9px; text-align: center; font: 700 10px/14px system-ui, sans-serif; box-shadow: 0 1px 3px rgba(0, 0, 0, .35); }
+.seq-badge.plain { border-radius: 50%; }             /* sin número: punto simple */
+.seq-badge.ghost { opacity: .3; }
+/* flechas de dirección sobre las líneas */
+.chev { pointer-events: none; background: none; border: none; }
+.chev span { display: inline-block; font: 700 13px/16px system-ui, sans-serif; text-shadow: 0 0 3px #fff, 0 0 3px #fff; }
+/* editor de segmentos (modo dev): vértice arrastrable y punto medio insertable */
+.geo-pt { background: #d4a017; border: 2px solid #fff; border-radius: 50%; box-shadow: 0 1px 3px rgba(0, 0, 0, .45); cursor: grab; }
+.geo-mid { background: #fff; border: 2px solid #d4a017; border-radius: 50%; opacity: .75; cursor: copy; }

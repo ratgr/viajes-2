@@ -42,7 +42,8 @@
 
     head.addEventListener('click', function (e) {
       if (e.target === master) return;
-      day.classList.toggle('open');
+      // abrir un día también lo ENCUADRA (toda su geometría, sin dibujarla)
+      if (day.classList.toggle('open')) focusKeys(keysUnder(day));
     });
     master.addEventListener('change', function () {
       rows.forEach(function (li) { li.querySelector('.ck').checked = master.checked; });
@@ -161,6 +162,35 @@
   var haloLayer = null;
   function clearHalo() {
     if (haloLayer && map) { map.removeLayer(haloLayer); haloLayer = null; }
+  }
+  // FOCO genérico: cualquier nivel de la barra (fila, elección, grupo, día)
+  // encuadra TODA la geometría contenida en su subárbol
+  function keysUnder(el) {
+    var keys = [];
+    var own = el.dataset && (el.dataset.location || el.dataset.transit);
+    if (own) keys.push(own);
+    el.querySelectorAll('[data-location],[data-transit]').forEach(function (e2) {
+      var k = e2.dataset.location || e2.dataset.transit;
+      if (k && keys.indexOf(k) < 0) keys.push(k);
+    });
+    return keys;
+  }
+  function boundsForKeys(keys) {
+    var bounds = null;
+    keys.forEach(function (key) {
+      var loc = GEO.locations[key];
+      var tr = GEO.transits[key];
+      var b = null;
+      if (loc) b = L.latLngBounds([loc]);
+      else if (tr && tr.coords.length) b = L.latLngBounds(tr.coords);
+      if (b) bounds = bounds ? bounds.extend(b) : L.latLngBounds(b.getSouthWest(), b.getNorthEast());
+    });
+    return bounds;
+  }
+  function focusKeys(keys) {
+    if (!map || !keys.length) return;
+    var b = boundsForKeys(keys);
+    if (b && b.isValid()) map.flyToBounds(b.pad(.2), { duration: .5 });
   }
   function haloFor(keys) {
     clearHalo();
@@ -384,10 +414,7 @@
       return true;
     }
     if (tr && tr.coords.length) {
-      tempLayer = L.polyline(tr.coords, {
-        color: tr.color, weight: tr.mode === 'walk' ? 3 : 5, opacity: .9,
-        dashArray: tr.mode === 'walk' ? '4 7' : null
-      }).addTo(map);
+      tempLayer = transitGroup(key, tr, tr.coords).addTo(map);
       map.flyToBounds(tempLayer.getBounds().pad(.25), { duration: .5 });
       openCardPopup(tr.coords[Math.floor(tr.coords.length / 2)], content);
       return true;
@@ -406,18 +433,89 @@
   // solo las filas/sub-filas MARCADAS dibujan su geometría (el maestro del
   // día marca todo el día); abrir/plegar solo organiza la barra
   var liveLayers = {};    // clave → capa Leaflet
+  var autoLayers = {};    // id de fila → conector automático (transit sin geometría)
+  var seqLabels = {};     // clave de lugar → '1' / '2·5' (cronología del día)
 
+  // rumbo de pantalla a→b en grados CSS (horario, 0° = este)
+  function segAngle(a, b) {
+    var dx = (b[1] - a[1]) * Math.cos(a[0] * Math.PI / 180);
+    var dy = a[0] - b[0];   // pantalla: y crece hacia el sur
+    return Math.atan2(dy, dx) * 180 / Math.PI;
+  }
+  // punto y rumbo a una fracción del largo total de la línea
+  function pointAlong(coords, frac) {
+    var d = [0], total = 0;
+    for (var i = 1; i < coords.length; i++) {
+      var dx = (coords[i][1] - coords[i - 1][1]) * Math.cos(coords[i][0] * Math.PI / 180);
+      var dy = coords[i][0] - coords[i - 1][0];
+      total += Math.sqrt(dx * dx + dy * dy);
+      d.push(total);
+    }
+    if (!total) return null;
+    var goal = total * frac;
+    for (var j = 1; j < coords.length; j++) {
+      if (d[j] >= goal) {
+        var t = (goal - d[j - 1]) / (d[j] - d[j - 1] || 1);
+        var a = coords[j - 1], b = coords[j];
+        return { p: [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t], ang: segAngle(a, b) };
+      }
+    }
+    return null;
+  }
+  // flechas de dirección sobre la línea (¼, ½, ¾ del recorrido)
+  function chevronMarkers(coords, color) {
+    var out = [];
+    [.25, .5, .75].forEach(function (f) {
+      var pa = pointAlong(coords, f);
+      if (!pa) return;
+      out.push(L.marker(pa.p, {
+        interactive: false, keyboard: false,
+        icon: L.divIcon({
+          className: 'chev', iconSize: [16, 16],
+          html: '<span style="transform:rotate(' + Math.round(pa.ang) + 'deg);color:' + color + '">❯</span>'
+        })
+      }));
+    });
+    return out;
+  }
+  // línea de transporte: polilínea + flechas + (si las estaciones calzan con
+  // los vértices, como en los rieles) un punto con nombre por estación
+  function transitGroup(key, tr, coords) {
+    var g = L.featureGroup();
+    var line = L.polyline(coords, {
+      color: tr.color, weight: tr.mode === 'walk' ? 3 : 5, opacity: .85,
+      dashArray: tr.mode === 'walk' ? '4 7' : null
+    });
+    g.addLayer(line);
+    g._line = line;
+    g._decos = chevronMarkers(coords, tr.color);
+    g._dots = [];
+    if (tr.stations && tr.stations.length === coords.length) {
+      coords.forEach(function (c, i) {
+        var dot = L.circleMarker(c, { radius: 3.5, color: tr.color, weight: 2, fillColor: '#fff', fillOpacity: 1 });
+        if (tr.stations[i]) dot.bindTooltip(tr.stations[i], { direction: 'top', offset: [0, -4] });
+        g._dots.push(dot);
+      });
+    }
+    g._decos.concat(g._dots).forEach(function (d) { g.addLayer(d); });
+    return g;
+  }
+  function locIcon(key, ghost) {
+    var label = seqLabels[key] || '';
+    var w = label.length > 2 ? 8 + label.length * 7 : 18;
+    return L.divIcon({
+      className: 'seq-badge' + (ghost ? ' ghost' : '') + (label ? '' : ' plain'),
+      html: label, iconSize: label ? [w, 18] : [12, 12]
+    });
+  }
   function makeLayer(key) {
     var loc = GEO.locations[key];
     var tr = GEO.transits[key];
     var ly = null;
     if (loc) {
-      ly = L.circleMarker(loc, { radius: 6, color: '#fff', weight: 2, fillColor: '#b23a2a', fillOpacity: 1 });
+      ly = L.marker(loc, { icon: locIcon(key, false) });
     } else if (tr && tr.coords.length) {
-      ly = L.polyline(tr.coords, {
-        color: tr.color, weight: tr.mode === 'walk' ? 3 : 5, opacity: .85,
-        dashArray: tr.mode === 'walk' ? '4 7' : null
-      });
+      ly = transitGroup(key, tr, tr.coords);
     }
     if (ly) {
       ly.on('click', function () {
@@ -442,25 +540,73 @@
   }
   function applyLayerState(key, st) {
     var ly = liveLayers[key];
-    if (!ly || !ly.setStyle) return;
+    if (!ly) return;
     var ghost = st === 'ghost';
-    if (GEO.transits[key]) {
-      ly.setStyle({ opacity: ghost ? .25 : .85 });
-    } else {
-      ly.setStyle({ opacity: ghost ? .3 : 1, fillOpacity: ghost ? .3 : 1 });
+    if (ly._line) {                       // grupo de transporte
+      ly._line.setStyle({ opacity: ghost ? .25 : .85 });
+      ly._decos.forEach(function (d) { d.setOpacity(ghost ? .25 : 1); });
+      ly._dots.forEach(function (d) { d.setStyle({ opacity: ghost ? .25 : 1, fillOpacity: ghost ? .25 : 1 }); });
+    } else if (ly.setIcon) {              // marcador de lugar (insignia numerada)
+      ly.setIcon(locIcon(key, ghost));
     }
+  }
+  // punto de anclaje de una fila con geometría: lugar → su gps;
+  // transporte → su último/primer vértice (según sea el previo o el siguiente)
+  function anchorPoint(el, end) {
+    var key = el.dataset.location || el.dataset.transit;
+    var loc = GEO.locations[key];
+    if (loc) return loc;
+    var tr = GEO.transits[key];
+    if (tr && tr.coords.length) return end ? tr.coords[tr.coords.length - 1] : tr.coords[0];
+    return null;
   }
   function syncLayers() {
     if (!map) return;
-    var want = {};   // clave → 'full' | 'ghost'
-    document.querySelectorAll('.panel [data-location], .panel [data-transit]').forEach(function (el) {
-      var key = el.dataset.location || el.dataset.transit;
-      if (!key || want[key] === 'full') return;
+    var want = {};      // clave → 'full' | 'ghost'
+    var autos = {};     // id de conector → {a, b, st}
+    var els = Array.prototype.slice.call(
+      document.querySelectorAll('.panel [data-location], .panel [data-transit]'));
+    var states = els.map(function (el) {
       var ck = el.querySelector(':scope > .ck');
-      if (!ck || !ck.checked) return;
+      if (!ck || !ck.checked) return null;
       var st = ghostState(el);
-      if (st === 'skip') return;
-      if (st === 'full' || !want[key]) want[key] = st;
+      return st === 'skip' ? null : st;
+    });
+    els.forEach(function (el, i) {
+      var st = states[i];
+      if (!st) return;
+      var key = el.dataset.location || el.dataset.transit;
+      if (GEO.locations[key] || (GEO.transits[key] && GEO.transits[key].coords.length)) {
+        if (st === 'full' || !want[key]) want[key] = st;
+        return;
+      }
+      if (!el.dataset.transit) return;
+      // transporte SIN geometría (referencia sin cumplir) = conector automático:
+      // une el punto previo con el siguiente dentro del mismo día
+      var day = el.closest('section.day');
+      var a = null, b = null, j;
+      for (j = i - 1; j >= 0 && !a; j--) {
+        if (els[j].closest('section.day') !== day) break;
+        a = anchorPoint(els[j], true);
+      }
+      for (j = i + 1; j < els.length && !b; j++) {
+        if (els[j].closest('section.day') !== day) break;
+        b = anchorPoint(els[j], false);
+      }
+      if (a && b) autos['auto-' + i + '-' + key] = { a: a, b: b, st: st };
+    });
+    // cronología del día: numerar los LUGARES plenos en orden del documento
+    seqLabels = {};
+    days.forEach(function (day) {
+      var n = 0;
+      els.forEach(function (el, i) {
+        if (states[i] !== 'full' || !el.dataset.location) return;
+        if (el.closest('section.day') !== day) return;
+        var key = el.dataset.location;
+        if (!GEO.locations[key]) return;
+        n += 1;
+        seqLabels[key] = seqLabels[key] ? seqLabels[key] + '·' + n : String(n);
+      });
     });
     Object.keys(liveLayers).forEach(function (k) {
       if (!want[k]) {
@@ -477,6 +623,28 @@
         }
       }
       applyLayerState(k, want[k]);
+    });
+    // conectores automáticos: punteado recto gris, una flecha al centro
+    Object.keys(autoLayers).forEach(function (id) {
+      if (!autos[id]) {
+        map.removeLayer(autoLayers[id]);
+        delete autoLayers[id];
+      }
+    });
+    Object.keys(autos).forEach(function (id) {
+      var sp = autos[id];
+      if (!autoLayers[id]) {
+        var g = L.featureGroup();
+        var line = L.polyline([sp.a, sp.b], { color: '#8a8073', weight: 2.5, opacity: .7, dashArray: '2 8' });
+        g.addLayer(line);
+        g._line = line;
+        g._decos = chevronMarkers([sp.a, sp.b], '#8a8073').slice(1, 2);   // solo la del centro
+        g._decos.forEach(function (d) { g.addLayer(d); });
+        autoLayers[id] = g.addTo(map);
+      }
+      var ghost = sp.st === 'ghost';
+      autoLayers[id]._line.setStyle({ opacity: ghost ? .2 : .7 });
+      autoLayers[id]._decos.forEach(function (d) { d.setOpacity(ghost ? .2 : .8); });
     });
   }
   function fitToLayers() {
@@ -499,7 +667,11 @@
   document.querySelectorAll('.day-nav a[href^="#d"]').forEach(function (a) {
     a.addEventListener('click', function () {
       clearHalo();
-      setTimeout(function () { syncLayers(); fitToLayers(); }, 60);
+      var sec = document.getElementById((a.getAttribute('href') || '').slice(1));
+      setTimeout(function () {
+        syncLayers();
+        if (sec) focusKeys(keysUnder(sec)); else fitToLayers();
+      }, 60);
     });
   });
   setTimeout(function () { syncLayers(); fitToLayers(); }, 150);   // arranque
@@ -582,6 +754,11 @@
       }
     } else {
       updateHash(null, li.id);
+      var ks = keysUnder(li);          // fila-contenedor: enfocar TODO lo suyo
+      if (ks.length) {
+        haloFor(ks);
+        focusKeys(ks);
+      }
     }
   });
 
@@ -608,7 +785,113 @@
     });
   }
   function closeDrawer() {
+    stopGeomEdit();
     if (drawer) { drawer.remove(); drawer = null; }
+  }
+
+  // ---------- editor de GEOMETRÍA de un segmento (modo dev) ----------
+  // arrastra los vértices · click en un punto medio inserta uno · click
+  // derecho sobre un vértice lo borra · «Ajustar a calle» pega la línea a la
+  // vialidad más cercana (OSRM público) — cada cambio reescribe la línea
+  // coords: del YAML de la entidad en el cajón; Guardar referencia persiste
+  var geomEd = null;   // {key, coords, group, ta, msg}
+  function stopGeomEdit() {
+    if (geomEd) {
+      if (map) map.removeLayer(geomEd.group);
+      geomEd = null;
+    }
+  }
+  function geomToYaml() {
+    if (!geomEd) return;
+    var s = geomEd.coords.map(function (c) {
+      return c[0].toFixed(6) + ',' + c[1].toFixed(6);
+    }).join(' ');
+    var ta = geomEd.ta;
+    // OJO: el dump del server puede PLEGAR la escalar larga en varias líneas
+    // (más indentadas): reemplazar el bloque completo, no solo la primera
+    var re = /^([ \t]*)coords:[^\n]*(?:\n\1[ \t]+[^\n]*)*/m;
+    if (re.test(ta.value)) {
+      ta.value = ta.value.replace(re, '$1coords: ' + s);
+    } else {
+      ta.value = ta.value.replace(/\s*$/, '\n') + 'coords: ' + s + '\n';
+    }
+    GEO.transits[geomEd.key] = GEO.transits[geomEd.key] || { color: '#7a6f63', mode: 'walk' };
+    GEO.transits[geomEd.key].coords = geomEd.coords;
+  }
+  function startGeomEdit(key, ta, msg) {
+    stopGeomEdit();
+    if (!map) return;
+    var tr = GEO.transits[key];
+    var coords = tr && tr.coords.length
+      ? tr.coords.map(function (c) { return [c[0], c[1]]; })
+      : (function () {   // sin geometría: arrancar con un tramo en el centro de la vista
+        var c = map.getCenter(), d = 0.002;
+        return [[c.lat, c.lng - d], [c.lat, c.lng + d]];
+      })();
+    var group = L.featureGroup().addTo(map);
+    geomEd = { key: key, coords: coords, group: group, ta: ta, msg: msg };
+    function redraw() {
+      group.clearLayers();
+      var line = L.polyline(coords, { color: '#d4a017', weight: 4, opacity: .9, dashArray: '1 7' });
+      group.addLayer(line);
+      coords.forEach(function (c, i) {
+        var h = L.marker(c, {
+          draggable: true,
+          icon: L.divIcon({ className: 'geo-pt', iconSize: [12, 12] })
+        });
+        h.on('drag', function (e) {
+          var ll = e.target.getLatLng();
+          coords[i] = [ll.lat, ll.lng];
+          line.setLatLngs(coords);
+        });
+        h.on('dragend', function () { redraw(); geomToYaml(); });
+        h.on('contextmenu', function () {
+          if (coords.length > 2) { coords.splice(i, 1); redraw(); geomToYaml(); }
+        });
+        group.addLayer(h);
+      });
+      for (var i = 0; i + 1 < coords.length; i++) {
+        (function (i) {
+          var mid = [(coords[i][0] + coords[i + 1][0]) / 2, (coords[i][1] + coords[i + 1][1]) / 2];
+          var m = L.marker(mid, { icon: L.divIcon({ className: 'geo-mid', iconSize: [10, 10] }) });
+          m.on('click', function () {
+            coords.splice(i + 1, 0, mid);
+            redraw();
+            geomToYaml();
+          });
+          group.addLayer(m);
+        })(i);
+      }
+    }
+    redraw();
+    map.flyToBounds(L.latLngBounds(coords).pad(.3), { duration: .4 });
+  }
+  function snapGeomToRoads() {
+    if (!geomEd) return;
+    var msg = geomEd.msg;
+    msg.textContent = 'ajustando a calles…';
+    // punto por punto contra /nearest (el /match del OSRM público rechaza
+    // trazas largas con TooBig); cada vértice se pega a su vialidad más cercana
+    var reqs = geomEd.coords.map(function (c) {
+      return fetch('https://router.project-osrm.org/nearest/v1/driving/' +
+                   c[1].toFixed(6) + ',' + c[0].toFixed(6))
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          var w = d.code === 'Ok' && d.waypoints && d.waypoints[0];
+          return w && w.location ? [w.location[1], w.location[0]] : null;
+        })
+        .catch(function () { return null; });
+    });
+    Promise.all(reqs).then(function (snapped) {
+      if (!geomEd) return;
+      var moved = 0;
+      snapped.forEach(function (p, i) {
+        if (p) { geomEd.coords[i] = p; moved += 1; }
+      });
+      geomToYaml();                                        // persistir en GEO + textarea
+      startGeomEdit(geomEd.key, geomEd.ta, geomEd.msg);    // redibujar con lo ajustado
+      geomEd.msg.textContent = 'snap ✓ (' + moved + '/' + snapped.length + ' puntos)';
+    });
   }
   function openDevEditor(li) {
     var m = /^d(\d+)-r(\d+)$/.exec(li.id || '');
@@ -634,6 +917,9 @@
       '<textarea class="dev-entity" spellcheck="false" hidden></textarea>' +
       '<div class="dev-btns dev-entity-btns" hidden>' +
       '<button class="dev-save-entity" type="button">Guardar referencia</button>' +
+      '<button class="dev-geom" type="button" hidden ' +
+      'title="Arrastra vértices · click en punto medio inserta · click derecho borra">Geometría</button>' +
+      '<button class="dev-snap" type="button" hidden>Ajustar a calle</button>' +
       '<span class="dev-entity-name"></span></div>';
     drawer.querySelector('.dev-info').textContent = facts.join('\n');
     document.body.appendChild(drawer);
@@ -653,7 +939,28 @@
     var entTa = drawer.querySelector('.dev-entity');
     var entBtns = drawer.querySelector('.dev-entity-btns');
     var entName = drawer.querySelector('.dev-entity-name');
+    var geomBtn = drawer.querySelector('.dev-geom');
+    var snapBtn = drawer.querySelector('.dev-snap');
     var entCur = null;    // {kind, key} de la entidad cargada
+    geomBtn.addEventListener('click', function () {
+      if (geomEd) {
+        stopGeomEdit();
+        geomBtn.textContent = 'Geometría';
+        snapBtn.hidden = true;
+        msg.textContent = 'edición de geometría terminada';
+        return;
+      }
+      if (!entCur) { msg.textContent = 'carga primero una referencia'; return; }
+      try {
+        startGeomEdit(entCur.key, entTa, msg);
+      } catch (err) {
+        msg.textContent = 'geometría error: ' + (err && err.message || err);
+        return;
+      }
+      geomBtn.textContent = 'Terminar geometría';
+      snapBtn.hidden = false;
+    });
+    snapBtn.addEventListener('click', snapGeomToRoads);
     refKeys.forEach(function (key) {
       var b = document.createElement('button');
       b.type = 'button';
@@ -669,6 +976,10 @@
             entTa.value = d.yaml;
             entTa.hidden = false;
             entBtns.hidden = false;
+            stopGeomEdit();
+            geomBtn.hidden = d.kind !== 'transits';
+            geomBtn.textContent = 'Geometría';
+            snapBtn.hidden = true;
           })
           .catch(function (e) { msg.textContent = 'error: ' + e; });
       });

@@ -34,8 +34,17 @@ def geo_tokens():
         coords = tr.get("coords")
         if coords:
             pts = [[float(a), float(b)] for a, b in (p.split(",") for p in str(coords).split())]
-            transits[key] = {"coords": pts, "color": tr.get("color", "#7a6f63"),
-                             "mode": tr.get("mode", "walk")}
+            entry = {"coords": pts, "color": tr.get("color", "#7a6f63"),
+                     "mode": tr.get("mode", "walk")}
+            # rieles: cada vértice ES una estación ([código, jp, romaji]) —
+            # el mapa las pinta como paradas con nombre si las cuentas calzan
+            stations = tr.get("stations")
+            if stations:
+                entry["stations"] = [
+                    (s[2] or s[1]) if isinstance(s, list) and len(s) >= 3 else str(s)
+                    for s in stations
+                ]
+            transits[key] = entry
     geo = {"locations": locs, "transits": transits}
     return {"<!--GEO-->": json.dumps(geo, ensure_ascii=False)}
 

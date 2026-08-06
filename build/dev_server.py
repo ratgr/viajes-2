@@ -102,16 +102,19 @@ class Handler(SimpleHTTPRequestHandler):
                 step = load(q["trip"])["days"][int(q["day"]) - 1]["steps"][int(q["step"]) - 1]
                 self._json(200, {"ok": True,
                                  "yaml": yaml.dump(step, allow_unicode=True, sort_keys=False,
-                                                   default_flow_style=False)})
+                                                   default_flow_style=False, width=100000)})
             elif u.path == "/api/entity":
                 Y = load(q["trip"])
                 key = q["key"]
                 kinds = [q["kind"]] if q.get("kind") in CATALOGS else CATALOGS
                 for kind in kinds:
                     if key in (Y.get(kind) or {}):
+                        # width enorme: coords debe quedar en UNA línea (el editor
+                        # de geometría del mapa la reescribe línea por línea)
                         self._json(200, {"ok": True, "kind": kind,
                                          "yaml": yaml.dump(Y[kind][key], allow_unicode=True,
-                                                           sort_keys=False, default_flow_style=False)})
+                                                           sort_keys=False, default_flow_style=False,
+                                                           width=100000)})
                         return
                 self._json(404, {"error": f"'{key}' no está en {'/'.join(kinds)}"})
             else:
