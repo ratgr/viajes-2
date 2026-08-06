@@ -1529,7 +1529,7 @@ days:
   - {transit: yamada-hankyu, time-from: '10:50', duration: 25 min, title: 'Hankyu Senri Line (transbordo en Yamada): @[Yamada → Kitahama](yamada-hankyu)', note: 'Entra directo a la @[línea Sakaisuji](sakaisuji) — reagrupe en el andén: el que se pierda, baja en Yamada y espera.'}
   - {transit: kitahama-hotel, duration: 2 min, title: Kitahama → hotel}
   - {location: royal-park, time-from: '12:00', fixed: true, duration: 1 h 20, title: 'Check-in en el @[Royal Park Canvas](royal-park)', note: '**Check-in** — dejamos maletas y una **siesta de ~1 h**; luego salimos ligeros al Castillo.'}
-  - {transit: hotel-temmabashi, time-from: '13:20', duration: 15 min, title: Hotel → Temmabashi por la ribera, note: '5 min a **Temmabashi** por la ribera (o @[Tanimachi Line](tanimachi), 1 estación a Tanimachi 4-chōme).'}
+  - {transit: hotel-temmabashi, time-to: '13:35', title: Hotel → Temmabashi por la ribera, note: '5 min a **Temmabashi** por la ribera (o @[Tanimachi Line](tanimachi), 1 estación a Tanimachi 4-chōme).'}
   - {transit: temmabashi-castillo, duration: 25 min, title: Temmabashi → Castillo (entra por el NORTE), note: ~20 min de parque hasta la torre; entramos por el norte para salir por el sur.}
   - {location: castillo, time-from: '14:15', fixed: true, duration: 2 h, title: '@[Castillo de Osaka](castillo) ★', note: 'Pase ya comprado (¥1,200): foso, parque y museo — 2 h.
 
@@ -1557,26 +1557,70 @@ days:
       Punto de reunión: el letrero de **Glico** a las 21:30.
 
       '
-    retorno: true
     options:
     - title: Take
       class: take-container
       options:
-      - {location: acchichi, price: ¥600}
-      - {location: kinryu, price: ¥900}
-      - {location: ichiran-do, price: '¥980-1,320'}
+      - title: '@[Acchichi Hompo](acchichi)'
+        price: ¥600
+        steps:
+        - {transit: to-acchichi, title: To Acchichi}
+        - {location: acchichi}
+        - {transit: from-acchichi, title: From Acchichi}
+      - title: '@[Kinryu Ramen](kinryu)'
+        price: ¥900
+        steps:
+        - {transit: to-kinryu, title: To Kinryu Ramen}
+        - {location: kinryu}
+        - {transit: from-kinryu, title: From Kinryu Ramen}
+      - title: '@[Ichiran Dotonbori](ichiran-do)'
+        price: ¥980-1,320
+        steps:
+        - {transit: to-ichiran-do, title: To Ichiran Dotonbori}
+        - {location: ichiran-do}
+        - {transit: from-ichiran-do, title: From Ichiran Dotonbori}
     - title: Ai
       class: ai-container
       options:
-      - {location: mizuno, price: '¥1,600'}
-      - {location: chibo, price: '¥2,000'}
-      - {location: daruma-do, price: '¥2,500'}
+      - title: '@[Mizuno](mizuno)'
+        price: ¥1,600
+        steps:
+        - {transit: to-mizuno, title: To Mizuno}
+        - {location: mizuno}
+        - {transit: from-mizuno, title: From Mizuno}
+      - title: '@[Chibo](chibo)'
+        price: ¥2,000
+        steps:
+        - {transit: to-chibo, title: To Chibo}
+        - {location: chibo}
+        - {transit: from-chibo, title: From Chibo}
+      - title: '@[Daruma Dotonbori](daruma-do)'
+        price: ¥2,500
+        steps:
+        - {transit: to-daruma-do, title: To Daruma Dotonbori}
+        - {location: daruma-do}
+        - {transit: from-daruma-do, title: From Daruma Dotonbori}
     - title: Shu
       class: shu-container
       options:
-      - {location: hariju, price: '¥7,000-10,000'}
-      - {location: kani-douraku, price: '¥6,000-12,000'}
-      - {location: mgyu-do, price: '¥8,000-12,000'}
+      - title: '@[Hariju](hariju)'
+        price: ¥7,000-10,000
+        steps:
+        - {transit: to-hariju, title: To Hariju}
+        - {location: hariju}
+        - {transit: from-hariju, title: From Hariju}
+      - title: '@[Kani Douraku honten](kani-douraku)'
+        price: ¥6,000-12,000
+        steps:
+        - {transit: to-kani-douraku, title: To Kani Douraku honten}
+        - {location: kani-douraku}
+        - {transit: from-kani-douraku, title: From Kani Douraku honten}
+      - title: '@[Matsusakagyu M Dotonbori](mgyu-do)'
+        price: ¥8,000-12,000
+        steps:
+        - {transit: to-mgyu-do, title: To Matsusakagyu M Dotonbori}
+        - {location: mgyu-do}
+        - {transit: from-mgyu-do, title: From Matsusakagyu M Dotonbori}
   - {transit: metro-midosuji, time-from: '21:45', duration: 10 min, title: 'Midosuji Line: @[Namba → Yodoyabashi](metro-midosuji)'}
   - {transit: yodoyabashi-hotel, time-from: '22:00', duration: 10 min, title: Yodoyabashi → hotel por la ribera, note: '🏪 Aviso mañana: el buffet abre 6:30 y SÍ alcanza — konbini solo de respaldo. El tren NO espera.'}
 - title: lun 5 · Hiroshima + Miyajima
@@ -1610,19 +1654,64 @@ days:
     options:
     - title: Take
       options:
-      - {location: udon-de-estacion, price: ¥600}
-      - {location: konbini-premium, price: ¥900}
-      - {location: ekiben-de-hiroshima, price: '¥1,300'}
+      - title: '@[Udon de estación](udon-de-estacion)'
+        price: ¥600
+        steps:
+        - {transit: to-udon-de-estacion, title: To Udon de estación}
+        - {location: udon-de-estacion}
+        - {transit: from-udon-de-estacion, title: From Udon de estación}
+      - title: '@[Konbini premium](konbini-premium)'
+        price: ¥900
+        steps:
+        - {transit: to-konbini-premium, title: To Konbini premium}
+        - {location: konbini-premium}
+        - {transit: from-konbini-premium, title: From Konbini premium}
+      - title: '@[Ekiben de Hiroshima](ekiben-de-hiroshima)'
+        price: ¥1,300
+        steps:
+        - {transit: to-ekiben-de-hiroshima, title: To Ekiben de Hiroshima}
+        - {location: ekiben-de-hiroshima}
+        - {transit: from-ekiben-de-hiroshima, title: From Ekiben de Hiroshima}
     - title: Ai
       options:
-      - {location: ramen-de-shin-osaka, price: '¥1,100'}
-      - {location: gyoza-cerveza, price: '¥1,500'}
-      - {location: coco-ichibanya, price: '¥1,200'}
+      - title: '@[Ramen de Shin-Osaka](ramen-de-shin-osaka)'
+        price: ¥1,100
+        steps:
+        - {transit: to-ramen-de-shin-osaka, title: To Ramen de Shin-Osaka}
+        - {location: ramen-de-shin-osaka}
+        - {transit: from-ramen-de-shin-osaka, title: From Ramen de Shin-Osaka}
+      - title: '@[Gyoza + cerveza](gyoza-cerveza)'
+        price: ¥1,500
+        steps:
+        - {transit: to-gyoza-cerveza, title: To Gyoza + cerveza}
+        - {location: gyoza-cerveza}
+        - {transit: from-gyoza-cerveza, title: From Gyoza + cerveza}
+      - title: '@[CoCo Ichibanya](coco-ichibanya)'
+        price: ¥1,200
+        steps:
+        - {transit: to-coco-ichibanya, title: To CoCo Ichibanya}
+        - {location: coco-ichibanya}
+        - {transit: from-coco-ichibanya, title: From CoCo Ichibanya}
     - title: Shu
       options:
-      - {location: sashimi-del-depachika, price: '¥3,000'}
-      - {location: sushi-de-shin-osaka-eki, price: '¥5,000'}
-      - {location: yakiniku-nocturno, price: '¥6,000'}
+      - title: '@[Sashimi del depachika](sashimi-del-depachika)'
+        price: ¥3,000
+        steps:
+        - {transit: to-sashimi-del-depachika, title: To Sashimi del depachika}
+        - {location: sashimi-del-depachika}
+        - {transit: from-sashimi-del-depachika, title: From Sashimi del depachika}
+      - title: '@[Sushi de Shin-Osaka Eki](sushi-de-shin-osaka-eki)'
+        price: ¥5,000
+        steps:
+        - {transit: to-sushi-de-shin-osaka-eki, title: To Sushi de Shin-Osaka Eki}
+        - {location: sushi-de-shin-osaka-eki}
+        - {transit: from-sushi-de-shin-osaka-eki, title: From Sushi de Shin-Osaka Eki}
+      - title: '@[Yakiniku nocturno](yakiniku-nocturno)'
+        price: ¥6,000
+        steps:
+        - {transit: to-yakiniku-nocturno, title: To Yakiniku nocturno}
+        - {location: yakiniku-nocturno}
+        - {transit: from-yakiniku-nocturno, title: From Yakiniku nocturno}
 - title: mar 6 · Universal + Nintendo World
   note: el día de parque — fila 6:45, regla de Juan
   anchor: Super Nintendo World
@@ -1646,19 +1735,64 @@ days:
     options:
     - title: Take
       options:
-      - {location: acchichi, price: ¥600}
-      - {location: kinryu, price: ¥900}
-      - {location: ichiran-do, price: '¥980–1,320'}
+      - title: '@[Acchichi Honpo](acchichi)'
+        price: ¥600
+        steps:
+        - {transit: to-acchichi, title: To Acchichi Honpo}
+        - {location: acchichi}
+        - {transit: from-acchichi, title: From Acchichi Honpo}
+      - title: '@[Kinryu Ramen](kinryu)'
+        price: ¥900
+        steps:
+        - {transit: to-kinryu, title: To Kinryu Ramen}
+        - {location: kinryu}
+        - {transit: from-kinryu, title: From Kinryu Ramen}
+      - title: '@[Ichiran Dotonbori](ichiran-do)'
+        price: ¥980–1,320
+        steps:
+        - {transit: to-ichiran-do, title: To Ichiran Dotonbori}
+        - {location: ichiran-do}
+        - {transit: from-ichiran-do, title: From Ichiran Dotonbori}
     - title: Ai
       options:
-      - {location: mizuno, price: '¥1,600'}
-      - {location: chibo, price: '¥2,000'}
-      - {location: daruma-do, price: '¥2,500'}
+      - title: '@[Mizuno](mizuno)'
+        price: ¥1,600
+        steps:
+        - {transit: to-mizuno, title: To Mizuno}
+        - {location: mizuno}
+        - {transit: from-mizuno, title: From Mizuno}
+      - title: '@[Chibo](chibo)'
+        price: ¥2,000
+        steps:
+        - {transit: to-chibo, title: To Chibo}
+        - {location: chibo}
+        - {transit: from-chibo, title: From Chibo}
+      - title: '@[Daruma Dotonbori](daruma-do)'
+        price: ¥2,500
+        steps:
+        - {transit: to-daruma-do, title: To Daruma Dotonbori}
+        - {location: daruma-do}
+        - {transit: from-daruma-do, title: From Daruma Dotonbori}
     - title: Shu
       options:
-      - {location: hariju, price: '¥7–10,000'}
-      - {location: kani-douraku, price: '¥6–12,000'}
-      - {location: mgyu-do, price: '¥8–12,000'}
+      - title: '@[Hariju](hariju)'
+        price: ¥7–10,000
+        steps:
+        - {transit: to-hariju, title: To Hariju}
+        - {location: hariju}
+        - {transit: from-hariju, title: From Hariju}
+      - title: '@[Kani Douraku honten](kani-douraku)'
+        price: ¥6–12,000
+        steps:
+        - {transit: to-kani-douraku, title: To Kani Douraku honten}
+        - {location: kani-douraku}
+        - {transit: from-kani-douraku, title: From Kani Douraku honten}
+      - title: '@[Matsusakagyu M Dotonbori](mgyu-do)'
+        price: ¥8–12,000
+        steps:
+        - {transit: to-mgyu-do, title: To Matsusakagyu M Dotonbori}
+        - {location: mgyu-do}
+        - {transit: from-mgyu-do, title: From Matsusakagyu M Dotonbori}
 - title: mié 7 · Nara
   note: los venados que hacen reverencia
   anchor: Nara Kōen
@@ -1693,22 +1827,72 @@ days:
     options:
     - title: Take
       options:
-      - {location: torikizoku, price: '¥2,500'}
-      - {location: ichiran-do, price: '¥980–1,320'}
-      - {location: okonomiyaki-de-barrio, price: '¥1,500'}
+      - title: '@[Torikizoku](torikizoku)'
+        price: ¥2,500
+        steps:
+        - {transit: to-torikizoku, title: To Torikizoku}
+        - {location: torikizoku}
+        - {transit: from-torikizoku, title: From Torikizoku}
+      - title: '@[Ichiran Dotonbori](ichiran-do)'
+        price: ¥980–1,320
+        steps:
+        - {transit: to-ichiran-do, title: To Ichiran Dotonbori}
+        - {location: ichiran-do}
+        - {transit: from-ichiran-do, title: From Ichiran Dotonbori}
+      - title: '@[Okonomiyaki de barrio](okonomiyaki-de-barrio)'
+        price: ¥1,500
+        steps:
+        - {transit: to-okonomiyaki-de-barrio, title: To Okonomiyaki de barrio}
+        - {location: okonomiyaki-de-barrio}
+        - {transit: from-okonomiyaki-de-barrio, title: From Okonomiyaki de barrio}
     - title: Ai
       options:
-      - {location: matsusakagyu-m-namba, price: '¥8–10,000'}
-      - {location: kushikatsu-bon, price: '¥6,000'}
-      - {location: kani-douraku, price: '¥6–12,000'}
+      - title: '@[Matsusakagyu M Namba](matsusakagyu-m-namba)'
+        price: ¥8–10,000
+        steps:
+        - {transit: to-matsusakagyu-m-namba, title: To Matsusakagyu M Namba}
+        - {location: matsusakagyu-m-namba}
+        - {transit: from-matsusakagyu-m-namba, title: From Matsusakagyu M Namba}
+      - title: '@[Kushikatsu Bon](kushikatsu-bon)'
+        price: ¥6,000
+        steps:
+        - {transit: to-kushikatsu-bon, title: To Kushikatsu Bon}
+        - {location: kushikatsu-bon}
+        - {transit: from-kushikatsu-bon, title: From Kushikatsu Bon}
+      - title: '@[Kani Douraku honten](kani-douraku)'
+        price: ¥6–12,000
+        steps:
+        - {transit: to-kani-douraku, title: To Kani Douraku honten}
+        - {location: kani-douraku}
+        - {transit: from-kani-douraku, title: From Kani Douraku honten}
     - title: Shu
       options:
-      - {location: misono, price: '¥12–15,000'}
-      - {location: omakase-de-barra, price: '¥12,000'}
-      - {location: mgyu-do, price: '¥8–12,000 — noche libre: SÍ hay tiempo de ir a propósito'}
+      - title: '@[Misono](misono)'
+        price: ¥12–15,000
+        steps:
+        - {transit: to-misono, title: To Misono}
+        - {location: misono}
+        - {transit: from-misono, title: From Misono}
+      - title: '@[Omakase de barra](omakase-de-barra)'
+        price: ¥12,000
+        steps:
+        - {transit: to-omakase-de-barra, title: To Omakase de barra}
+        - {location: omakase-de-barra}
+        - {transit: from-omakase-de-barra, title: From Omakase de barra}
+      - title: '@[Matsusakagyu M Dotonbori](mgyu-do)'
+        price: '¥8–12,000 — noche libre: SÍ hay tiempo de ir a propósito'
+        steps:
+        - {transit: to-mgyu-do, title: To Matsusakagyu M Dotonbori}
+        - {location: mgyu-do}
+        - {transit: from-mgyu-do, title: From Matsusakagyu M Dotonbori}
     - title: 🏮 Barrio
       options:
-      - {location: hozenji-yokocho, price: — Callejón empedrado de restaurancitos junto al templo de musgo}
+      - title: '@[Hōzenji Yokocho](hozenji-yokocho)'
+        price: — Callejón empedrado de restaurancitos junto al templo de musgo
+        steps:
+        - {transit: to-hozenji-yokocho, title: To Hōzenji Yokocho}
+        - {location: hozenji-yokocho}
+        - {transit: from-hozenji-yokocho, title: From Hōzenji Yokocho}
 - title: jue 8 · Shinsekai + Abeno → Kioto
   note: la despedida de Osaka por lo alto, y el HARUKA de las 5
   anchor: mirador Abeno Harukas
@@ -1724,22 +1908,72 @@ days:
     options:
     - title: Take
       options:
-      - {location: yaekatsu, price: '¥1,600'}
-      - {location: kushikatsu-tengu, price: '¥1,800'}
-      - {location: daruma-original-1929, price: '¥2,000'}
+      - title: '@[Yaekatsu](yaekatsu)'
+        price: ¥1,600
+        steps:
+        - {transit: to-yaekatsu, title: To Yaekatsu}
+        - {location: yaekatsu}
+        - {transit: from-yaekatsu, title: From Yaekatsu}
+      - title: '@[Kushikatsu Tengu](kushikatsu-tengu)'
+        price: ¥1,800
+        steps:
+        - {transit: to-kushikatsu-tengu, title: To Kushikatsu Tengu}
+        - {location: kushikatsu-tengu}
+        - {transit: from-kushikatsu-tengu, title: From Kushikatsu Tengu}
+      - title: '@[Daruma (original 1929)](daruma-original-1929)'
+        price: ¥2,000
+        steps:
+        - {transit: to-daruma-original-1929, title: To Daruma (original 1929)}
+        - {location: daruma-original-1929}
+        - {transit: from-daruma-original-1929, title: From Daruma (original 1929)}
     - title: Ai
       options:
-      - {location: ronda-por-janjan-yokocho, price: '¥3,000'}
-      - {location: doteyaki-kushikatsu, price: '¥3,500'}
-      - {location: kappo-casual, price: '¥4,000'}
+      - title: '@[Ronda por Janjan Yokocho](ronda-por-janjan-yokocho)'
+        price: ¥3,000
+        steps:
+        - {transit: to-ronda-por-janjan-yokocho, title: To Ronda por Janjan Yokocho}
+        - {location: ronda-por-janjan-yokocho}
+        - {transit: from-ronda-por-janjan-yokocho, title: From Ronda por Janjan Yokocho}
+      - title: '@[Doteyaki + kushikatsu](doteyaki-kushikatsu)'
+        price: ¥3,500
+        steps:
+        - {transit: to-doteyaki-kushikatsu, title: To Doteyaki + kushikatsu}
+        - {location: doteyaki-kushikatsu}
+        - {transit: from-doteyaki-kushikatsu, title: From Doteyaki + kushikatsu}
+      - title: '@[Kappo casual](kappo-casual)'
+        price: ¥4,000
+        steps:
+        - {transit: to-kappo-casual, title: To Kappo casual}
+        - {location: kappo-casual}
+        - {transit: from-kappo-casual, title: From Kappo casual}
     - title: Shu
       options:
-      - {location: matsusakagyu-m-namba, price: '¥8–10,000'}
-      - {location: teppan-en-kitashinchi, price: '¥12,000'}
-      - {location: kaiseki-de-cangrejo, price: '¥10,000'}
+      - title: '@[Matsusakagyu M Namba](matsusakagyu-m-namba)'
+        price: ¥8–10,000
+        steps:
+        - {transit: to-matsusakagyu-m-namba, title: To Matsusakagyu M Namba}
+        - {location: matsusakagyu-m-namba}
+        - {transit: from-matsusakagyu-m-namba, title: From Matsusakagyu M Namba}
+      - title: '@[Teppan en Kitashinchi](teppan-en-kitashinchi)'
+        price: ¥12,000
+        steps:
+        - {transit: to-teppan-en-kitashinchi, title: To Teppan en Kitashinchi}
+        - {location: teppan-en-kitashinchi}
+        - {transit: from-teppan-en-kitashinchi, title: From Teppan en Kitashinchi}
+      - title: '@[Kaiseki de cangrejo](kaiseki-de-cangrejo)'
+        price: ¥10,000
+        steps:
+        - {transit: to-kaiseki-de-cangrejo, title: To Kaiseki de cangrejo}
+        - {location: kaiseki-de-cangrejo}
+        - {transit: from-kaiseki-de-cangrejo, title: From Kaiseki de cangrejo}
     - title: 🏮 Barrio
       options:
-      - {location: janjan-yokocho, price: — Callejón de 20 barras de kushikatsu e izakaya — llegar y escoger}
+      - title: '@[Janjan Yokocho](janjan-yokocho)'
+        price: — Callejón de 20 barras de kushikatsu e izakaya — llegar y escoger
+        steps:
+        - {transit: to-janjan-yokocho, title: To Janjan Yokocho}
+        - {location: janjan-yokocho}
+        - {transit: from-janjan-yokocho, title: From Janjan Yokocho}
   - {location: abeno-harukas, time-from: '14:00', fixed: true, title: '@[Mirador Abeno Harukas](abeno-harukas) 🔘 — reservado por Juan: 300 m sobre Osaka — 1 h 30 (encima de la estación: cero traslado).'}
   - {transit: d8-3, time-from: '15:45', title: 'Tennōji → @[Midosuji Line](d8-3) → Yodoyabashi — 15 min.'}
   - {transit: d8-4, time-from: '16:05', title: 'Por las maletas al hotel — 15 min (los de takkyubin: directo a Umeda y café con calma).'}
@@ -1754,22 +1988,72 @@ days:
     options:
     - title: Take
       options:
-      - {location: ramen-kairikiya, price: ¥900}
-      - {location: yakitori-de-pontocho, price: '¥2,500'}
-      - {location: ganko-sushi-sanjo, price: '¥3,000'}
+      - title: '@[Ramen Kairikiya](ramen-kairikiya)'
+        price: ¥900
+        steps:
+        - {transit: to-ramen-kairikiya, title: To Ramen Kairikiya}
+        - {location: ramen-kairikiya}
+        - {transit: from-ramen-kairikiya, title: From Ramen Kairikiya}
+      - title: '@[Yakitori de Pontocho](yakitori-de-pontocho)'
+        price: ¥2,500
+        steps:
+        - {transit: to-yakitori-de-pontocho, title: To Yakitori de Pontocho}
+        - {location: yakitori-de-pontocho}
+        - {transit: from-yakitori-de-pontocho, title: From Yakitori de Pontocho}
+      - title: '@[Ganko Sushi Sanjo](ganko-sushi-sanjo)'
+        price: ¥3,000
+        steps:
+        - {transit: to-ganko-sushi-sanjo, title: To Ganko Sushi Sanjo}
+        - {location: ganko-sushi-sanjo}
+        - {transit: from-ganko-sushi-sanjo, title: From Ganko Sushi Sanjo}
     - title: Ai
       options:
-      - {location: kichi-kichi, price: '¥2,700 (chico ¥1,450)'}
-      - {location: izakaya-al-rio, price: '¥4,000'}
-      - {location: kappo-casual, price: '¥5,000'}
+      - title: '@[Kichi Kichi](kichi-kichi)'
+        price: ¥2,700 (chico ¥1,450)
+        steps:
+        - {transit: to-kichi-kichi, title: To Kichi Kichi}
+        - {location: kichi-kichi}
+        - {transit: from-kichi-kichi, title: From Kichi Kichi}
+      - title: '@[Izakaya al río](izakaya-al-rio)'
+        price: ¥4,000
+        steps:
+        - {transit: to-izakaya-al-rio, title: To Izakaya al río}
+        - {location: izakaya-al-rio}
+        - {transit: from-izakaya-al-rio, title: From Izakaya al río}
+      - title: '@[Kappo casual](kappo-casual)'
+        price: ¥5,000
+        steps:
+        - {transit: to-kappo-casual, title: To Kappo casual}
+        - {location: kappo-casual}
+        - {transit: from-kappo-casual, title: From Kappo casual}
     - title: Shu
       options:
-      - {location: mishima-tei, price: '¥9,000'}
-      - {location: kaiseki-kawadoko, price: '¥10–15,000'}
-      - {location: wagyu-premium-pontocho, price: '¥12,000'}
+      - title: '@[Mishima-tei](mishima-tei)'
+        price: ¥9,000
+        steps:
+        - {transit: to-mishima-tei, title: To Mishima-tei}
+        - {location: mishima-tei}
+        - {transit: from-mishima-tei, title: From Mishima-tei}
+      - title: '@[Kaiseki kawadoko](kaiseki-kawadoko)'
+        price: ¥10–15,000
+        steps:
+        - {transit: to-kaiseki-kawadoko, title: To Kaiseki kawadoko}
+        - {location: kaiseki-kawadoko}
+        - {transit: from-kaiseki-kawadoko, title: From Kaiseki kawadoko}
+      - title: '@[Wagyu premium Pontocho](wagyu-premium-pontocho)'
+        price: ¥12,000
+        steps:
+        - {transit: to-wagyu-premium-pontocho, title: To Wagyu premium Pontocho}
+        - {location: wagyu-premium-pontocho}
+        - {transit: from-wagyu-premium-pontocho, title: From Wagyu premium Pontocho}
     - title: 🏮 Barrio
       options:
-      - {location: pontocho, price: '— 40 puertas en 300 m, de yakitori a kaiseki — caminar y elegir a ojo'}
+      - title: '@[Pontocho](pontocho)'
+        price: — 40 puertas en 300 m, de yakitori a kaiseki — caminar y elegir a ojo
+        steps:
+        - {transit: to-pontocho, title: To Pontocho}
+        - {location: pontocho}
+        - {transit: from-pontocho, title: From Pontocho}
 - title: vie 9 · Kioto este
   note: Kiyomizu a hora humana + las 1,001 Kannon
   anchor: Kiyomizu-dera
@@ -1817,22 +2101,72 @@ days:
     options:
     - title: Take
       options:
-      - {location: matsuba-nishin-soba, price: '¥1,500'}
-      - {location: menbaka-fire-ramen, price: '¥1,650'}
-      - {location: gyukatsu-kyoto-katsugyu, price: '¥1,900'}
+      - title: '@[Matsuba (nishin soba)](matsuba-nishin-soba)'
+        price: ¥1,500
+        steps:
+        - {transit: to-matsuba-nishin-soba, title: To Matsuba (nishin soba)}
+        - {location: matsuba-nishin-soba}
+        - {transit: from-matsuba-nishin-soba, title: From Matsuba (nishin soba)}
+      - title: '@[Menbaka Fire Ramen](menbaka-fire-ramen)'
+        price: ¥1,650
+        steps:
+        - {transit: to-menbaka-fire-ramen, title: To Menbaka Fire Ramen}
+        - {location: menbaka-fire-ramen}
+        - {transit: from-menbaka-fire-ramen, title: From Menbaka Fire Ramen}
+      - title: '@[Gyukatsu Kyoto Katsugyu](gyukatsu-kyoto-katsugyu)'
+        price: ¥1,900
+        steps:
+        - {transit: to-gyukatsu-kyoto-katsugyu, title: To Gyukatsu Kyoto Katsugyu}
+        - {location: gyukatsu-kyoto-katsugyu}
+        - {transit: from-gyukatsu-kyoto-katsugyu, title: From Gyukatsu Kyoto Katsugyu}
     - title: Ai
       options:
-      - {location: gyoza-chao-chao, price: '¥2,500'}
-      - {location: obanzai, price: '¥3,500'}
-      - {location: kyogoku-kaneyo, price: '¥4,000'}
+      - title: '@[Gyoza Chao Chao](gyoza-chao-chao)'
+        price: ¥2,500
+        steps:
+        - {transit: to-gyoza-chao-chao, title: To Gyoza Chao Chao}
+        - {location: gyoza-chao-chao}
+        - {transit: from-gyoza-chao-chao, title: From Gyoza Chao Chao}
+      - title: '@[Obanzai](obanzai)'
+        price: ¥3,500
+        steps:
+        - {transit: to-obanzai, title: To Obanzai}
+        - {location: obanzai}
+        - {transit: from-obanzai, title: From Obanzai}
+      - title: '@[Kyogoku Kaneyo](kyogoku-kaneyo)'
+        price: ¥4,000
+        steps:
+        - {transit: to-kyogoku-kaneyo, title: To Kyogoku Kaneyo}
+        - {location: kyogoku-kaneyo}
+        - {transit: from-kyogoku-kaneyo, title: From Kyogoku Kaneyo}
     - title: Shu
       options:
-      - {location: mishima-tei, price: '¥9,000'}
-      - {location: kaiseki-de-entrada, price: '¥10,000'}
-      - {location: teppan-wagyu, price: '¥12,000 — libres desde las 5'}
+      - title: '@[Mishima-tei](mishima-tei)'
+        price: ¥9,000
+        steps:
+        - {transit: to-mishima-tei, title: To Mishima-tei}
+        - {location: mishima-tei}
+        - {transit: from-mishima-tei, title: From Mishima-tei}
+      - title: '@[Kaiseki de entrada](kaiseki-de-entrada)'
+        price: ¥10,000
+        steps:
+        - {transit: to-kaiseki-de-entrada, title: To Kaiseki de entrada}
+        - {location: kaiseki-de-entrada}
+        - {transit: from-kaiseki-de-entrada, title: From Kaiseki de entrada}
+      - title: '@[Teppan wagyu](teppan-wagyu)'
+        price: ¥12,000 — libres desde las 5
+        steps:
+        - {transit: to-teppan-wagyu, title: To Teppan wagyu}
+        - {location: teppan-wagyu}
+        - {transit: from-teppan-wagyu, title: From Teppan wagyu}
     - title: 🏮 Barrio
       options:
-      - {location: kiyamachi, price: — La calle de izakayas junto al canal — la versión barata de Pontocho}
+      - title: '@[Kiyamachi](kiyamachi)'
+        price: — La calle de izakayas junto al canal — la versión barata de Pontocho
+        steps:
+        - {transit: to-kiyamachi, title: To Kiyamachi}
+        - {location: kiyamachi}
+        - {transit: from-kiyamachi, title: From Kiyamachi}
 - title: sáb 10 · Arashiyama
   note: bambú al alba, Tenryu-ji al abrir, monos y kimonos
   anchor: bosque de bambú
@@ -1864,19 +2198,64 @@ days:
     options:
     - title: Take
       options:
-      - {location: croquetas-nakamuraya, price: ¥400}
-      - {location: soba-con-vista, price: '¥1,200'}
-      - {location: arabica-pan, price: '¥1,000'}
+      - title: '@[Croquetas Nakamuraya](croquetas-nakamuraya)'
+        price: ¥400
+        steps:
+        - {transit: to-croquetas-nakamuraya, title: To Croquetas Nakamuraya}
+        - {location: croquetas-nakamuraya}
+        - {transit: from-croquetas-nakamuraya, title: From Croquetas Nakamuraya}
+      - title: '@[Soba con vista](soba-con-vista)'
+        price: ¥1,200
+        steps:
+        - {transit: to-soba-con-vista, title: To Soba con vista}
+        - {location: soba-con-vista}
+        - {transit: from-soba-con-vista, title: From Soba con vista}
+      - title: '@[% Arabica + pan](arabica-pan)'
+        price: ¥1,000
+        steps:
+        - {transit: to-arabica-pan, title: To % Arabica + pan}
+        - {location: arabica-pan}
+        - {transit: from-arabica-pan, title: From % Arabica + pan}
     - title: Ai
       options:
-      - {location: tempura-set, price: '¥2,800'}
-      - {location: yudofu-sagano, price: '¥3,800'}
-      - {location: unagi-hirokawa, price: '¥4,500'}
+      - title: '@[Tempura set](tempura-set)'
+        price: ¥2,800
+        steps:
+        - {transit: to-tempura-set, title: To Tempura set}
+        - {location: tempura-set}
+        - {transit: from-tempura-set, title: From Tempura set}
+      - title: '@[Yudōfu Sagano](yudofu-sagano)'
+        price: ¥3,800
+        steps:
+        - {transit: to-yudofu-sagano, title: To Yudōfu Sagano}
+        - {location: yudofu-sagano}
+        - {transit: from-yudofu-sagano, title: From Yudōfu Sagano}
+      - title: '@[Unagi Hirokawa](unagi-hirokawa)'
+        price: ¥4,500
+        steps:
+        - {transit: to-unagi-hirokawa, title: To Unagi Hirokawa}
+        - {location: unagi-hirokawa}
+        - {transit: from-unagi-hirokawa, title: From Unagi Hirokawa}
     - title: Shu
       options:
-      - {location: shoraian, price: '¥6,000'}
-      - {location: wagyu-premium, price: '¥8,000'}
-      - {location: kitcho-arashiyama, price: '~¥60,000'}
+      - title: '@[Shoraian](shoraian)'
+        price: ¥6,000
+        steps:
+        - {transit: to-shoraian, title: To Shoraian}
+        - {location: shoraian}
+        - {transit: from-shoraian, title: From Shoraian}
+      - title: '@[Wagyu premium](wagyu-premium)'
+        price: ¥8,000
+        steps:
+        - {transit: to-wagyu-premium, title: To Wagyu premium}
+        - {location: wagyu-premium}
+        - {transit: from-wagyu-premium, title: From Wagyu premium}
+      - title: '@[Kitchō Arashiyama](kitcho-arashiyama)'
+        price: ~¥60,000
+        steps:
+        - {transit: to-kitcho-arashiyama, title: To Kitchō Arashiyama}
+        - {location: kitcho-arashiyama}
+        - {transit: from-kitcho-arashiyama, title: From Kitchō Arashiyama}
   - {time-from: '14:30', title: 'Bajada por el camino de Sagano — 45 min de callecitas, Adashino opcional.'}
   - {time-from: '15:15', title: Tarde a elegir — 2 h. 👉 Desliza para ver la opción kimono con su horario.}
   - time-from: '15:15'
@@ -1900,19 +2279,64 @@ days:
     options:
     - title: Take
       options:
-      - {location: coco-curry, price: '¥1,000'}
-      - {location: tenkaippin-honten, price: '¥1,100'}
-      - {location: menbaka-fire-ramen, price: '¥1,650'}
+      - title: '@[CoCo Curry](coco-curry)'
+        price: ¥1,000
+        steps:
+        - {transit: to-coco-curry, title: To CoCo Curry}
+        - {location: coco-curry}
+        - {transit: from-coco-curry, title: From CoCo Curry}
+      - title: '@[Tenkaippin honten](tenkaippin-honten)'
+        price: ¥1,100
+        steps:
+        - {transit: to-tenkaippin-honten, title: To Tenkaippin honten}
+        - {location: tenkaippin-honten}
+        - {transit: from-tenkaippin-honten, title: From Tenkaippin honten}
+      - title: '@[Menbaka Fire Ramen](menbaka-fire-ramen)'
+        price: ¥1,650
+        steps:
+        - {transit: to-menbaka-fire-ramen, title: To Menbaka Fire Ramen}
+        - {location: menbaka-fire-ramen}
+        - {transit: from-menbaka-fire-ramen, title: From Menbaka Fire Ramen}
     - title: Ai
       options:
-      - {location: gyoza-chao-chao, price: '¥2,500'}
-      - {location: yakitori-hitomi, price: '¥3,500'}
-      - {location: izakaya-pontocho, price: '¥4,000'}
+      - title: '@[Gyoza Chao Chao](gyoza-chao-chao)'
+        price: ¥2,500
+        steps:
+        - {transit: to-gyoza-chao-chao, title: To Gyoza Chao Chao}
+        - {location: gyoza-chao-chao}
+        - {transit: from-gyoza-chao-chao, title: From Gyoza Chao Chao}
+      - title: '@[Yakitori Hitomi](yakitori-hitomi)'
+        price: ¥3,500
+        steps:
+        - {transit: to-yakitori-hitomi, title: To Yakitori Hitomi}
+        - {location: yakitori-hitomi}
+        - {transit: from-yakitori-hitomi, title: From Yakitori Hitomi}
+      - title: '@[Izakaya Pontocho](izakaya-pontocho)'
+        price: ¥4,000
+        steps:
+        - {transit: to-izakaya-pontocho, title: To Izakaya Pontocho}
+        - {location: izakaya-pontocho}
+        - {transit: from-izakaya-pontocho, title: From Izakaya Pontocho}
     - title: Shu
       options:
-      - {location: bar-de-sake-premium, price: '¥5,000'}
-      - {location: sushi-moderado, price: '¥8,000'}
-      - {location: whisky-japones, price: '¥6,000'}
+      - title: '@[Bar de sake premium](bar-de-sake-premium)'
+        price: ¥5,000
+        steps:
+        - {transit: to-bar-de-sake-premium, title: To Bar de sake premium}
+        - {location: bar-de-sake-premium}
+        - {transit: from-bar-de-sake-premium, title: From Bar de sake premium}
+      - title: '@[Sushi moderado](sushi-moderado)'
+        price: ¥8,000
+        steps:
+        - {transit: to-sushi-moderado, title: To Sushi moderado}
+        - {location: sushi-moderado}
+        - {transit: from-sushi-moderado, title: From Sushi moderado}
+      - title: '@[Whisky japonés](whisky-japones)'
+        price: ¥6,000
+        steps:
+        - {transit: to-whisky-japones, title: To Whisky japonés}
+        - {location: whisky-japones}
+        - {transit: from-whisky-japones, title: From Whisky japonés}
 - title: dom 11 · Kioto oeste + Nijo + despedida
   note: portales al alba, oro a media mañana, té de despedida
   anchor: Fushimi Inari
@@ -1938,19 +2362,64 @@ days:
     options:
     - title: Take
       options:
-      - {location: udon-del-centro, price: ¥900}
-      - {location: shinshindo, price: ¥800}
-      - {location: musashi-sushi, price: '¥1,500'}
+      - title: '@[Udon del centro](udon-del-centro)'
+        price: ¥900
+        steps:
+        - {transit: to-udon-del-centro, title: To Udon del centro}
+        - {location: udon-del-centro}
+        - {transit: from-udon-del-centro, title: From Udon del centro}
+      - title: '@[Shinshindo](shinshindo)'
+        price: ¥800
+        steps:
+        - {transit: to-shinshindo, title: To Shinshindo}
+        - {location: shinshindo}
+        - {transit: from-shinshindo, title: From Shinshindo}
+      - title: '@[Musashi Sushi](musashi-sushi)'
+        price: ¥1,500
+        steps:
+        - {transit: to-musashi-sushi, title: To Musashi Sushi}
+        - {location: musashi-sushi}
+        - {transit: from-musashi-sushi, title: From Musashi Sushi}
     - title: Ai
       options:
-      - {location: soba-premium, price: '¥2,000'}
-      - {location: tonkatsu-set, price: '¥2,200'}
-      - {location: tempura-set, price: '¥2,500'}
+      - title: '@[Soba premium](soba-premium)'
+        price: ¥2,000
+        steps:
+        - {transit: to-soba-premium, title: To Soba premium}
+        - {location: soba-premium}
+        - {transit: from-soba-premium, title: From Soba premium}
+      - title: '@[Tonkatsu set](tonkatsu-set)'
+        price: ¥2,200
+        steps:
+        - {transit: to-tonkatsu-set, title: To Tonkatsu set}
+        - {location: tonkatsu-set}
+        - {transit: from-tonkatsu-set, title: From Tonkatsu set}
+      - title: '@[Tempura set](tempura-set)'
+        price: ¥2,500
+        steps:
+        - {transit: to-tempura-set, title: To Tempura set}
+        - {location: tempura-set}
+        - {transit: from-tempura-set, title: From Tempura set}
     - title: Shu
       options:
-      - {location: chirashi, price: '¥3,500'}
-      - {location: wagyu-don, price: '¥4,000'}
-      - {location: anago, price: '¥4,000 — ligero: hoy es la despedida'}
+      - title: '@[Chirashi](chirashi)'
+        price: ¥3,500
+        steps:
+        - {transit: to-chirashi, title: To Chirashi}
+        - {location: chirashi}
+        - {transit: from-chirashi, title: From Chirashi}
+      - title: '@[Wagyu-don](wagyu-don)'
+        price: ¥4,000
+        steps:
+        - {transit: to-wagyu-don, title: To Wagyu-don}
+        - {location: wagyu-don}
+        - {transit: from-wagyu-don, title: From Wagyu-don}
+      - title: '@[Anago](anago)'
+        price: '¥4,000 — ligero: hoy es la despedida'
+        steps:
+        - {transit: to-anago, title: To Anago}
+        - {location: anago}
+        - {transit: from-anago, title: From Anago}
   - {transit: d11-5, time-from: '13:30', title: '@[Bus 12/101](d11-5) por Nishioji → Nijojo-mae — 20 min; o taxis ×3 ¥1,400.'}
   - {location: castillo-de-nijo, time-from: '14:00', fixed: true, title: '@[Castillo de Nijo](castillo-de-nijo) ★ — 1 h 30 (¥1,300 con palacio): los pisos de ruiseñor del Shogun — del Keep de Juan (a las 14:00 hay menos grupo escolar).'}
   - {transit: d11-6, time-from: '15:40', title: 'Nijojo-mae → @[Tozai Line](d11-6) → Higashiyama — 12 min directo (la ceremonia de té es en Higashiyama/Gion).'}
@@ -1988,19 +2457,64 @@ days:
     options:
     - title: Take
       options:
-      - {location: fuunji, price: '¥1,100'}
-      - {location: ichiran-shinjuku, price: '¥980–1,320'}
-      - {location: shin-udon, price: '¥1,200'}
+      - title: '@[Fuunji](fuunji)'
+        price: ¥1,100
+        steps:
+        - {transit: to-fuunji, title: To Fuunji}
+        - {location: fuunji}
+        - {transit: from-fuunji, title: From Fuunji}
+      - title: '@[Ichiran Shinjuku](ichiran-shinjuku)'
+        price: ¥980–1,320
+        steps:
+        - {transit: to-ichiran-shinjuku, title: To Ichiran Shinjuku}
+        - {location: ichiran-shinjuku}
+        - {transit: from-ichiran-shinjuku, title: From Ichiran Shinjuku}
+      - title: '@[Shin Udon](shin-udon)'
+        price: ¥1,200
+        steps:
+        - {transit: to-shin-udon, title: To Shin Udon}
+        - {location: shin-udon}
+        - {transit: from-shin-udon, title: From Shin Udon}
     - title: Ai
       options:
-      - {location: konjiki-hototogisu, price: '¥1,500'}
-      - {location: tsunahachi-comida, price: '¥1,800'}
-      - {location: katsukura, price: '¥1,900'}
+      - title: '@[Konjiki Hototogisu](konjiki-hototogisu)'
+        price: ¥1,500
+        steps:
+        - {transit: to-konjiki-hototogisu, title: To Konjiki Hototogisu}
+        - {location: konjiki-hototogisu}
+        - {transit: from-konjiki-hototogisu, title: From Konjiki Hototogisu}
+      - title: '@[Tsunahachi (comida)](tsunahachi-comida)'
+        price: ¥1,800
+        steps:
+        - {transit: to-tsunahachi-comida, title: To Tsunahachi (comida)}
+        - {location: tsunahachi-comida}
+        - {transit: from-tsunahachi-comida, title: From Tsunahachi (comida)}
+      - title: '@[Katsukura](katsukura)'
+        price: ¥1,900
+        steps:
+        - {transit: to-katsukura, title: To Katsukura}
+        - {location: katsukura}
+        - {transit: from-katsukura, title: From Katsukura}
     - title: Shu
       options:
-      - {location: unagi-premium, price: '¥3,000'}
-      - {location: wagyu-lunch-set, price: '¥4,000'}
-      - {location: tempura-de-barra, price: '¥5,000'}
+      - title: '@[Unagi premium](unagi-premium)'
+        price: ¥3,000
+        steps:
+        - {transit: to-unagi-premium, title: To Unagi premium}
+        - {location: unagi-premium}
+        - {transit: from-unagi-premium, title: From Unagi premium}
+      - title: '@[Wagyu lunch set](wagyu-lunch-set)'
+        price: ¥4,000
+        steps:
+        - {transit: to-wagyu-lunch-set, title: To Wagyu lunch set}
+        - {location: wagyu-lunch-set}
+        - {transit: from-wagyu-lunch-set, title: From Wagyu lunch set}
+      - title: '@[Tempura de barra](tempura-de-barra)'
+        price: ¥5,000
+        steps:
+        - {transit: to-tempura-de-barra, title: To Tempura de barra}
+        - {location: tempura-de-barra}
+        - {transit: from-tempura-de-barra, title: From Tempura de barra}
   - {time-from: '15:00', fixed: true, title: Check-in Rose Garden + descanso — 1 h 30.}
   - {location: mirador-del-gobierno-metropolitano, time-from: '17:00', title: 'Shinjuku a pie — 2 h: Kabukichō, Godzilla, y el @[mirador GRATIS del Gobierno Metropolitano](mirador-del-gobierno-metropolitano) (piso 45, hasta 22:00) — todo caminando.'}
   - {location: omoide-yokocho, time-from: '19:30', title: '@[Omoide Yokocho](omoide-yokocho) — 1 h 30 de yakitori (a 12 min a pie del mirador, cruzando la estación) bajo las vías; barras de 4–6: dividirse ES el plan; reunión en el arco a las 21:00.'}
@@ -2009,19 +2523,64 @@ days:
     options:
     - title: Take
       options:
-      - {location: barras-de-omoide, price: '¥2,500'}
-      - {location: ramen-de-remate, price: '¥1,000'}
-      - {location: gyoza-bar, price: '¥1,800'}
+      - title: '@[Barras de Omoide](barras-de-omoide)'
+        price: ¥2,500
+        steps:
+        - {transit: to-barras-de-omoide, title: To Barras de Omoide}
+        - {location: barras-de-omoide}
+        - {transit: from-barras-de-omoide, title: From Barras de Omoide}
+      - title: '@[Ramen de remate](ramen-de-remate)'
+        price: ¥1,000
+        steps:
+        - {transit: to-ramen-de-remate, title: To Ramen de remate}
+        - {location: ramen-de-remate}
+        - {transit: from-ramen-de-remate, title: From Ramen de remate}
+      - title: '@[Gyoza bar](gyoza-bar)'
+        price: ¥1,800
+        steps:
+        - {transit: to-gyoza-bar, title: To Gyoza bar}
+        - {location: gyoza-bar}
+        - {transit: from-gyoza-bar, title: From Gyoza bar}
     - title: Ai
       options:
-      - {location: las-barras-buenas, price: '¥3,500–4,000'}
-      - {location: motsunabe, price: '¥3,500'}
-      - {location: kabuto, price: '¥3,000'}
+      - title: '@[Las barras ''buenas''](las-barras-buenas)'
+        price: ¥3,500–4,000
+        steps:
+        - {transit: to-las-barras-buenas, title: To Las barras 'buenas'}
+        - {location: las-barras-buenas}
+        - {transit: from-las-barras-buenas, title: From Las barras 'buenas'}
+      - title: '@[Motsunabe](motsunabe)'
+        price: ¥3,500
+        steps:
+        - {transit: to-motsunabe, title: To Motsunabe}
+        - {location: motsunabe}
+        - {transit: from-motsunabe, title: From Motsunabe}
+      - title: '@[Kabuto](kabuto)'
+        price: ¥3,000
+        steps:
+        - {transit: to-kabuto, title: To Kabuto}
+        - {location: kabuto}
+        - {transit: from-kabuto, title: From Kabuto}
     - title: Shu
       options:
-      - {location: izakaya-privado, price: '¥6,000'}
-      - {location: yakiniku-shinjuku, price: '¥8,000'}
-      - {location: ny-bar-park-hyatt, price: '¥3,000/copa'}
+      - title: '@[Izakaya privado](izakaya-privado)'
+        price: ¥6,000
+        steps:
+        - {transit: to-izakaya-privado, title: To Izakaya privado}
+        - {location: izakaya-privado}
+        - {transit: from-izakaya-privado, title: From Izakaya privado}
+      - title: '@[Yakiniku Shinjuku](yakiniku-shinjuku)'
+        price: ¥8,000
+        steps:
+        - {transit: to-yakiniku-shinjuku, title: To Yakiniku Shinjuku}
+        - {location: yakiniku-shinjuku}
+        - {transit: from-yakiniku-shinjuku, title: From Yakiniku Shinjuku}
+      - title: '@[NY Bar (Park Hyatt)](ny-bar-park-hyatt)'
+        price: ¥3,000/copa
+        steps:
+        - {transit: to-ny-bar-park-hyatt, title: To NY Bar (Park Hyatt)}
+        - {location: ny-bar-park-hyatt}
+        - {transit: from-ny-bar-park-hyatt, title: From NY Bar (Park Hyatt)}
 - title: mar 13 · Tokio viejo
   note: Asakusa + Skytree/capibaras + Ueno
   anchor: Sensō-ji
@@ -2064,22 +2623,72 @@ days:
     options:
     - title: Take
       options:
-      - {location: ichiran-ueno, price: '¥1,000'}
-      - {location: gyukatsu-asakusa, price: '¥2,000'}
-      - {location: yakitori-de-ameyoko, price: '¥2,500'}
+      - title: '@[Ichiran Ueno](ichiran-ueno)'
+        price: ¥1,000
+        steps:
+        - {transit: to-ichiran-ueno, title: To Ichiran Ueno}
+        - {location: ichiran-ueno}
+        - {transit: from-ichiran-ueno, title: From Ichiran Ueno}
+      - title: '@[Gyukatsu Asakusa](gyukatsu-asakusa)'
+        price: ¥2,000
+        steps:
+        - {transit: to-gyukatsu-asakusa, title: To Gyukatsu Asakusa}
+        - {location: gyukatsu-asakusa}
+        - {transit: from-gyukatsu-asakusa, title: From Gyukatsu Asakusa}
+      - title: '@[Yakitori de Ameyoko](yakitori-de-ameyoko)'
+        price: ¥2,500
+        steps:
+        - {transit: to-yakitori-de-ameyoko, title: To Yakitori de Ameyoko}
+        - {location: yakitori-de-ameyoko}
+        - {transit: from-yakitori-de-ameyoko, title: From Yakitori de Ameyoko}
     - title: Ai
       options:
-      - {location: daikokuya, price: '¥2,200'}
-      - {location: monjayaki, price: '¥2,800'}
-      - {location: tonkatsu-isen-honten, price: '¥3,000'}
+      - title: '@[Daikokuya](daikokuya)'
+        price: ¥2,200
+        steps:
+        - {transit: to-daikokuya, title: To Daikokuya}
+        - {location: daikokuya}
+        - {transit: from-daikokuya, title: From Daikokuya}
+      - title: '@[Monjayaki](monjayaki)'
+        price: ¥2,800
+        steps:
+        - {transit: to-monjayaki, title: To Monjayaki}
+        - {location: monjayaki}
+        - {transit: from-monjayaki, title: From Monjayaki}
+      - title: '@[Tonkatsu Isen honten](tonkatsu-isen-honten)'
+        price: ¥3,000
+        steps:
+        - {transit: to-tonkatsu-isen-honten, title: To Tonkatsu Isen honten}
+        - {location: tonkatsu-isen-honten}
+        - {transit: from-tonkatsu-isen-honten, title: From Tonkatsu Isen honten}
     - title: Shu
       options:
-      - {location: unagi-izuei, price: '¥6,000'}
-      - {location: tempura-nakasei, price: '¥7,000'}
-      - {location: sukiyaki-imahan, price: '¥10,000+'}
+      - title: '@[Unagi Izuei](unagi-izuei)'
+        price: ¥6,000
+        steps:
+        - {transit: to-unagi-izuei, title: To Unagi Izuei}
+        - {location: unagi-izuei}
+        - {transit: from-unagi-izuei, title: From Unagi Izuei}
+      - title: '@[Tempura Nakasei](tempura-nakasei)'
+        price: ¥7,000
+        steps:
+        - {transit: to-tempura-nakasei, title: To Tempura Nakasei}
+        - {location: tempura-nakasei}
+        - {transit: from-tempura-nakasei, title: From Tempura Nakasei}
+      - title: '@[Sukiyaki Imahan](sukiyaki-imahan)'
+        price: ¥10,000+
+        steps:
+        - {transit: to-sukiyaki-imahan, title: To Sukiyaki Imahan}
+        - {location: sukiyaki-imahan}
+        - {transit: from-sukiyaki-imahan, title: From Sukiyaki Imahan}
     - title: 🏮 Barrio
       options:
-      - {location: ameyoko, price: '— Mercado callejero bajo las vías: mariscos a la plancha, caos rico'}
+      - title: '@[Ameyoko](ameyoko)'
+        price: '— Mercado callejero bajo las vías: mariscos a la plancha, caos rico'
+        steps:
+        - {transit: to-ameyoko, title: To Ameyoko}
+        - {location: ameyoko}
+        - {transit: from-ameyoko, title: From Ameyoko}
   - {transit: d13-12, time-from: '19:45', title: '@[JR Yamanote](d13-12): Ueno → Shinjuku directo — 25 min, mismo vagón todos. 🏪 AVISO PARA MAÑANA: el tour de Hakone sale antes del buffet — konbini esta noche.'}
 - title: mié 14 · Hakone / Fuji
   note: el tour contratado — horario militar
@@ -2100,22 +2709,72 @@ days:
     options:
     - title: Take
       options:
-      - {location: tokyo-ramen-street, price: '¥1,200'}
-      - {location: kitchen-street, price: '¥1,500'}
-      - {location: bento-del-depachika, price: '¥1,500'}
+      - title: '@[Tokyo Ramen Street](tokyo-ramen-street)'
+        price: ¥1,200
+        steps:
+        - {transit: to-tokyo-ramen-street, title: To Tokyo Ramen Street}
+        - {location: tokyo-ramen-street}
+        - {transit: from-tokyo-ramen-street, title: From Tokyo Ramen Street}
+      - title: '@[Kitchen Street](kitchen-street)'
+        price: ¥1,500
+        steps:
+        - {transit: to-kitchen-street, title: To Kitchen Street}
+        - {location: kitchen-street}
+        - {transit: from-kitchen-street, title: From Kitchen Street}
+      - title: '@[Bento del depachika](bento-del-depachika)'
+        price: ¥1,500
+        steps:
+        - {transit: to-bento-del-depachika, title: To Bento del depachika}
+        - {location: bento-del-depachika}
+        - {transit: from-bento-del-depachika, title: From Bento del depachika}
     - title: Ai
       options:
-      - {location: tonkatsu-bairin, price: '¥2,500'}
-      - {location: ginza-lion, price: '¥3,500'}
-      - {location: sushi-no-midori, price: '¥4,000'}
+      - title: '@[Tonkatsu Bairin](tonkatsu-bairin)'
+        price: ¥2,500
+        steps:
+        - {transit: to-tonkatsu-bairin, title: To Tonkatsu Bairin}
+        - {location: tonkatsu-bairin}
+        - {transit: from-tonkatsu-bairin, title: From Tonkatsu Bairin}
+      - title: '@[Ginza Lion](ginza-lion)'
+        price: ¥3,500
+        steps:
+        - {transit: to-ginza-lion, title: To Ginza Lion}
+        - {location: ginza-lion}
+        - {transit: from-ginza-lion, title: From Ginza Lion}
+      - title: '@[Sushi no Midori](sushi-no-midori)'
+        price: ¥4,000
+        steps:
+        - {transit: to-sushi-no-midori, title: To Sushi no Midori}
+        - {location: sushi-no-midori}
+        - {transit: from-sushi-no-midori, title: From Sushi no Midori}
     - title: Shu
       options:
-      - {location: omakase-medio, price: '¥10,000'}
-      - {location: teppan-ginza, price: '¥12,000'}
-      - {location: tempura-con-estrella, price: '¥15,000 — solo si queda pila del tour'}
+      - title: '@[Omakase medio](omakase-medio)'
+        price: ¥10,000
+        steps:
+        - {transit: to-omakase-medio, title: To Omakase medio}
+        - {location: omakase-medio}
+        - {transit: from-omakase-medio, title: From Omakase medio}
+      - title: '@[Teppan Ginza](teppan-ginza)'
+        price: ¥12,000
+        steps:
+        - {transit: to-teppan-ginza, title: To Teppan Ginza}
+        - {location: teppan-ginza}
+        - {transit: from-teppan-ginza, title: From Teppan Ginza}
+      - title: '@[Tempura con estrella](tempura-con-estrella)'
+        price: ¥15,000 — solo si queda pila del tour
+        steps:
+        - {transit: to-tempura-con-estrella, title: To Tempura con estrella}
+        - {location: tempura-con-estrella}
+        - {transit: from-tempura-con-estrella, title: From Tempura con estrella}
     - title: 🏮 Barrio
       options:
-      - {location: kitchen-st-ramen-st, price: — 30 restaurantes dentro de Tokyo Station — sin salir a la calle}
+      - title: '@[Kitchen St + Ramen St](kitchen-st-ramen-st)'
+        price: — 30 restaurantes dentro de Tokyo Station — sin salir a la calle
+        steps:
+        - {transit: to-kitchen-st-ramen-st, title: To Kitchen St + Ramen St}
+        - {location: kitchen-st-ramen-st}
+        - {transit: from-kitchen-st-ramen-st, title: From Kitchen St + Ramen St}
 - title: jue 15 · Shibuya–Harajuku
   note: el Tokio de la ropa y el caos (¿o Disney?)
   anchor: cruce de Shibuya
@@ -2137,19 +2796,64 @@ days:
     options:
     - title: Take
       options:
-      - {location: harajuku-gyozaro, price: ¥800}
-      - {location: crepas-de-takeshita, price: ¥700}
-      - {location: afuri, price: '¥1,400'}
+      - title: '@[Harajuku Gyozarō](harajuku-gyozaro)'
+        price: ¥800
+        steps:
+        - {transit: to-harajuku-gyozaro, title: To Harajuku Gyozarō}
+        - {location: harajuku-gyozaro}
+        - {transit: from-harajuku-gyozaro, title: From Harajuku Gyozarō}
+      - title: '@[Crepas de Takeshita](crepas-de-takeshita)'
+        price: ¥700
+        steps:
+        - {transit: to-crepas-de-takeshita, title: To Crepas de Takeshita}
+        - {location: crepas-de-takeshita}
+        - {transit: from-crepas-de-takeshita, title: From Crepas de Takeshita}
+      - title: '@[Afuri](afuri)'
+        price: ¥1,400
+        steps:
+        - {transit: to-afuri, title: To Afuri}
+        - {location: afuri}
+        - {transit: from-afuri, title: From Afuri}
     - title: Ai
       options:
-      - {location: luke-s-lobster, price: '¥1,500'}
-      - {location: golden-brown, price: '¥1,800'}
-      - {location: bills, price: '¥2,200'}
+      - title: '@[Luke''s Lobster](luke-s-lobster)'
+        price: ¥1,500
+        steps:
+        - {transit: to-luke-s-lobster, title: To Luke's Lobster}
+        - {location: luke-s-lobster}
+        - {transit: from-luke-s-lobster, title: From Luke's Lobster}
+      - title: '@[Golden Brown](golden-brown)'
+        price: ¥1,800
+        steps:
+        - {transit: to-golden-brown, title: To Golden Brown}
+        - {location: golden-brown}
+        - {transit: from-golden-brown, title: From Golden Brown}
+      - title: '@[bills](bills)'
+        price: ¥2,200
+        steps:
+        - {transit: to-bills, title: To bills}
+        - {location: bills}
+        - {transit: from-bills, title: From bills}
     - title: Shu
       options:
-      - {location: gyukatsu-motomura, price: '¥2,200'}
-      - {location: maisen, price: '¥3,000'}
-      - {location: teppan-lunch, price: '¥5,000'}
+      - title: '@[Gyukatsu Motomura](gyukatsu-motomura)'
+        price: ¥2,200
+        steps:
+        - {transit: to-gyukatsu-motomura, title: To Gyukatsu Motomura}
+        - {location: gyukatsu-motomura}
+        - {transit: from-gyukatsu-motomura, title: From Gyukatsu Motomura}
+      - title: '@[Maisen](maisen)'
+        price: ¥3,000
+        steps:
+        - {transit: to-maisen, title: To Maisen}
+        - {location: maisen}
+        - {transit: from-maisen, title: From Maisen}
+      - title: '@[Teppan lunch](teppan-lunch)'
+        price: ¥5,000
+        steps:
+        - {transit: to-teppan-lunch, title: To Teppan lunch}
+        - {location: teppan-lunch}
+        - {transit: from-teppan-lunch, title: From Teppan lunch}
   - {time-from: '13:30', fixed: true, title: 'La hora de los subgrupos — 1 h 30 (cafés con reserva):>'}
   - time-from: '13:30'
     title: Elige tu plan del día
@@ -2175,22 +2879,72 @@ days:
     options:
     - title: Take
       options:
-      - {location: ichiran-shinjuku, price: '¥980–1,320'}
-      - {location: uobei, price: '¥1,500/persona'}
-      - {location: genki-sushi, price: '¥1,800'}
+      - title: '@[Ichiran Shinjuku](ichiran-shinjuku)'
+        price: ¥980–1,320
+        steps:
+        - {transit: to-ichiran-shinjuku, title: To Ichiran Shinjuku}
+        - {location: ichiran-shinjuku}
+        - {transit: from-ichiran-shinjuku, title: From Ichiran Shinjuku}
+      - title: '@[Uobei](uobei)'
+        price: ¥1,500/persona
+        steps:
+        - {transit: to-uobei, title: To Uobei}
+        - {location: uobei}
+        - {transit: from-uobei, title: From Uobei}
+      - title: '@[Genki Sushi](genki-sushi)'
+        price: ¥1,800
+        steps:
+        - {transit: to-genki-sushi, title: To Genki Sushi}
+        - {location: genki-sushi}
+        - {transit: from-genki-sushi, title: From Genki Sushi}
     - title: Ai
       options:
-      - {location: nabezo-shibuya, price: '¥4,500'}
-      - {location: izakaya-premium, price: '¥4,000'}
-      - {location: han-no-daidokoro-entrada, price: '¥6,000'}
+      - title: '@[Nabezo Shibuya](nabezo-shibuya)'
+        price: ¥4,500
+        steps:
+        - {transit: to-nabezo-shibuya, title: To Nabezo Shibuya}
+        - {location: nabezo-shibuya}
+        - {transit: from-nabezo-shibuya, title: From Nabezo Shibuya}
+      - title: '@[Izakaya premium](izakaya-premium)'
+        price: ¥4,000
+        steps:
+        - {transit: to-izakaya-premium, title: To Izakaya premium}
+        - {location: izakaya-premium}
+        - {transit: from-izakaya-premium, title: From Izakaya premium}
+      - title: '@[Han no Daidokoro (entrada)](han-no-daidokoro-entrada)'
+        price: ¥6,000
+        steps:
+        - {transit: to-han-no-daidokoro-entrada, title: To Han no Daidokoro (entrada)}
+        - {location: han-no-daidokoro-entrada}
+        - {transit: from-han-no-daidokoro-entrada, title: From Han no Daidokoro (entrada)}
     - title: Shu
       options:
-      - {location: han-no-daidokoro-curso, price: '¥10,000'}
-      - {location: omakase-shibuya, price: '¥12,000'}
-      - {location: ushigoro-s, price: '¥15,000'}
+      - title: '@[Han no Daidokoro curso](han-no-daidokoro-curso)'
+        price: ¥10,000
+        steps:
+        - {transit: to-han-no-daidokoro-curso, title: To Han no Daidokoro curso}
+        - {location: han-no-daidokoro-curso}
+        - {transit: from-han-no-daidokoro-curso, title: From Han no Daidokoro curso}
+      - title: '@[Omakase Shibuya](omakase-shibuya)'
+        price: ¥12,000
+        steps:
+        - {transit: to-omakase-shibuya, title: To Omakase Shibuya}
+        - {location: omakase-shibuya}
+        - {transit: from-omakase-shibuya, title: From Omakase Shibuya}
+      - title: '@[Ushigoro S](ushigoro-s)'
+        price: ¥15,000
+        steps:
+        - {transit: to-ushigoro-s, title: To Ushigoro S}
+        - {location: ushigoro-s}
+        - {transit: from-ushigoro-s, title: From Ushigoro S}
     - title: 🏮 Barrio
       options:
-      - {location: shibuya-yokocho, price: '— 19 mini-barras regionales en fila, en Miyashita Park'}
+      - title: '@[Shibuya Yokocho](shibuya-yokocho)'
+        price: — 19 mini-barras regionales en fila, en Miyashita Park
+        steps:
+        - {transit: to-shibuya-yokocho, title: To Shibuya Yokocho}
+        - {location: shibuya-yokocho}
+        - {transit: from-shibuya-yokocho, title: From Shibuya Yokocho}
   - {transit: d15-8, time-from: '21:15', title: '@[Yamanote](d15-8) a Shinjuku — 7 min. 🏪 AVISO PARA MAÑANA: Kamakura y @[Kawaguchiko](lago-kawaguchiko) salen antes del buffet — konbini esta noche; el plan urbano sí desayuna en el hotel.'}
 - title: vie 16 · día de subgrupos
   note: cada quien su Japón — 3 planes en paralelo
@@ -2242,22 +2996,72 @@ days:
     options:
     - title: Take
       options:
-      - {location: torikizoku, price: '¥2,500'}
-      - {location: gyoza-bar, price: '¥1,800'}
-      - {location: uoya-itcho, price: '¥3,500'}
+      - title: '@[Torikizoku](torikizoku)'
+        price: ¥2,500
+        steps:
+        - {transit: to-torikizoku, title: To Torikizoku}
+        - {location: torikizoku}
+        - {transit: from-torikizoku, title: From Torikizoku}
+      - title: '@[Gyoza bar](gyoza-bar)'
+        price: ¥1,800
+        steps:
+        - {transit: to-gyoza-bar, title: To Gyoza bar}
+        - {location: gyoza-bar}
+        - {transit: from-gyoza-bar, title: From Gyoza bar}
+      - title: '@[Uoya-Itcho](uoya-itcho)'
+        price: ¥3,500
+        steps:
+        - {transit: to-uoya-itcho, title: To Uoya-Itcho}
+        - {location: uoya-itcho}
+        - {transit: from-uoya-itcho, title: From Uoya-Itcho}
     - title: Ai
       options:
-      - {location: gyukaku, price: '¥4,000'}
-      - {location: nabezo-shinjuku, price: '¥4,500'}
-      - {location: imahan-shabu, price: '¥6,000'}
+      - title: '@[Gyukaku](gyukaku)'
+        price: ¥4,000
+        steps:
+        - {transit: to-gyukaku, title: To Gyukaku}
+        - {location: gyukaku}
+        - {transit: from-gyukaku, title: From Gyukaku}
+      - title: '@[Nabezo Shinjuku](nabezo-shinjuku)'
+        price: ¥4,500
+        steps:
+        - {transit: to-nabezo-shinjuku, title: To Nabezo Shinjuku}
+        - {location: nabezo-shinjuku}
+        - {transit: from-nabezo-shinjuku, title: From Nabezo Shinjuku}
+      - title: '@[Imahan shabu](imahan-shabu)'
+        price: ¥6,000
+        steps:
+        - {transit: to-imahan-shabu, title: To Imahan shabu}
+        - {location: imahan-shabu}
+        - {transit: from-imahan-shabu, title: From Imahan shabu}
     - title: Shu
       options:
-      - {location: jojoen, price: '¥8–12,000'}
-      - {location: robatayaki-premium, price: '¥10,000'}
-      - {location: ny-grill-park-hyatt, price: '¥15,000+'}
+      - title: '@[Jojoen](jojoen)'
+        price: ¥8–12,000
+        steps:
+        - {transit: to-jojoen, title: To Jojoen}
+        - {location: jojoen}
+        - {transit: from-jojoen, title: From Jojoen}
+      - title: '@[Robatayaki premium](robatayaki-premium)'
+        price: ¥10,000
+        steps:
+        - {transit: to-robatayaki-premium, title: To Robatayaki premium}
+        - {location: robatayaki-premium}
+        - {transit: from-robatayaki-premium, title: From Robatayaki premium}
+      - title: '@[NY Grill (Park Hyatt)](ny-grill-park-hyatt)'
+        price: ¥15,000+
+        steps:
+        - {transit: to-ny-grill-park-hyatt, title: To NY Grill (Park Hyatt)}
+        - {location: ny-grill-park-hyatt}
+        - {transit: from-ny-grill-park-hyatt, title: From NY Grill (Park Hyatt)}
     - title: 🏮 Barrio
       options:
-      - {location: golden-gai, price: '— 200 barras de 5 asientos — para la sobremesa, los 10 se dispersan solos'}
+      - title: '@[Golden Gai](golden-gai)'
+        price: — 200 barras de 5 asientos — para la sobremesa, los 10 se dispersan solos
+        steps:
+        - {transit: to-golden-gai, title: To Golden Gai}
+        - {location: golden-gai}
+        - {transit: from-golden-gai, title: From Golden Gai}
 - title: sáb 17 · Tsukiji + cierre
   note: mercado, Ginza y maletas — y los papás al aeropuerto
   anchor: Tsukiji Outer Market
@@ -2272,22 +3076,72 @@ days:
     options:
     - title: Take
       options:
-      - {location: uniqlo-coffee, price: ¥800}
-      - {location: kagari, price: '¥1,500'}
-      - {location: conveyor-de-ginza, price: '¥2,000'}
+      - title: '@[Uniqlo Coffee](uniqlo-coffee)'
+        price: ¥800
+        steps:
+        - {transit: to-uniqlo-coffee, title: To Uniqlo Coffee}
+        - {location: uniqlo-coffee}
+        - {transit: from-uniqlo-coffee, title: From Uniqlo Coffee}
+      - title: '@[Kagari](kagari)'
+        price: ¥1,500
+        steps:
+        - {transit: to-kagari, title: To Kagari}
+        - {location: kagari}
+        - {transit: from-kagari, title: From Kagari}
+      - title: '@[Conveyor de Ginza](conveyor-de-ginza)'
+        price: ¥2,000
+        steps:
+        - {transit: to-conveyor-de-ginza, title: To Conveyor de Ginza}
+        - {location: conveyor-de-ginza}
+        - {transit: from-conveyor-de-ginza, title: From Conveyor de Ginza}
     - title: Ai
       options:
-      - {location: tonkatsu-bairin, price: '¥2,500'}
-      - {location: ginza-lion, price: '¥3,500'}
-      - {location: sushi-no-midori, price: '¥4,000'}
+      - title: '@[Tonkatsu Bairin](tonkatsu-bairin)'
+        price: ¥2,500
+        steps:
+        - {transit: to-tonkatsu-bairin, title: To Tonkatsu Bairin}
+        - {location: tonkatsu-bairin}
+        - {transit: from-tonkatsu-bairin, title: From Tonkatsu Bairin}
+      - title: '@[Ginza Lion](ginza-lion)'
+        price: ¥3,500
+        steps:
+        - {transit: to-ginza-lion, title: To Ginza Lion}
+        - {location: ginza-lion}
+        - {transit: from-ginza-lion, title: From Ginza Lion}
+      - title: '@[Sushi no Midori](sushi-no-midori)'
+        price: ¥4,000
+        steps:
+        - {transit: to-sushi-no-midori, title: To Sushi no Midori}
+        - {location: sushi-no-midori}
+        - {transit: from-sushi-no-midori, title: From Sushi no Midori}
     - title: Shu
       options:
-      - {location: chirashi-premium, price: '¥5,000'}
-      - {location: tempura-counter, price: '¥6,000'}
-      - {location: anago, price: '¥5,000 — ligero: la grande es hoy en la noche'}
+      - title: '@[Chirashi premium](chirashi-premium)'
+        price: ¥5,000
+        steps:
+        - {transit: to-chirashi-premium, title: To Chirashi premium}
+        - {location: chirashi-premium}
+        - {transit: from-chirashi-premium, title: From Chirashi premium}
+      - title: '@[Tempura counter](tempura-counter)'
+        price: ¥6,000
+        steps:
+        - {transit: to-tempura-counter, title: To Tempura counter}
+        - {location: tempura-counter}
+        - {transit: from-tempura-counter, title: From Tempura counter}
+      - title: '@[Anago](anago)'
+        price: '¥5,000 — ligero: la grande es hoy en la noche'
+        steps:
+        - {transit: to-anago, title: To Anago}
+        - {location: anago}
+        - {transit: from-anago, title: From Anago}
     - title: 🏮 Barrio
       options:
-      - {location: depachika-de-ginza, price: '— Los sótanos gourmet de Mitsukoshi/Matsuya: picnic de lujo o regalos'}
+      - title: '@[Depachika de Ginza](depachika-de-ginza)'
+        price: '— Los sótanos gourmet de Mitsukoshi/Matsuya: picnic de lujo o regalos'
+        steps:
+        - {transit: to-depachika-de-ginza, title: To Depachika de Ginza}
+        - {location: depachika-de-ginza}
+        - {transit: from-depachika-de-ginza, title: From Depachika de Ginza}
   - {transit: d17-3, time-from: '07:45', title: 'Tsukiji Hongwan-ji (a 3 min, abre 6:00) — 30 min: el templo budista de estilo indio, único en Tokio.'}
   - {transit: d17-e14, hidden-summary: true, title: Ginza → Akihabara}
   - {transit: d17-e9, hidden-summary: true, title: Ginza → Tsukiji}
@@ -2316,38 +3170,128 @@ days:
     options:
     - title: Take
       options:
-      - {location: izakaya-con-vista, price: '¥4,000'}
-      - {location: shabu-tabehodai, price: '¥4,500'}
-      - {location: gonpachi, price: '¥5,000'}
+      - title: '@[Izakaya con vista](izakaya-con-vista)'
+        price: ¥4,000
+        steps:
+        - {transit: to-izakaya-con-vista, title: To Izakaya con vista}
+        - {location: izakaya-con-vista}
+        - {transit: from-izakaya-con-vista, title: From Izakaya con vista}
+      - title: '@[Shabu tabehōdai](shabu-tabehodai)'
+        price: ¥4,500
+        steps:
+        - {transit: to-shabu-tabehodai, title: To Shabu tabehōdai}
+        - {location: shabu-tabehodai}
+        - {transit: from-shabu-tabehodai, title: From Shabu tabehōdai}
+      - title: '@[Gonpachi](gonpachi)'
+        price: ¥5,000
+        steps:
+        - {transit: to-gonpachi, title: To Gonpachi}
+        - {location: gonpachi}
+        - {transit: from-gonpachi, title: From Gonpachi}
     - title: Ai
       options:
-      - {location: kaiseki-de-entrada, price: '¥8,000'}
-      - {location: teppan-moderado, price: '¥8,000'}
-      - {location: sukiyaki-imahan, price: '¥10,000+'}
+      - title: '@[Kaiseki de entrada](kaiseki-de-entrada)'
+        price: ¥8,000
+        steps:
+        - {transit: to-kaiseki-de-entrada, title: To Kaiseki de entrada}
+        - {location: kaiseki-de-entrada}
+        - {transit: from-kaiseki-de-entrada, title: From Kaiseki de entrada}
+      - title: '@[Teppan moderado](teppan-moderado)'
+        price: ¥8,000
+        steps:
+        - {transit: to-teppan-moderado, title: To Teppan moderado}
+        - {location: teppan-moderado}
+        - {transit: from-teppan-moderado, title: From Teppan moderado}
+      - title: '@[Sukiyaki Imahan](sukiyaki-imahan)'
+        price: ¥10,000+
+        steps:
+        - {transit: to-sukiyaki-imahan, title: To Sukiyaki Imahan}
+        - {location: sukiyaki-imahan}
+        - {transit: from-sukiyaki-imahan, title: From Sukiyaki Imahan}
     - title: Shu
       options:
-      - {location: omakase-en-ginza, price: '¥15–25,000'}
-      - {location: teppan-de-kobe, price: '¥20,000'}
-      - {location: barra-con-estrella, price: '¥25,000+ — decidir y reservar YA'}
+      - title: '@[Omakase en Ginza](omakase-en-ginza)'
+        price: ¥15–25,000
+        steps:
+        - {transit: to-omakase-en-ginza, title: To Omakase en Ginza}
+        - {location: omakase-en-ginza}
+        - {transit: from-omakase-en-ginza, title: From Omakase en Ginza}
+      - title: '@[Teppan de Kobe](teppan-de-kobe)'
+        price: ¥20,000
+        steps:
+        - {transit: to-teppan-de-kobe, title: To Teppan de Kobe}
+        - {location: teppan-de-kobe}
+        - {transit: from-teppan-de-kobe, title: From Teppan de Kobe}
+      - title: '@[Barra con estrella](barra-con-estrella)'
+        price: ¥25,000+ — decidir y reservar YA
+        steps:
+        - {transit: to-barra-con-estrella, title: To Barra con estrella}
+        - {location: barra-con-estrella}
+        - {transit: from-barra-con-estrella, title: From Barra con estrella}
   - {transit: d17-8, time-from: '17:00', title: '👋 Ricardo papá y Lety se despiden: checkout adelantado (su reserva de Tokio es 1 noche menos) — duermen junto al aeropuerto para su vuelo de madrugada a China. Abrazo y su taxi a Haneda.'}
   - time-from: '19:00'
     title: Cena de despedida (los 8) — 2 h.
     options:
     - title: Take
       options:
-      - {location: izakaya-con-vista, price: '¥4,000'}
-      - {location: shabu-tabehodai, price: '¥4,500'}
-      - {location: gonpachi, price: '¥5,000'}
+      - title: '@[Izakaya con vista](izakaya-con-vista)'
+        price: ¥4,000
+        steps:
+        - {transit: to-izakaya-con-vista, title: To Izakaya con vista}
+        - {location: izakaya-con-vista}
+        - {transit: from-izakaya-con-vista, title: From Izakaya con vista}
+      - title: '@[Shabu tabehōdai](shabu-tabehodai)'
+        price: ¥4,500
+        steps:
+        - {transit: to-shabu-tabehodai, title: To Shabu tabehōdai}
+        - {location: shabu-tabehodai}
+        - {transit: from-shabu-tabehodai, title: From Shabu tabehōdai}
+      - title: '@[Gonpachi](gonpachi)'
+        price: ¥5,000
+        steps:
+        - {transit: to-gonpachi, title: To Gonpachi}
+        - {location: gonpachi}
+        - {transit: from-gonpachi, title: From Gonpachi}
     - title: Ai
       options:
-      - {location: kaiseki-de-entrada, price: '¥8,000'}
-      - {location: teppan-moderado, price: '¥8,000'}
-      - {location: sukiyaki-imahan, price: '¥10,000+'}
+      - title: '@[Kaiseki de entrada](kaiseki-de-entrada)'
+        price: ¥8,000
+        steps:
+        - {transit: to-kaiseki-de-entrada, title: To Kaiseki de entrada}
+        - {location: kaiseki-de-entrada}
+        - {transit: from-kaiseki-de-entrada, title: From Kaiseki de entrada}
+      - title: '@[Teppan moderado](teppan-moderado)'
+        price: ¥8,000
+        steps:
+        - {transit: to-teppan-moderado, title: To Teppan moderado}
+        - {location: teppan-moderado}
+        - {transit: from-teppan-moderado, title: From Teppan moderado}
+      - title: '@[Sukiyaki Imahan](sukiyaki-imahan)'
+        price: ¥10,000+
+        steps:
+        - {transit: to-sukiyaki-imahan, title: To Sukiyaki Imahan}
+        - {location: sukiyaki-imahan}
+        - {transit: from-sukiyaki-imahan, title: From Sukiyaki Imahan}
     - title: Shu
       options:
-      - {location: omakase-en-ginza, price: '¥15–25,000'}
-      - {location: teppan-de-kobe, price: '¥20,000'}
-      - {location: barra-con-estrella, price: '¥25,000+ — decidir y reservar YA'}
+      - title: '@[Omakase en Ginza](omakase-en-ginza)'
+        price: ¥15–25,000
+        steps:
+        - {transit: to-omakase-en-ginza, title: To Omakase en Ginza}
+        - {location: omakase-en-ginza}
+        - {transit: from-omakase-en-ginza, title: From Omakase en Ginza}
+      - title: '@[Teppan de Kobe](teppan-de-kobe)'
+        price: ¥20,000
+        steps:
+        - {transit: to-teppan-de-kobe, title: To Teppan de Kobe}
+        - {location: teppan-de-kobe}
+        - {transit: from-teppan-de-kobe, title: From Teppan de Kobe}
+      - title: '@[Barra con estrella](barra-con-estrella)'
+        price: ¥25,000+ — decidir y reservar YA
+        steps:
+        - {transit: to-barra-con-estrella, title: To Barra con estrella}
+        - {location: barra-con-estrella}
+        - {transit: from-barra-con-estrella, title: From Barra con estrella}
   - {time-from: '21:00', title: 'Maletas listas HOY — báscula del hotel: máximo 23 kg por maleta documentada.'}
 - title: dom 18 · regreso
   note: sayonara

@@ -174,27 +174,38 @@ def parse_step(li):
     return d
 
 
+def parse_option_span(c):
+    """span.option → plana {location, price} o enriquecida {title, price, steps}."""
+    ul = first(c.children, "ul", "steps")
+    price_el = first(c.children, "span", "price")
+    e = {}
+    if ul is not None:
+        inline = [x for x in c.children
+                  if x is not ul and not (isinstance(x, Node) and "price" in x.cls())]
+        e["title"] = to_md(inline).strip()
+        if price_el is not None:
+            e["price"] = text_of(price_el).strip()
+        e["steps"] = [parse_step(x) for x in nodes(ul.children, "li")]
+    else:
+        a = first(c.children, "a", "modal-link")
+        e["location"] = (a.attrs.get("href") or "")[3:] if a else ""
+        if price_el is not None:
+            e["price"] = text_of(price_el).strip()
+    return e
+
+
 def parse_opt(li):
     sub = first(li.children, "ul", "steps")
     b = first(li.children, "b")
     title = to_md(b.children).strip() if b else ""
     if sub is not None:
-        return {"title": title, "steps": [parse_step(x) for x in nodes(sub.children, "li")]}
-    opts, last = [], None
-
-    def eat(children):
-        nonlocal last
-        for c in nodes(children):
-            if c.tag == "span" and "option" in c.cls():
-                eat(c.children)
-            elif c.tag == "a" and "modal-link" in c.cls():
-                last = {"location": (c.attrs.get("href") or "")[3:]}
-                opts.append(last)
-            elif c.tag == "span" and "price" in c.cls() and last is not None:
-                last["price"] = text_of(c).strip()
-
-    eat(li.children)
-    return {"title": title, "options": opts}
+        d = {"title": title, "steps": [parse_step(x) for x in nodes(sub.children, "li")]}
+    else:
+        d = {"title": title,
+             "options": [parse_option_span(c) for c in nodes(li.children, "span", "option")]}
+    if li.attrs.get("class"):
+        d["class"] = li.attrs["class"]
+    return d
 
 
 def parse_days(html_text):
@@ -272,14 +283,27 @@ def norm_step(s):
 def norm_opt(o):
     title = str(o.get("title", "")).replace("*", "").strip()
     if "steps" in o:
-        return {"title": title, "steps": [norm_step(x) for x in o["steps"] if isinstance(x, dict)]}
-    opts = []
-    for x in o.get("options", []):
-        e = {"location": str(x.get("location") or "")}
-        if x.get("price"):
-            e["price"] = str(x["price"]).strip()
-        opts.append(e)
-    return {"title": title, "options": opts}
+        d = {"title": title, "steps": [norm_step(x) for x in o["steps"] if isinstance(x, dict)]}
+    else:
+        opts = []
+        for x in o.get("options", []):
+            if not isinstance(x, dict):
+                continue
+            if "steps" in x or "title" in x:      # opción enriquecida
+                e = {"title": str(x.get("title", "")).strip()}
+                if x.get("price"):
+                    e["price"] = str(x["price"]).strip()
+                if x.get("steps"):
+                    e["steps"] = [norm_step(s) for s in x["steps"] if isinstance(s, dict)]
+            else:
+                e = {"location": str(x.get("location") or "")}
+                if x.get("price"):
+                    e["price"] = str(x["price"]).strip()
+            opts.append(e)
+        d = {"title": title, "options": opts}
+    if o.get("class"):
+        d["class"] = str(o["class"])
+    return d
 
 
 def norm_day(day):

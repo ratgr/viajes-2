@@ -345,6 +345,10 @@ def row_text(n, refs, sc=None):
             parts.append(f'<b class="title" data-value="{base}">{mode_icon(n)}{shown}</b>')
         else:
             parts.append(f'<b class="title">{mode_icon(n)}{md(title, refs)}</b>')
+    elif n.get("location") and PLACES.get(n["location"], {}).get("name"):
+        # paso-lugar sin título: el nombre del catálogo como título derivado
+        nombre = html.escape(PLACES[n["location"]]["name"])
+        parts.append(f'<b class="title" data-derived="title">{mode_icon(n)}{nombre}</b>')
     raw_dur = n.get("duration")
     flex = parse_flex(raw_dur) if raw_dur is not None else None
     dur_show = n.get("duration-show")
@@ -401,6 +405,21 @@ def time_cell(n, sc=None):
     return f'<time class="{cls}"{dt}>{inner}</time>'
 
 
+def render_option(opt, refs):
+    """opción de tier — plana {location, price} o ENRIQUECIDA {title, price,
+    steps}: la ida/lugar/regreso viven como sub-pasos propios (el itinerario
+    no los muestra; el mapa sí, seleccionables)."""
+    if "steps" in opt or "title" in opt:
+        out = md(str(opt.get("title", "")), refs)
+        if opt.get("price"):
+            out += f' <span class="price">{html.escape(str(opt["price"]))}</span>'
+        if opt.get("steps"):
+            subs = "\n".join(render_li(s, refs) for s in opt["steps"])
+            out += f'<ul class="steps">\n{subs}\n</ul>'
+        return out
+    return resto_link(opt, refs)
+
+
 def resto_link(opt, refs):
     """opción hoja { location: acchichi, precio: ¥600 }."""
     key = opt.get("location")
@@ -428,11 +447,12 @@ def render_options(node, refs, ctx=""):
             items.append(f'<li><b>{title}</b><ul class="steps">\n{subs}\n</ul></li>')
         else:
             label = html.escape(str(o.get("title", "")))
+            extra = f' class="{html.escape(str(o["class"]))}"' if o.get("class") else ""
             # cada opción envuelta (span.option) y separador en span.sep: el
             # itinerario fluye inline; el mapa las apila una por línea
             inner = '<span class="sep"> · </span>'.join(
-                f'<span class="option">{resto_link(x, refs)}</span>' for x in o.get("options", []))
-            items.append(f'<li data-tier="{label}"><b>{label}</b>{inner}</li>')
+                f'<span class="option">{render_option(x, refs)}</span>' for x in o.get("options", []))
+            items.append(f'<li data-tier="{label}"{extra}><b>{label}</b>{inner}</li>')
     return '<ul class="options">' + "".join(items) + "</ul>"
 
 

@@ -57,6 +57,7 @@ body.show-free .panel .steps > li[data-free]::after { content: '⏳ ' attr(data-
 
 /* opciones de tier: en el mapa una por línea (el itinerario fluye inline) */
 .panel .options > li .option { display: block; padding: 1px 0; }
+.panel .option > .steps { display: block; margin: 2px 0 3px 16px; }
 
 /* pasos solo-mapa (hidden-summary): el itinerario los oculta, el MAPA no —
    son geometría; van atenuados para distinguirlos */
