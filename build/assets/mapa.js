@@ -676,6 +676,195 @@
   });
   setTimeout(function () { syncLayers(); fitToLayers(); }, 150);   // arranque
 
+  // ---------- STEPPER: recorrido paso a paso (navegación principal en teléfono) ----------
+  // ‹ / › recorren los pasos CONCRETOS (con lugar o transporte) siguiendo la
+  // opción ELEGIDA de cada choice; cuando el siguiente paso entra a un choice
+  // se muestran sus opciones para elegir a cuál saltar (anidados: columnas
+  // plegables por grupo — se elige la opción de abajo, no el grupo); dentro
+  // de una opción el «saltar a» sigue visible (plegable) y saltar a otra
+  // opción arranca en su primer paso
+  var stEls = Array.prototype.slice.call(
+    document.querySelectorAll('.panel [data-location], .panel [data-transit]'));
+  var stCur = stEls.length ? 0 : -1;
+  var stMode = null;        // conjunto .options mostrando elección, o null
+  var stJumpOpen = true;
+
+  function chosenContainer(set, node) {
+    var opt = node.closest('.option');
+    if (opt && opt.closest('.options') === set) return opt;
+    var li = node;
+    while (li && li.parentElement !== set) li = li.parentElement;
+    return li;
+  }
+  function onChosenPath(el) {
+    var node = el;
+    for (var set = node.closest('.options'); set;
+         set = set.parentElement && set.parentElement.closest('.options')) {
+      var chosen = set.querySelector('.option-choice:checked, .group-choice:checked');
+      if (chosen) {
+        var cont = chosenContainer(set, node);
+        if (!cont || !cont.contains(chosen)) return false;
+      }
+      node = set;
+    }
+    return true;
+  }
+  function nextConcrete(i, dir) {
+    for (var j = i + dir; j >= 0 && j < stEls.length; j += dir) {
+      if (onChosenPath(stEls[j])) return j;
+    }
+    return -1;
+  }
+  function stTitle(el) {
+    var t = el.querySelector('.title') || el.querySelector('a.modal-link');
+    return (t ? t.textContent : (el.dataset.location || el.dataset.transit))
+      .replace(/\s+/g, ' ').trim();
+  }
+  function optLabel(cont) {
+    var a = cont.querySelector('a.modal-link');
+    var b = cont.querySelector('b');
+    var s = (a && a.textContent) || (b && b.textContent) || cont.textContent;
+    // fuera el caret de plegado de la barra si vino dentro del <b>
+    return s.replace(/\s+/g, ' ').replace(/^[▼▾▸▶ ]+/, '').trim().slice(0, 42);
+  }
+
+  var stBar = document.createElement('div');
+  stBar.className = 'stepper';
+  stBar.innerHTML =
+    '<div class="st-row">' +
+    '<button class="st-prev" type="button">‹</button>' +
+    '<div class="st-center"></div>' +
+    '<button class="st-next" type="button">›</button></div>' +
+    '<div class="st-jump" hidden>' +
+    '<button class="st-jump-toggle" type="button">saltar a ▾</button>' +
+    '<div class="st-jump-body"></div></div>';
+  document.getElementById('map').appendChild(stBar);
+  ['pointerdown', 'dblclick', 'wheel'].forEach(function (ev) {
+    stBar.addEventListener(ev, function (e) { e.stopPropagation(); });
+  });
+
+  function stGoTo(i) {
+    stCur = i;
+    stMode = null;
+    var el = stEls[i];
+    var li = rowOf(el) || el;
+    openDayOf(li);
+    selectRow(li);
+    li.scrollIntoView({ block: 'center' });
+    var key = el.dataset.location || el.dataset.transit;
+    if (!showOnMap(key, stTitle(el), li.id)) {
+      // sin geometría (conector automático): encuadrar sus puntos vecinos
+      var pts = [], j, p;
+      for (j = i - 1; j >= 0; j--) { p = anchorPoint(stEls[j], true); if (p) { pts.push(p); break; } }
+      for (j = i + 1; j < stEls.length; j++) { p = anchorPoint(stEls[j], false); if (p) { pts.push(p); break; } }
+      if (pts.length && map) map.flyToBounds(L.latLngBounds(pts).pad(.3), { duration: .5 });
+    }
+    stRender();
+  }
+  function enterOption(cont) {
+    var r = cont.querySelector('.option-choice, .group-choice');
+    if (r && !r.checked) { r.checked = true; syncLayers(); }
+    for (var j = 0; j < stEls.length; j++) {
+      if (cont.contains(stEls[j])) { stGoTo(j); return; }
+    }
+    stMode = null;
+    stRender();
+  }
+  // botones de opciones de un conjunto: planes = un botón por li; tiers = las
+  // opciones de abajo agrupadas en columnas plegables por grupo
+  function renderChoices(set, box) {
+    box.innerHTML = '';
+    var curEl = stEls[stCur];
+    [].slice.call(set.children).forEach(function (li) {
+      if (li.tagName !== 'LI') return;
+      var opts = [].slice.call(li.querySelectorAll('.option')).filter(function (o) {
+        return o.closest('.options') === set;
+      });
+      function mkBtn(cont, label) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'st-opt';
+        b.textContent = label;
+        if (curEl && cont.contains(curEl)) b.classList.add('on');
+        var r = cont.querySelector('.option-choice, .group-choice');
+        if (r && r.checked) b.classList.add('chosen');
+        b.addEventListener('click', function () { enterOption(cont); });
+        return b;
+      }
+      if (opts.length) {
+        var col = document.createElement('div');
+        col.className = 'st-col';
+        var head = li.querySelector('b');
+        if (head) {
+          var hb = document.createElement('button');
+          hb.type = 'button';
+          hb.className = 'st-col-head';
+          hb.textContent = head.textContent.replace(/\s+/g, ' ')
+            .replace(/^[▼▾▸▶ ]+/, '').trim() + ' ▾';
+          hb.addEventListener('click', function () { col.classList.toggle('closed'); });
+          col.appendChild(hb);
+        }
+        opts.forEach(function (o) { col.appendChild(mkBtn(o, optLabel(o))); });
+        box.appendChild(col);
+      } else {
+        box.appendChild(mkBtn(li, optLabel(li)));
+      }
+    });
+  }
+  function stRender() {
+    var el = stEls[stCur];
+    var center = stBar.querySelector('.st-center');
+    var nextB = stBar.querySelector('.st-next');
+    var jump = stBar.querySelector('.st-jump');
+    stBar.querySelector('.st-prev').disabled = nextConcrete(stCur, -1) < 0;
+    if (stMode) {                       // eligiendo a qué opción entrar
+      center.innerHTML = '';
+      renderChoices(stMode, center);
+      nextB.hidden = true;
+    } else {
+      center.innerHTML = '<span class="st-cur"></span>';
+      center.querySelector('.st-cur').textContent = el ? stTitle(el) : '—';
+      var nx = nextConcrete(stCur, 1);
+      nextB.hidden = false;
+      nextB.disabled = nx < 0;
+    }
+    // dentro de una opción: «saltar a» con TODAS las opciones del conjunto
+    var set = el ? el.closest('.options') : null;
+    if (set && !stMode) {
+      jump.hidden = false;
+      var body = jump.querySelector('.st-jump-body');
+      body.hidden = !stJumpOpen;
+      jump.querySelector('.st-jump-toggle').textContent = stJumpOpen ? 'saltar a ▾' : 'saltar a ▸';
+      if (stJumpOpen) renderChoices(set, body); else body.innerHTML = '';
+    } else {
+      jump.hidden = true;
+    }
+  }
+  stBar.querySelector('.st-prev').addEventListener('click', function () {
+    var p = nextConcrete(stCur, -1);
+    if (stMode) { stMode = null; stRender(); return; }   // cancelar elección
+    if (p >= 0) stGoTo(p);
+  });
+  stBar.querySelector('.st-next').addEventListener('click', function () {
+    var nx = nextConcrete(stCur, 1);
+    if (nx < 0) return;
+    var curSet = stEls[stCur] ? stEls[stCur].closest('.options') : null;
+    var nxSet = stEls[nx].closest('.options');
+    if (nxSet && nxSet !== curSet) { stMode = nxSet; stRender(); return; }
+    stGoTo(nx);
+  });
+  stBar.querySelector('.st-jump-toggle').addEventListener('click', function () {
+    stJumpOpen = !stJumpOpen;
+    stRender();
+  });
+  // click en una fila de la barra → el stepper se posiciona ahí
+  function stSyncTo(li) {
+    for (var j = 0; j < stEls.length; j++) {
+      if (stEls[j] === li || li.contains(stEls[j])) { stCur = j; stMode = null; stRender(); return; }
+    }
+  }
+  stRender();
+
   // teléfono: el panel es un sobrepuesto que abre el botón ☰; al elegir algo
   // se cierra solo para dejar ver el popup
   var narrow = window.matchMedia('(max-width: 820px)');
@@ -744,6 +933,7 @@
     var li = rowOf(e.target);
     if (!li) return;
     selectRow(li);
+    stSyncTo(li);
     if (devMode) { updateHash(null, li.id); openDevEditor(li); return; }
     var key = li.dataset.location || li.dataset.transit;
     if (key) {
