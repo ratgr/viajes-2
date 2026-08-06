@@ -70,9 +70,8 @@ body.show-free .panel .steps > li[data-free]::after { content: '⏳ ' attr(data-
 
 /* ojo del conjunto de elección: fantasma u ocultar los NO elegidos (solo si
    ya hay una elección — sin radio marcado no se atenúa ni oculta nada) */
-.panel .options { position: relative; }
-.panel .options .eye-toggle { position: absolute; top: -4px; right: 0; z-index: 2; border: none; background: none; font-size: 13px; line-height: 1; padding: 2px; cursor: pointer; opacity: .65; }
-.panel .options .eye-toggle:hover { opacity: 1; }
+.panel .steps li .eye-toggle { position: absolute; top: 22px; right: 0; z-index: 2; border: none; background: none; font-size: 13px; line-height: 1; padding: 2px; cursor: pointer; opacity: .65; }
+.panel .steps li .eye-toggle:hover { opacity: 1; }
 .panel .options.eye-ghost:has(.group-choice:checked) > li:not(:has(.group-choice:checked)) { opacity: .35; }
 .panel .options.eye-hide:has(.group-choice:checked) > li:not(:has(.group-choice:checked)) { display: none; }
 

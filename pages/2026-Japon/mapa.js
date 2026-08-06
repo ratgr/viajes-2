@@ -208,13 +208,15 @@
   // (mutuamente excluyentes); elegir uno marca la opción y enciende su geometría
   document.querySelectorAll('.panel .options').forEach(function (set, si) {
     // ojo del conjunto: 👁 = fantasma de los no elegidos · 🙈 = solo el elegido
+    // (vive en la FILA padre, no dentro de las opciones)
     var eye = document.createElement('button');
     eye.type = 'button';
     eye.className = 'eye-toggle';
     eye.textContent = '👁';
     eye.title = 'Los no elegidos: fantasma (👁) u ocultos (🙈)';
     set.classList.add('eye-ghost');
-    set.appendChild(eye);
+    var host = set.closest('li') || set;
+    host.appendChild(eye);
     eye.addEventListener('click', function (e) {
       e.stopPropagation();
       var hide = set.classList.toggle('eye-hide');
