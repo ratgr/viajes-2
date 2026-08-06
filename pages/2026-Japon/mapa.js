@@ -364,9 +364,9 @@
     return li;
   }
 
-  // ---------- capas vivas: el mapa muestra TODO lo visible en la barra ----------
-  // cada fila/sub-fila con clave dibuja su geometría si está a la vista (día
-  // abierto, opción desplegada, ojo…); la casilla la ANCLA aunque se oculte
+  // ---------- capas vivas: la CASILLA manda ----------
+  // solo las filas/sub-filas MARCADAS dibujan su geometría (el maestro del
+  // día marca todo el día); abrir/plegar solo organiza la barra
   var liveLayers = {};    // clave → capa Leaflet
 
   function makeLayer(key) {
@@ -397,7 +397,7 @@
       var key = el.dataset.location || el.dataset.transit;
       if (!key || want[key]) return;
       var ck = el.querySelector(':scope > .ck');
-      if (el.offsetParent !== null || (ck && ck.checked)) want[key] = true;
+      if (ck && ck.checked) want[key] = true;
     });
     Object.keys(liveLayers).forEach(function (k) {
       if (!want[k]) {
