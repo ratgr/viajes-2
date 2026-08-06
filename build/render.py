@@ -138,10 +138,10 @@ def row_text(n, refs):
         title = str(n["title"]).replace("*", "")   # defensa; migrate_yaml ya los quita
         parts.append(f'<b class="title">{mode_icon(n)}{md(title, refs)}</b>')
     if n.get("duration") not in (None, 0, "0"):
-        sep = " - " if parts else ""
+        sep = '<span class="sep"> - </span>' if parts else ""
         parts.append(f'<span class="duration">{sep}{html.escape(str(n["duration"]))}</span>')
     if n.get("note"):
-        sep = " - " if parts else ""
+        sep = '<span class="sep"> - </span>' if parts else ""
         parts.append(f'<span class="note">{sep}{md(str(n["note"]).strip(), refs)}</span>')
     return "".join(parts)
 
@@ -150,7 +150,14 @@ def time_cell(n):
     t = str(n.get("time") or "")
     cls = "time fixed" if n.get("fixed") else "time"
     dt = f' datetime="{t}"' if re.match(r"^\d{1,2}:\d{2}$", t) else ""
-    return f'<time class="{cls}"{dt}>{html.escape(t)}</time>'
+    # hora de FIN calculada (time + duration): derivada; el itinerario la
+    # esconde por CSS, la barra del mapa la muestra como rango DESDE–HASTA
+    to = ""
+    if dt and n.get("duration") not in (None, 0, "0"):
+        fin = add_min(t, dmin(n["duration"]))
+        if fin:
+            to = f'<span class="to" data-derived="fin">–{fin}</span>'
+    return f'<time class="{cls}"{dt}>{html.escape(t)}{to}</time>'
 
 
 def resto_link(opt, refs):
@@ -348,8 +355,9 @@ def render_modal(key):
     return f'<div class="modal" id="m-{key}"><h3>{html.escape(key)}</h3></div>'
 
 # ---------------------------------------------------------------- ensamblado
-def build_page(trip, template_name, out_name):
-    """src/<trip>/viaje.yaml + src/<trip>/<template> → pages/<trip>/<out>."""
+def build_page(trip, template_name, out_name, extra=None):
+    """src/<trip>/viaje.yaml + src/<trip>/<template> → pages/<trip>/<out>.
+    `extra`: callable (corre tras init) que devuelve tokens adicionales."""
     src_dir, pages_dir, cfg = trip_paths(trip)
     data = yaml.safe_load(open(os.path.join(src_dir, "viaje.yaml"), encoding="utf-8"))
     init(data, cfg.get("foto_base", ""))
@@ -359,8 +367,11 @@ def build_page(trip, template_name, out_name):
     nav = "".join(nav_link(d, i + 1) for i, d in enumerate(DAYS))
     modals = "\n".join(render_modal(k) for k in refs.order)
 
+    tokens = {"<!--NAV-->": nav, "<!--DAYS-->": days, "<!--MODALS-->": modals}
+    if extra:
+        tokens.update(extra())
     page = open(os.path.join(src_dir, template_name), encoding="utf-8").read()
-    for token, value in (("<!--NAV-->", nav), ("<!--DAYS-->", days), ("<!--MODALS-->", modals)):
+    for token, value in tokens.items():
         assert token in page, f"{template_name} sin {token}"
         page = page.replace(token, value, 1)
     os.makedirs(pages_dir, exist_ok=True)

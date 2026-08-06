@@ -75,6 +75,19 @@ def text_of(node):
     return "".join(out)
 
 
+def text_plain(node):
+    """texto sin lo derivado ni separadores presentacionales (.sep)."""
+    out = []
+    for c in node.children:
+        if isinstance(c, str):
+            out.append(c)
+        elif "data-derived" in c.attrs or "sep" in c.cls():
+            continue
+        else:
+            out.append(text_plain(c))
+    return "".join(out)
+
+
 def to_md(children):
     """HTML renderizado → texto fuente (markdown + @[refs]); salta lo derivado."""
     out = []
@@ -114,7 +127,7 @@ def parse_step(li):
         d["hidden-summary"] = True
     t = first(li.children, "time")
     if t is not None:
-        tt = text_of(t).strip()
+        tt = text_plain(t).strip()      # sin la hora-fin derivada
         if tt:
             d["time"] = tt
         if "fixed" in t.cls():
@@ -128,7 +141,7 @@ def parse_step(li):
         if c.tag == "b" and "title" in c.cls():
             d["title"] = to_md(c.children).strip()
         elif c.tag == "span" and "duration" in c.cls():
-            d["duration"] = re.sub(r"^\s*-\s*", "", text_of(c)).strip()
+            d["duration"] = text_plain(c).strip()
         elif c.tag == "span" and "note" in c.cls():
             d["note"] = re.sub(r"^\s*-\s", "", to_md(c.children)).strip()
         elif c.tag == "ul" and "options" in c.cls():

@@ -1,10 +1,12 @@
 /* mapa.css — cromo del mapa SOBRE el markup del itinerario (no lo cambia):
    disposición barra-lateral + mapa, filas compactas con casilla, días colapsables. */
 
-/* ---------- disposición: barra lateral + mapa ---------- */
+/* ---------- disposición: barra lateral + divisor arrastrable + mapa ---------- */
 html, body { height: 100%; }
 body { display: flex; padding: 0; overflow: hidden; }
-.panel { width: 380px; min-width: 300px; overflow-y: auto; padding: 0 14px 40px; border-right: 1px solid var(--line); background: var(--paper); }
+.panel { width: 380px; min-width: 260px; max-width: 70vw; flex: 0 0 auto; overflow-y: auto; padding: 0 14px 40px; background: var(--paper); }
+.splitter { flex: 0 0 5px; cursor: col-resize; background: var(--line); }
+.splitter:hover, .splitter.dragging { background: var(--shu); }
 #map { flex: 1; min-width: 0; }
 
 /* ---------- cabecera de la barra ---------- */
@@ -23,12 +25,27 @@ body { display: flex; padding: 0; overflow: hidden; }
 .panel section.day.open .day-head .caret { transform: rotate(90deg); }
 .panel .day-head .note, .panel .day-head .ancla { display: none; }  /* no caben en 380px */
 
-/* ---------- filas compactas con casilla (columna extra para el checkbox) ---------- */
-.panel .steps > li { grid-template-columns: 16px 42px minmax(0, 1fr); gap: 8px; padding: 4px 0; font-size: 12.5px; scroll-margin-top: 46px; }
-.panel .steps > li .note { display: none; }     /* la nota es del itinerario; el mapa respira */
-.panel .steps .time { font-size: 11px; }
+/* ---------- filas compactas con casilla ----------
+   Rejilla: [casilla | hora/duración | contenido]. El div.body (y el span
+   .transit) se aplanan con display:contents para colocar título a la derecha
+   y duración ABAJO de la hora, en la columna izquierda. */
+.panel .steps > li { grid-template-columns: 16px 52px minmax(0, 1fr); gap: 2px 8px; padding: 4px 0; font-size: 12.5px; scroll-margin-top: 46px; }
+.panel .steps > li > .ck { grid-column: 1; grid-row: 1; }
+.panel .steps > li > .time { grid-column: 2; grid-row: 1; font-size: 11px; }
+.panel .steps > li > .body, .panel .steps li .transit { display: contents; }
+.panel .steps li .title { grid-column: 3; grid-row: 1; }
+.panel .steps li .duration { grid-column: 2; grid-row: 2; font-size: 10.5px; color: var(--ink-soft); }
+.panel .steps li .options { grid-column: 1 / -1; grid-row: 3; }
+.panel .steps li .note, .panel .sep { display: none; }   /* la nota es del itinerario */
+/* rango DESDE–HASTA: la hora-fin derivada se muestra debajo de la de inicio */
+.panel .steps .time .to { display: block; font-weight: 400; color: var(--ink-soft); }
 .panel .ck { margin: 3px 0 0; accent-color: var(--shu); }
 .panel .day-head .ck { margin: 0; align-self: center; }
+
+/* fila seleccionada (mapa.js) */
+.panel .steps > li { border-left: 3px solid transparent; padding-left: 2px; }
+.panel .steps > li:hover { border-left-color: var(--ai); background: var(--paper-2); cursor: pointer; }
+.panel .steps > li.sel { background: var(--shu-soft); border-left-color: var(--shu); }
 
 /* options en columna única dentro de la barra */
 .panel .options { grid-template-columns: 1fr; }

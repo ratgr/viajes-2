@@ -52,6 +52,7 @@ a { color: var(--shu); }
 .title .icon { font-style: normal; }
 .steps .time { color: var(--ink-soft); font-variant-numeric: tabular-nums; font-size: 12px; padding-top: 2px; white-space: nowrap; letter-spacing: .06em; font-weight: 600; }
 .steps .time.fixed { color: var(--shu); }
+.steps .time .to { display: none; }   /* hora-fin derivada: solo la muestra el mapa */
 .steps b { font-weight: 600; }
 .steps .transit { color: var(--ink-soft); }
 
