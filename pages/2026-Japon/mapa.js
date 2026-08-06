@@ -17,6 +17,18 @@
   // ---------- barra lateral ----------
   var days = Array.prototype.slice.call(document.querySelectorAll('section.day'));
 
+  // INVARIANTE del maestro del día: todo prendido = ✔ · algo prendido = ▬
+  // (tercer estado) · nada = vacío. Se recalcula tras CUALQUIER cambio,
+  // venga de un click o de código (stepper de día, hash, restauración).
+  function updateMaster(day) {
+    var m = day.querySelector('.ck-day');
+    if (!m) return;
+    var cks = Array.prototype.slice.call(day.querySelectorAll('.ck:not(.ck-day)'));
+    var on = cks.filter(function (c) { return c.checked; }).length;
+    m.checked = on === cks.length && on > 0;
+    m.indeterminate = on > 0 && on < cks.length;
+  }
+
   days.forEach(function (day) {
     var head = day.querySelector('.day-head');
     var rows = Array.prototype.slice.call(
@@ -51,15 +63,13 @@
       Array.prototype.forEach.call(day.querySelectorAll('.ck:not(.ck-day)'), function (ck) {
         ck.checked = master.checked;
       });
+      master.indeterminate = false;
       if (master.checked) day.classList.add('open');
     });
-    // maestro tri-estado según TODAS las casillas del día
+    // tri-estado ante CUALQUIER cambio de casilla dentro del día
     day.addEventListener('change', function (e) {
       if (e.target === master || !e.target.classList.contains('ck')) return;
-      var cks = Array.prototype.slice.call(day.querySelectorAll('.ck:not(.ck-day)'));
-      var on = cks.filter(function (c) { return c.checked; }).length;
-      master.checked = on === cks.length && on > 0;
-      master.indeterminate = on > 0 && on < cks.length;
+      updateMaster(day);
     });
   });
 
@@ -993,11 +1003,10 @@
     return el ? days.indexOf(el.closest('section.day')) : -1;
   }
   function setDayChecked(day, on) {
-    var m = day.querySelector('.ck-day');
-    if (m) { m.checked = on; m.indeterminate = false; }
     Array.prototype.forEach.call(day.querySelectorAll('.ck:not(.ck-day)'), function (c) {
       c.checked = on;
     });
+    updateMaster(day);
   }
   function firstConcreteOfDay(di) {
     for (var j = 0; j < stEls.length; j++) {
