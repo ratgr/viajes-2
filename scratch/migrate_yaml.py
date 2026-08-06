@@ -15,6 +15,7 @@ import sys
 
 import yaml
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "build"))
 from common import ROOT, resolve_trip, trip_paths
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")

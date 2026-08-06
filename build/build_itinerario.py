@@ -3,12 +3,14 @@
 
 Estructura del repo (los scripts de build/ sirven para cualquier viaje):
 
-    build/                 scripts + assets compartidos (css/js se copian al release)
+    build/                 pipeline + assets compartidos (css/js se copian al release)
     src/<viaje>/           viaje.yaml · plantilla.html · config.yaml
     pages/<viaje>/         release autocontenida (html + css/js copiados)
+    scratch/               herramientas fuera del pipeline (p.ej. migrate_yaml.py)
 
-    python build/migrate_yaml.py [viaje]        resincroniza viaje.yaml del upstream
+    ./build-japan.sh | build-japan.bat          corrida rápida del viaje Japón
     python build/build_itinerario.py [viaje]    genera la página (y verifica 1:1)
+    python scratch/migrate_yaml.py [viaje]      resincroniza viaje.yaml del upstream
 
 El HTML es una proyección 1:1 del YAML: cada paso es un <li> con sus claves
 como data-* (location/transit/mode/solo-seleccion), sus campos como elementos
