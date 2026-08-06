@@ -307,6 +307,11 @@
         });
       }
     });
+    // por defecto la PRIMERA opción del conjunto queda elegida (sin volar ahí)
+    if (!set.querySelector('.group-choice:checked, .option-choice:checked')) {
+      var first = set.querySelector('.group-choice, .option-choice');
+      if (first) first.checked = true;
+    }
   });
   // popup con la tarjeta COMPLETA (en teléfono es la única vista); si es alta
   // se colapsa tras «Ver más» y expandida scrollea con tope de 40% de pantalla
