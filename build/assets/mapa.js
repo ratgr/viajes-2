@@ -809,6 +809,15 @@
     return map.getZoom();
   }
   function stGoTo(i) {
+    // cruzar de día con el caminador — como sea que pase (‹ ›, día ‹ ›,
+    // saltar a opción) — OCULTA el día anterior y ACTIVA el nuevo completo
+    var prevDi = dayIndexOf(stEls[stCur]);
+    var newDi = dayIndexOf(stEls[i]);
+    if (newDi >= 0 && newDi !== prevDi) {
+      if (prevDi >= 0) setDayChecked(days[prevDi], false);
+      setDayChecked(days[newDi], true);
+      syncLayers();
+    }
     stCur = i;
     stMode = null;
     var el = stEls[i];
@@ -1469,9 +1478,13 @@
     var li = m[2] ? document.getElementById(m[2]) : null;
     if (li) {
       openDayOf(li);
+      // el día de la fila del hash llega ACTIVO (visible en el mapa)
+      var liDay = li.closest('section.day');
+      if (liDay) setDayChecked(liDay, true);
       selectRow(li);
       stSyncTo(li);
       li.scrollIntoView({ block: 'center' });
+      schedSync();
     }
     if (devMode && li) {
       openDevEditor(li);

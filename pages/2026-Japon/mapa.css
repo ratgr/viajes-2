@@ -162,15 +162,17 @@ body.show-free .panel .steps > li[data-free]::after { content: '⏳ ' attr(data-
 .geo-mid { background: #fff; border: 2px solid #d4a017; border-radius: 50%; opacity: .75; cursor: copy; }
 
 /* ---------- stepper: recorrido paso a paso (principal en teléfono) ----------
-   Barra de lado a lado del mapa; ‹ › SIEMPRE pegados a las orillas, el título
-   centrado y separado de ellos. El stepper de DÍA vive abajo. */
-.stepper { position: absolute; top: 0; left: 0; right: 0; z-index: 1000; background: var(--card); border-bottom: 1px solid var(--line); box-shadow: 0 2px 10px rgba(0, 0, 0, .14); font-size: 12.5px; }
-.stepper .st-row { display: flex; align-items: center; gap: 8px; padding: 6px 10px; }
-.stepper .st-prev, .stepper .st-next { border: none; background: none; font-size: 20px; line-height: 1; cursor: pointer; padding: 2px 10px; color: var(--shu); flex: 0 0 auto; }
+   SIN barra de fondo: cada pieza flota como su propia pastilla (‹ › pegados
+   a las orillas, título centrado) y el mapa se ve y se usa entre ellas —
+   en teléfono la barra sólida tapaba medio mapa y los botones de zoom.
+   El stepper de DÍA vive abajo, igual de suelto. */
+.stepper { position: absolute; top: 0; left: 0; right: 0; z-index: 1000; font-size: 12.5px; pointer-events: none; }
+.stepper .st-row { display: flex; align-items: center; gap: 8px; padding: 8px; }
+.stepper .st-prev, .stepper .st-next { pointer-events: auto; border: 1px solid var(--line); background: var(--card); border-radius: 50%; width: 34px; height: 34px; box-shadow: 0 2px 8px rgba(0, 0, 0, .22); font-size: 18px; line-height: 1; cursor: pointer; padding: 0; color: var(--shu); flex: 0 0 auto; }
 .stepper button:disabled { opacity: .25; cursor: default; }
 .stepper .st-center { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; min-width: 0; }
-.stepper .st-cur { max-width: 60vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
-.stepper .st-opt { border: 1px solid var(--line); background: var(--paper-2); color: var(--ink); border-radius: 999px; padding: 2px 10px; cursor: pointer; font-size: 12px; text-align: left; }
+.stepper .st-cur { pointer-events: auto; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 5px 14px; box-shadow: 0 2px 8px rgba(0, 0, 0, .22); max-width: 60vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
+.stepper .st-opt { pointer-events: auto; border: 1px solid var(--line); background: var(--paper-2); color: var(--ink); border-radius: 999px; padding: 2px 10px; cursor: pointer; font-size: 12px; text-align: left; box-shadow: 0 1px 5px rgba(0, 0, 0, .18); }
 .stepper .st-opt.chosen { border-color: var(--shu); }
 .stepper .st-opt.on { border-color: var(--shu); color: var(--shu); font-weight: 700; }
 /* colores del tier en las pastillas y su etiqueta (sin colapso por columna) */
@@ -182,17 +184,17 @@ body.show-free .panel .steps > li[data-free]::after { content: '⏳ ' attr(data-
 .stepper .st-col-head[data-tier="Shu"] { color: var(--shu); }
 .stepper .st-opt.on[data-tier] { box-shadow: inset 0 0 0 1px currentColor; color: var(--shu); }
 .stepper .st-col { display: inline-flex; flex-direction: column; gap: 3px; vertical-align: top; }
-.stepper .st-col-head { font-weight: 700; font-size: 11px; color: var(--ink-soft); }
-.stepper .st-jump { border-top: 1px dashed var(--line); padding: 4px 10px 7px; }
-.stepper .st-jump-toggle { border: none; background: none; font-size: 11px; color: var(--ink-soft); cursor: pointer; padding: 0; }
-.stepper .st-jump-body { margin-top: 4px; display: flex; gap: 6px; flex-wrap: wrap; align-items: flex-start; justify-content: center; }
+.stepper .st-col-head { pointer-events: auto; align-self: flex-start; background: var(--card); border-radius: 999px; padding: 1px 8px; box-shadow: 0 1px 5px rgba(0, 0, 0, .18); font-weight: 700; font-size: 11px; color: var(--ink-soft); }
+.stepper .st-jump { padding: 0 10px 6px; }
+.stepper .st-jump-toggle { pointer-events: auto; border: 1px solid var(--line); background: var(--card); border-radius: 999px; padding: 2px 10px; box-shadow: 0 1px 5px rgba(0, 0, 0, .18); font-size: 11px; color: var(--ink-soft); cursor: pointer; display: block; margin: 0 auto; }
+.stepper .st-jump-body { margin-top: 5px; display: flex; gap: 6px; flex-wrap: wrap; align-items: flex-start; justify-content: center; }
 
-/* stepper de día: barra inferior, de lado a lado */
-.day-stepper { position: absolute; bottom: 0; left: 0; right: 0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--card); border-top: 1px solid var(--line); padding: 6px 10px; font-size: 12.5px; }
-.day-stepper button { border: none; background: none; color: var(--shu); font-size: 13px; font-weight: 700; cursor: pointer; padding: 2px 8px; flex: 0 0 auto; }
+/* stepper de día: piezas sueltas abajo, sin barra */
+.day-stepper { position: absolute; bottom: 0; left: 0; right: 0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px; font-size: 12.5px; pointer-events: none; }
+.day-stepper button { pointer-events: auto; border: 1px solid var(--line); background: var(--card); border-radius: 999px; box-shadow: 0 2px 8px rgba(0, 0, 0, .22); color: var(--shu); font-size: 12.5px; font-weight: 700; cursor: pointer; padding: 5px 12px; flex: 0 0 auto; }
 .day-stepper button:disabled { opacity: .25; cursor: default; }
-.day-stepper .ds-cur { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.day-stepper .ds-cur { pointer-events: auto; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 5px 14px; box-shadow: 0 2px 8px rgba(0, 0, 0, .22); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 
-/* el cromo de Leaflet se aparta de las barras: zoom más abajo, créditos arriba */
-#map .leaflet-top .leaflet-control { margin-top: 100px; }
-#map .leaflet-bottom .leaflet-control { margin-bottom: 34px; }
+/* el cromo de Leaflet solo libra la fila de pastillas de arriba/abajo */
+#map .leaflet-top .leaflet-control { margin-top: 52px; }
+#map .leaflet-bottom .leaflet-control { margin-bottom: 42px; }
