@@ -18,6 +18,7 @@ así que la identidad de la edición sale del id de la fila.
 
 Uso: python build/dev_server.py [puerto]      (default 8791)
 """
+import contextlib
 import json
 import os
 import subprocess
@@ -41,13 +42,17 @@ CATALOGS = ("places", "transits", "lines")
 
 def yaml_path(trip):
     p = os.path.abspath(os.path.join(ROOT, "src", trip, "viaje.yaml"))
-    if not p.startswith(os.path.join(ROOT, "src")):
+    # separador final: sin él, '../srcotra' pasaba el filtro de prefijo
+    if not p.startswith(os.path.join(ROOT, "src", "")):
         raise ValueError(f"viaje inválido: {trip}")
     return p
 
 
-# el servidor es multihilo: nunca leer el YAML mientras otro hilo lo escribe
-_YAML_LOCK = threading.Lock()
+# el servidor es multihilo: el candado debe cubrir CADA secuencia completa
+# leer-modificar-guardar (no solo la lectura y la escritura por separado —
+# dos POST simultáneos se pisaban la edición en silencio). RLock: load/save
+# también se usan solos.
+_YAML_LOCK = threading.RLock()
 
 
 def load(trip):
@@ -65,13 +70,42 @@ def save(trip, data):
         os.replace(tmp, path)
 
 
+@contextlib.contextmanager
+def edit(trip):
+    """leer-modificar-guardar ATÓMICO: candado sostenido todo el trayecto."""
+    with _YAML_LOCK:
+        Y = load(trip)
+        yield Y
+        save(trip, Y)
+
+
+def steps_of(Y, day):
+    """lista de pasos del día 1-based — con validación de rango (el indexado
+    negativo de Python convertía day=0 en 'el último día' sin error)."""
+    d = int(day)
+    if not 1 <= d <= len(Y.get("days", [])):
+        raise ValueError(f"día fuera de rango: {day}")
+    return Y["days"][d - 1]["steps"]
+
+
+def step_at(Y, day, step):
+    steps = steps_of(Y, day)
+    s = int(step)
+    if not 1 <= s <= len(steps):
+        raise ValueError(f"paso fuera de rango: {step}")
+    return steps, s - 1
+
+
 def rebuild(trip):
-    outs = []
-    for script in ("build_itinerario.py", "build_mapa.py"):
-        r = subprocess.run([sys.executable, os.path.join(ROOT, "build", script), trip],
-                           capture_output=True, text=True, encoding="utf-8")
-        outs.append(r.stdout.strip() or r.stderr.strip())
-    return "\n".join(outs)
+    # bajo el candado: un Guardar aterrizando entre los dos scripts producía
+    # itinerario y mapa construidos de VERSIONES DISTINTAS del YAML
+    with _YAML_LOCK:
+        outs = []
+        for script in ("build_itinerario.py", "build_mapa.py"):
+            r = subprocess.run([sys.executable, os.path.join(ROOT, "build", script), trip],
+                               capture_output=True, text=True, encoding="utf-8")
+            outs.append(r.stdout.strip() or r.stderr.strip())
+        return "\n".join(outs)
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -99,9 +133,9 @@ class Handler(SimpleHTTPRequestHandler):
         q = dict(urllib.parse.parse_qsl(u.query))
         try:
             if u.path == "/api/step":
-                step = load(q["trip"])["days"][int(q["day"]) - 1]["steps"][int(q["step"]) - 1]
+                steps, i = step_at(load(q["trip"]), q["day"], q["step"])
                 self._json(200, {"ok": True,
-                                 "yaml": yaml.dump(step, allow_unicode=True, sort_keys=False,
+                                 "yaml": yaml.dump(steps[i], allow_unicode=True, sort_keys=False,
                                                    default_flow_style=False, width=100000)})
             elif u.path == "/api/entity":
                 Y = load(q["trip"])
@@ -131,10 +165,9 @@ class Handler(SimpleHTTPRequestHandler):
                 step = yaml.safe_load(req["yaml"])
                 if not isinstance(step, dict):
                     return self._json(400, {"error": "el YAML debe ser un mapeo (un paso)"})
-                trip = req["trip"]
-                Y = load(trip)
-                Y["days"][int(req["day"]) - 1]["steps"][int(req["step"]) - 1] = step
-                save(trip, Y)
+                with edit(req["trip"]) as Y:
+                    steps, i = step_at(Y, req["day"], req["step"])
+                    steps[i] = step
                 self._json(200, {"ok": True})
             elif u.path == "/api/entity":
                 obj = yaml.safe_load(req["yaml"])
@@ -142,35 +175,25 @@ class Handler(SimpleHTTPRequestHandler):
                     return self._json(400, {"error": "el YAML debe ser un mapeo (una entidad)"})
                 if req.get("kind") not in CATALOGS:
                     return self._json(400, {"error": f"kind debe ser uno de {CATALOGS}"})
-                trip = req["trip"]
-                Y = load(trip)
-                Y.setdefault(req["kind"], {})[req["key"]] = obj
-                save(trip, Y)
+                with edit(req["trip"]) as Y:
+                    Y.setdefault(req["kind"], {})[req["key"]] = obj
                 self._json(200, {"ok": True})
             elif u.path == "/api/step-insert":
                 # inserta {title: (nuevo paso)} antes/después de la fila dada;
                 # responde el número (1-based) del paso nuevo
-                trip = req["trip"]
-                Y = load(trip)
-                steps = Y["days"][int(req["day"]) - 1]["steps"]
-                i = int(req["step"]) - 1
-                if not 0 <= i < len(steps):
-                    return self._json(400, {"error": "paso fuera de rango"})
-                pos = i if req.get("where") == "before" else i + 1
-                steps.insert(pos, {"title": "(nuevo paso)"})
-                save(trip, Y)
+                with edit(req["trip"]) as Y:
+                    steps, i = step_at(Y, req["day"], req["step"])
+                    pos = i if req.get("where") == "before" else i + 1
+                    steps.insert(pos, {"title": "(nuevo paso)"})
                 self._json(200, {"ok": True, "step": pos + 1})
             elif u.path == "/api/step-move":
                 # mueve la fila una posición (dir=-1 sube, dir=1 baja)
-                trip = req["trip"]
-                Y = load(trip)
-                steps = Y["days"][int(req["day"]) - 1]["steps"]
-                i = int(req["step"]) - 1
-                j = i + int(req.get("dir", 0))
-                if not (0 <= i < len(steps) and 0 <= j < len(steps) and i != j):
-                    return self._json(400, {"error": "movimiento fuera de rango"})
-                steps.insert(j, steps.pop(i))
-                save(trip, Y)
+                with edit(req["trip"]) as Y:
+                    steps, i = step_at(Y, req["day"], req["step"])
+                    j = i + int(req.get("dir", 0))
+                    if not (0 <= j < len(steps) and i != j):
+                        raise ValueError("movimiento fuera de rango")
+                    steps.insert(j, steps.pop(i))
                 self._json(200, {"ok": True, "step": j + 1})
             elif u.path == "/api/rebuild":
                 self._json(200, {"ok": True, "build": rebuild(req["trip"])})

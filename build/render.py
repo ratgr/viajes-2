@@ -140,9 +140,25 @@ def round_walk(mins):
     return m5 if m5 <= 45 else math.ceil(mins / 15) * 15
 
 
-def walk_calc(coords_str):
-    """(metros, minutos redondeados) del camino a pie."""
-    pts = [tuple(float(x) for x in p.split(",")) for p in str(coords_str).split()]
+def parse_pts(raw, ctx=""):
+    """lista de (lat,lng) del formato 'lat,lng lat,lng …' — o None si está
+    malformado (un dato roto es un DIAGNÓSTICO, no un build muerto)."""
+    try:
+        pts = []
+        for tok in str(raw).split():
+            la, lo = tok.split(",")
+            pts.append((float(la), float(lo)))
+        return pts or None
+    except ValueError:
+        DIAGNOSTICS.append(f"{ctx}: gps/coords malformadas «{str(raw)[:48]}»")
+        return None
+
+
+def walk_calc(coords_str, ctx=""):
+    """(metros, minutos redondeados) del camino a pie — None si está malformado."""
+    pts = parse_pts(coords_str, ctx)
+    if not pts or len(pts) < 2:
+        return None
     dist = sum(_crow_m(pts[i - 1], pts[i]) for i in range(1, len(pts)))
     return dist, round_walk(dist / WALK_M_PER_MIN)
 
@@ -162,15 +178,15 @@ def _place_pt(key):
     gps = PLACES.get(key, {}).get("gps")
     if not gps:
         return None
-    la, lo = str(gps).split(",")
-    return (float(la), float(lo))
+    pts = parse_pts(gps, f"places[{key}]")
+    return pts[0] if pts else None
 
 
 def _transit_pts(key):
     coords = TRANSITS.get(key, {}).get("coords")
     if not coords:
         return None
-    return [tuple(float(x) for x in p.split(",")) for p in str(coords).split()]
+    return parse_pts(coords, f"transits[{key}]")
 
 
 def check_teleports(steps, sched, ctx=""):
@@ -257,8 +273,9 @@ def derive_schedule(steps, ctx=""):
         # caminatas: la geometría dicta la duración (4 km/h + redondeo);
         # si el YAML trae otra cosa, es un diagnóstico
         coords = step_walk_geometry(s)
-        if coords and not is_flex:
-            dist, esperado = walk_calc(coords)
+        wc = walk_calc(coords, f"{ctx} paso {i + 1}") if coords and not is_flex else None
+        if wc:
+            dist, esperado = wc
             if fo["dur"] is None:
                 fo["dur"], fo["dur_derived"], fo["approx"] = esperado, True, True
             elif fo["dur_exp"] and fo["dur"] != esperado:
@@ -300,10 +317,15 @@ def derive_schedule(steps, ctx=""):
         elif fo["begin"] is not None and fo["dur"]:
             fo["end"] = fo["begin"] + fo["dur"]
         cursor = fo["end"] if fo["end"] is not None else fo["begin"]
-    # pasada atrás: con duración pero sin inicio → fin = inicio del siguiente
+    # pasada atrás: con duración pero sin inicio → fin = inicio del siguiente;
+    # PERO un time-to explícito propio manda: inicio = fin − duración (antes
+    # el snap al siguiente PISABA el fin explícito sin avisar)
     for i in range(n - 1, -1, -1):
         fo = info[i]
         if fo is None or fo["begin"] is not None or not fo["dur"]:
+            continue
+        if fo["end_exp"] is not None:
+            fo["begin"], fo["beg_derived"] = fo["end_exp"] - fo["dur"], True
             continue
         nb = next_begin(i)
         if nb is not None:
@@ -327,11 +349,19 @@ def derive_schedule(steps, ctx=""):
                 fo["conflict"] = (f"termina {fmt_hm(fo['begin'] + fo['dur'])} pero lo "
                                   f"siguiente empieza {fmt_hm(nb)} (encimados {exceso} min)")
                 DIAGNOSTICS.append(f"{ctx} paso {i + 1} «{title}»: {fo['conflict']}")
-    # tiempo LIBRE tras cada paso: hueco entre su fin y el próximo inicio explícito
+    # tiempo LIBRE tras cada paso: hueco entre su fin y el próximo inicio YA
+    # RESUELTO (explícito o derivado — contar solo explícitos duplicaba el
+    # hueco cuando en medio había pasos con inicio encadenado)
+    def next_resolved_begin(i):
+        for j in range(i + 1, n):
+            if info[j] and info[j]["begin"] is not None:
+                return info[j]["begin"]
+        return None
+
     for i, fo in enumerate(info):
         if fo is None or fo["end"] is None:
             continue
-        nb = next_begin(i)
+        nb = next_resolved_begin(i)
         if nb is not None and nb > fo["end"]:
             fo["free"] = nb - fo["end"]
     return [{} if fo is None else
@@ -460,8 +490,11 @@ def time_cell(n, sc=None):
     inner = html.escape(t)
     if not t and sc.get("start_derived"):
         inner = f'<span class="from" data-derived="from">{fmt_hm(sc["start"])}</span>'
-    if sc.get("end_exp") is not None and inner:
-        inner += f'<span class="to">–{fmt_hm(sc["end_exp"])}</span>'   # explícito: verde
+    # time-to explícito va CRUDO (el verify lo compara literal: normalizarlo
+    # rompía el round-trip con grafías tipo '9:05') y SIEMPRE se emite,
+    # aunque no haya inicio del cual colgarlo
+    if n.get("time-to") is not None:
+        inner += f'<span class="to">–{html.escape(str(n["time-to"]))}</span>'   # explícito: verde
     elif sc.get("end") is not None and inner:
         inner += f'<span class="to" data-derived="to">–{fmt_hm(sc["end"])}</span>'
     if sc.get("conflict"):
@@ -703,7 +736,9 @@ def build_page(trip, template_name, out_name, extra=None):
     `extra`: callable (corre tras init) que devuelve tokens adicionales."""
     src_dir, pages_dir, cfg = trip_paths(trip)
     data = yaml.safe_load(open(os.path.join(src_dir, "viaje.yaml"), encoding="utf-8"))
-    init(data, cfg.get("foto_base", ""))
+    # la llave del config es photo_base (esquema en inglés); se leía foto_base
+    # y la base quedaba SIEMPRE vacía — rutas relativas de imagen rotas
+    init(data, cfg.get("photo_base", cfg.get("foto_base", "")))
 
     refs = RefLog()
     days = "\n\n".join(render_day(d, refs, i + 1) for i, d in enumerate(DAYS))

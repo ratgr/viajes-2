@@ -16,6 +16,8 @@
 
   // ---------- barra lateral ----------
   var days = Array.prototype.slice.call(document.querySelectorAll('section.day'));
+  var activeDay = -1;    // índice del día ACTIVO (visible en el mapa); lo
+                         // mueven goDay/stGoTo/restore — no los clicks sueltos
 
   // INVARIANTE del maestro del día: todo prendido = ✔ · algo prendido = ▬
   // (tercer estado) · nada = vacío. Se recalcula tras CUALQUIER cambio,
@@ -393,7 +395,9 @@
   // popup con la tarjeta COMPLETA (en teléfono es la única vista); si es alta
   // se colapsa tras «Ver más» y expandida scrollea con tope de 40% de pantalla
   function openCardPopup(latlng, content) {
-    var pop = L.popup({ maxWidth: 320 })
+    // autoPan APAGADO: cada apertura viene con su propio vuelo explícito y
+    // el paneo automático del popup peleaba con la animación en curso
+    var pop = L.popup({ maxWidth: 320, autoPan: false })
       .setLatLng(latlng)
       .setContent('<div class="popup-card">' + content + '</div>')
       .openOn(map);
@@ -427,7 +431,9 @@
     clearTemp();
     haloFor([key]);
     if (loc) {
-      var z = repeat ? Math.min(19, map.getZoom() + 2)
+      // repetido: acercar SIEMPRE por encima del nivel normal de lugar —
+      // si venimos de un encuadre lejano, +2 podía quedar MÁS lejos que 15
+      var z = repeat ? Math.min(19, Math.max(map.getZoom() + 2, 16))
                      : (zoomOpt || Math.max(map.getZoom(), 15));
       map.flyTo(loc, z, { duration: .5 });
       openCardPopup(loc, content + dayPieces(key, activeRowId));
@@ -577,6 +583,7 @@
     var li = rowOf(stEls[idx]) || stEls[idx];
     openDayOf(li);
     selectRow(li);
+    if (li.id) updateHash(null, li.id);
     li.scrollIntoView({ block: 'center' });
     stCur = idx;
     stMode = null;
@@ -584,16 +591,25 @@
   }
   // estado fantasma: elemento marcado dentro de una opción NO elegida —
   // con 👁 su geometría se dibuja atenuada; con 🙈 va en línea GORDA tenue
-  // (sigue visible: distinta, no borrada)
+  // (sigue visible: distinta, no borrada). Recorre TODOS los conjuntos
+  // ancestros (como onChosenPath/sameBranch): en elecciones anidadas manda
+  // el peor estado de cualquier nivel.
   function ghostState(el) {
-    var set = el.closest('.options');
-    if (!set) return 'full';
-    var chosen = set.querySelector('.option-choice:checked, .group-choice:checked');
-    if (!chosen) return 'full';
-    var container = el.closest('.option') || el.closest('.options > li');
-    if (!container || container.contains(chosen)) return 'full';
-    if (set.classList.contains('eye-hide')) return 'hidden';
-    return set.classList.contains('eye-ghost') ? 'ghost' : 'full';
+    var worst = 'full';
+    var node = el;
+    for (var set = node.closest('.options'); set;
+         set = set.parentElement && set.parentElement.closest('.options')) {
+      var chosen = set.querySelector('.option-choice:checked, .group-choice:checked');
+      if (chosen) {
+        var cont = chosenContainer(set, node);
+        if (cont && !cont.contains(chosen)) {
+          if (set.classList.contains('eye-hide')) return 'hidden';
+          if (set.classList.contains('eye-ghost')) worst = 'ghost';
+        }
+      }
+      node = set;
+    }
+    return worst;
   }
   var ST_RANK = { full: 3, ghost: 2, hidden: 1 };
   function applyLayerState(key, st) {
@@ -749,7 +765,13 @@
       }, 60);
     });
   });
-  setTimeout(function () { syncLayers(); fitToLayers(); }, 150);   // arranque
+  // arranque: si restore() ya posicionó la cámara (hash), NO re-encuadrar —
+  // el fitToLayers de arranque cancelaba el vuelo del restore a media animación
+  var restoredView = false;
+  setTimeout(function () {
+    syncLayers();
+    if (!restoredView) fitToLayers();
+  }, 150);
 
   // ---------- STEPPER: recorrido paso a paso (navegación principal en teléfono) ----------
   // ‹ / › recorren los pasos CONCRETOS (con lugar o transporte) siguiendo la
@@ -833,12 +855,13 @@
   }
   function stGoTo(i) {
     // cruzar de día con el caminador — como sea que pase (‹ ›, día ‹ ›,
-    // saltar a opción) — OCULTA el día anterior y ACTIVA el nuevo completo
-    var prevDi = dayIndexOf(stEls[stCur]);
+    // saltar a opción) — OCULTA el día ACTIVO (no el del stepper: pueden
+    // diferir si el usuario clickeó una fila de otro día) y ACTIVA el nuevo
     var newDi = dayIndexOf(stEls[i]);
-    if (newDi >= 0 && newDi !== prevDi) {
-      if (prevDi >= 0) setDayChecked(days[prevDi], false);
+    if (newDi >= 0 && newDi !== activeDay) {
+      if (activeDay >= 0) setDayChecked(days[activeDay], false);
       setDayChecked(days[newDi], true);
+      activeDay = newDi;
       syncLayers();
     }
     stCur = i;
@@ -847,6 +870,7 @@
     var li = rowOf(el) || el;
     openDayOf(li);
     selectRow(li);
+    if (li.id) updateHash(null, li.id);   // el hash sigue al caminador
     li.scrollIntoView({ block: 'center' });
     var key = el.dataset.location || el.dataset.transit;
     // suavizar el zoom entre pasos (regla del usuario): promedio aritmético
@@ -887,6 +911,11 @@
     for (var j = 0; j < stEls.length; j++) {
       if (cont.contains(stEls[j])) { stGoTo(j); return; }
     }
+    // opción PLANA (sin sub-pasos concretos): mostrarla en el mapa vía su
+    // referencia — antes el click marcaba el radio y no pasaba nada más
+    var a = cont.querySelector('a.modal-link');
+    var href = a ? (a.getAttribute('href') || '') : '';
+    if (href.indexOf('#m-') === 0) showOnMap(href.slice(3), a.textContent);
     stMode = null;
     stRender();
   }
@@ -937,7 +966,9 @@
     var center = stBar.querySelector('.st-center');
     var nextB = stBar.querySelector('.st-next');
     var jump = stBar.querySelector('.st-jump');
-    stBar.querySelector('.st-prev').disabled = nextConcrete(stCur, -1) < 0;
+    // en modo elección ‹ es CANCELAR: siempre disponible aunque no haya
+    // paso anterior (antes quedaba deshabilitado y no había salida)
+    stBar.querySelector('.st-prev').disabled = !stMode && nextConcrete(stCur, -1) < 0;
     if (stMode) {                       // eligiendo a qué opción entrar
       center.innerHTML = '';
       renderChoices(stMode, center);
@@ -1014,18 +1045,28 @@
     }
     return -1;
   }
+  // el día ACTIVO (visible en el mapa) es la fuente de verdad del stepper de
+  // día — NO el día del paso actual: pueden divergir si el usuario clickea
+  // filas de otros días sin activarlos
   function goDay(di) {
     if (di < 0 || di >= days.length) return;
-    var cur = dayIndexOf(stEls[stCur]);
-    if (cur >= 0 && cur !== di) setDayChecked(days[cur], false);   // ocultar el actual
-    setDayChecked(days[di], true);                                 // mostrar el nuevo
+    if (activeDay >= 0 && activeDay !== di) setDayChecked(days[activeDay], false);
+    setDayChecked(days[di], true);
+    activeDay = di;
     days.forEach(function (d, i2) { d.classList.toggle('open', i2 === di); });
     syncLayers();
     var j = firstConcreteOfDay(di);
-    if (j >= 0) stGoTo(j); else stRender();
+    if (j >= 0) {
+      stGoTo(j);
+    } else {
+      // día sin pasos concretos: igual queda activo y navegable (antes el
+      // stepper de día se atoraba aquí para siempre)
+      history.replaceState(null, '', '#' + days[di].id);
+      stRender();
+    }
   }
   function dsRender() {
-    var di = dayIndexOf(stEls[stCur]);
+    var di = activeDay >= 0 ? activeDay : dayIndexOf(stEls[stCur]);
     var h3 = di >= 0 ? days[di].querySelector('h3') : null;
     dayBar.querySelector('.ds-cur').textContent =
       h3 ? h3.textContent.replace(/\s+/g, ' ').trim() : '—';
@@ -1033,10 +1074,10 @@
     dayBar.querySelector('.ds-next').disabled = di < 0 || di >= days.length - 1;
   }
   dayBar.querySelector('.ds-prev').addEventListener('click', function () {
-    goDay(dayIndexOf(stEls[stCur]) - 1);
+    goDay((activeDay >= 0 ? activeDay : dayIndexOf(stEls[stCur])) - 1);
   });
   dayBar.querySelector('.ds-next').addEventListener('click', function () {
-    goDay(dayIndexOf(stEls[stCur]) + 1);
+    goDay((activeDay >= 0 ? activeDay : dayIndexOf(stEls[stCur])) + 1);
   });
   stRender();
 
@@ -1269,8 +1310,11 @@
         })
         .catch(function () { return null; });
     });
+    // capturar la edición que originó el snap: si al llegar las respuestas ya
+    // se editaba OTRO segmento, tirarlas (escribían índice a índice en él)
+    var mine = geomEd;
     Promise.all(reqs).then(function (snapped) {
-      if (!geomEd) return;
+      if (geomEd !== mine) return;
       var moved = 0;
       snapped.forEach(function (p, i) {
         if (p) { geomEd.coords[i] = p; moved += 1; }
@@ -1353,15 +1397,18 @@
       snapBtn.hidden = false;
     });
     snapBtn.addEventListener('click', snapGeomToRoads);
+    var entReq = 0;    // generación: gana el ÚLTIMO click, no la respuesta más lenta
     refKeys.forEach(function (key) {
       var b = document.createElement('button');
       b.type = 'button';
       b.textContent = key;
       b.addEventListener('click', function () {
         msg.textContent = '';
+        var myReq = ++entReq;
         fetch('/api/entity?trip=' + encodeURIComponent(TRIP) + '&key=' + encodeURIComponent(key))
           .then(function (r) { return r.json(); })
           .then(function (d) {
+            if (myReq !== entReq) return;   // ya se pidió otra referencia
             if (!d.ok) { msg.textContent = 'error: ' + d.error; return; }
             entCur = { kind: d.kind, key: key };
             entName.textContent = d.kind + ' · ' + key;
@@ -1437,6 +1484,18 @@
       }).then(function (r) { return r.json(); })
         .then(function (d) {
           if (!d.ok) { msg.textContent = 'error: ' + d.error; return; }
+          // el paso EDITADO cambió de número: re-apuntar el cajón YA — si no,
+          // el siguiente Guardar/mover escribiría sobre la fila equivocada
+          var mine = +m[2];
+          if (path === '/api/step-insert') {
+            if (body.where === 'before') mine += 1;      // me recorrí un lugar
+          } else {
+            mine = d.step;                               // move: soy el movido
+          }
+          m[2] = String(mine);
+          drawer.querySelector('.dev-info').textContent =
+            'fila d' + m[1] + '-r' + String(mine).padStart(2, '0') +
+            '  (days[' + (m[1] - 1) + '].steps[' + (mine - 1) + '])  — tras ' + path.slice(5);
           var target = 'd' + m[1] + '-r' + String(d.step).padStart(2, '0');
           if (window.confirm('Guardado. ¿Recalcular (rebuild) ahora?')) {
             fetch('/api/rebuild', {
@@ -1451,7 +1510,8 @@
               })
               .catch(function (e) { msg.textContent = 'error: ' + e; });
           } else {
-            msg.textContent = 'guardado ✓ (pendiente rebuild — los ids de fila ya cambiaron)';
+            msg.textContent = 'guardado ✓ (pendiente rebuild; este cajón ya apunta a r' +
+              String(mine).padStart(2, '0') + ')';
           }
         })
         .catch(function (e) { msg.textContent = 'error: ' + e; });
@@ -1478,22 +1538,26 @@
     var overlayEl = document.getElementById('overlay');
     var m = /^#(?:m-([^@]+))?(?:@(.+))?$/.exec(location.hash || '');
     var dm = /^#(d\d+)$/.exec(location.hash || '');
+    function applyDefault() {
+      // día 1 completo seleccionado, stepper en su primer paso concreto
+      // (sin volar: el encuadre inicial ya lo hace)
+      if (!days.length) return;
+      setDayChecked(days[0], true);
+      activeDay = 0;
+      days.forEach(function (d, i2) { d.classList.toggle('open', i2 === 0); });
+      var j0 = firstConcreteOfDay(0);
+      if (j0 >= 0) { stCur = j0; stRender(); }
+      schedSync();
+    }
     if (dm) {
-      // #dN: ese día completo seleccionado y el stepper en su primer paso
+      // #dN: ese día completo seleccionado y el stepper en su primer paso;
+      // día inexistente (hash viejo) → estado por defecto, no página en blanco
       var sec = document.getElementById(dm[1]);
-      if (sec) goDay(days.indexOf(sec));
+      if (sec) { goDay(days.indexOf(sec)); restoredView = true; } else applyDefault();
       return;
     }
     if (!m || (!m[1] && !m[2])) {
-      // sin posición en el hash: día 1 completo seleccionado, stepper en su
-      // primer paso concreto (sin volar: el encuadre inicial ya lo hace)
-      if (days.length) {
-        setDayChecked(days[0], true);
-        days.forEach(function (d, i2) { d.classList.toggle('open', i2 === 0); });
-        var j0 = firstConcreteOfDay(0);
-        if (j0 >= 0) { stCur = j0; stRender(); }
-        schedSync();
-      }
+      applyDefault();
       return;
     }
     if (overlayEl && overlayEl.open) overlayEl.close();
@@ -1502,17 +1566,26 @@
       openDayOf(li);
       // el día de la fila del hash llega ACTIVO (visible en el mapa)
       var liDay = li.closest('section.day');
-      if (liDay) setDayChecked(liDay, true);
+      if (liDay) {
+        setDayChecked(liDay, true);
+        activeDay = days.indexOf(liDay);
+      }
       selectRow(li);
       stSyncTo(li);
       li.scrollIntoView({ block: 'center' });
       schedSync();
+    } else if (!m[1]) {
+      // fila del hash ya no existe (ids renumerados) y no hay modal → defecto
+      applyDefault();
+      return;
     }
     if (devMode && li) {
       openDevEditor(li);
     } else if (m[1]) {
       var title = li && li.querySelector('.title');
-      showOnMap(m[1], title ? title.textContent : m[1], li && li.id);
+      if (showOnMap(m[1], title ? title.textContent : m[1], li && li.id)) {
+        restoredView = true;   // que el encuadre de arranque no pise este vuelo
+      }
     }
   })();
 })();

@@ -27,13 +27,18 @@ def geo_tokens():
     for key, pl in render.PLACES.items():
         gps = pl.get("gps")
         if gps:
-            la, lo = str(gps).split(",")
-            locs[key] = [float(la), float(lo)]
+            pt = render.parse_pts(gps, f"places[{key}]")
+            if not pt:
+                continue          # malformado: ya quedó en DIAGNOSTICS
+            locs[key] = [pt[0][0], pt[0][1]]
     transits = {}
     for key, tr in render.TRANSITS.items():
         coords = tr.get("coords")
         if coords:
-            pts = [[float(a), float(b)] for a, b in (p.split(",") for p in str(coords).split())]
+            parsed = render.parse_pts(coords, f"transits[{key}]")
+            if not parsed:
+                continue
+            pts = [[a, b] for a, b in parsed]
             entry = {"coords": pts, "color": tr.get("color", "#7a6f63"),
                      "mode": tr.get("mode", "walk")}
             # rieles: cada vértice ES una estación ([código, jp, romaji]) —
