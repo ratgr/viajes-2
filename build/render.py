@@ -38,6 +38,7 @@ def init(data, foto_base=""):
     _LINE_BY_NAME = {v.get("nombre"): v for v in LINEAS.values() if v.get("frecuencia")}
     _LINE_BY_CHIP = {v.get("chip"): v for v in LINEAS.values() if v.get("frecuencia") and v.get("chip")}
     # primer step que usa cada transit (da el renglón Sale/Llega de su modal)
+    DIAGNOSTICS.clear()
     TRANSIT_STEP = {}
     for day in DAYS:
         for step in day.get("steps", []):
@@ -81,6 +82,92 @@ def add_min(hhmm, mins):
         return ""
     total = (int(m.group(1)) * 60 + int(m.group(2)) + int(mins or 0)) % (24 * 60)
     return f"{total // 60:02d}:{total % 60:02d}"
+
+
+def hm_min(hhmm):
+    """'07:15' → 435 · otra cosa → None."""
+    m = re.match(r"^(\d{1,2}):(\d{2})$", str(hhmm or "").strip())
+    return int(m.group(1)) * 60 + int(m.group(2)) if m else None
+
+
+def fmt_hm(total):
+    return f"{total // 60 % 24:02d}:{total % 60:02d}"
+
+
+def fmt_dur(mins):
+    """65 → '1 h 05' · 15 → '15 min'."""
+    if mins < 60:
+        return f"{mins} min"
+    h, m = divmod(mins, 60)
+    return f"{h} h {m:02d}" if m else f"{h} h"
+
+
+DIAGNOSTICS = []   # pasos cuyo horario no se puede completar: problema del YAML
+
+
+def derive_schedule(steps, ctx=""):
+    """Horario por paso, completado por SNAP a los vecinos:
+      · sin inicio → snap ARRIBA (fin del paso anterior) o ABAJO (inicio del
+        siguiente − duración propia)
+      · sin duración → snap ABAJO (hueco hasta el próximo inicio explícito)
+    Regla: cada paso debe quedar con 2 de {inicio, fin, duración}. Un LUGAR
+    con solo inicio es un ancla válida (llegas y punto); cualquier otro paso
+    incompleto es un problema del YAML → va a DIAGNOSTICS.
+    Todo lo inferido se marca data-derived al render."""
+    n = len(steps)
+    info = []
+    for s in steps:
+        if not isinstance(s, dict) or s.get("hidden-summary"):
+            info.append(None)
+            continue
+        beg = hm_min(s.get("time"))
+        has_dur = s.get("duration") not in (None, 0, "0")
+        info.append({"begin": beg, "beg_exp": beg is not None, "beg_derived": False,
+                     "dur": dmin(s.get("duration")) if has_dur else None,
+                     "dur_derived": False, "end": None})
+
+    def next_begin(i):
+        for j in range(i + 1, n):
+            if info[j] and info[j]["beg_exp"]:
+                return info[j]["begin"]
+        return None
+
+    # pasada adelante: inicio = fin del anterior; duración = hueco al siguiente
+    cursor = None
+    for i, fo in enumerate(info):
+        if fo is None:
+            continue
+        if fo["begin"] is None and cursor is not None:
+            fo["begin"], fo["beg_derived"] = cursor, True
+        if fo["dur"] is None and fo["begin"] is not None:
+            nb = next_begin(i)
+            if nb is not None and nb > fo["begin"]:
+                fo["dur"], fo["dur_derived"] = nb - fo["begin"], True
+        if fo["begin"] is not None and fo["dur"]:
+            fo["end"] = fo["begin"] + fo["dur"]
+        cursor = fo["end"] if fo["end"] is not None else fo["begin"]
+    # pasada atrás: con duración pero sin inicio → fin = inicio del siguiente
+    for i in range(n - 1, -1, -1):
+        fo = info[i]
+        if fo is None or fo["begin"] is not None or not fo["dur"]:
+            continue
+        nb = next_begin(i)
+        if nb is not None:
+            fo["end"] = nb
+            fo["begin"], fo["beg_derived"] = nb - fo["dur"], True
+    # diagnóstico
+    for i, (s, fo) in enumerate(zip(steps, info)):
+        if fo is None:
+            continue
+        title = str(s.get("title", ""))[:52]
+        if fo["begin"] is None:
+            DIAGNOSTICS.append(f"{ctx} paso {i + 1} «{title}»: sin inicio anclable (ni arriba ni abajo)")
+        elif not fo["dur"] and "location" not in s:
+            DIAGNOSTICS.append(f"{ctx} paso {i + 1} «{title}»: solo inicio — falta duración o fin")
+    return [{} if fo is None else
+            {"start": fo["begin"], "start_derived": fo["beg_derived"],
+             "dur": fo["dur"], "dur_derived": fo["dur_derived"], "end": fo["end"]}
+            for fo in info]
 
 
 class RefLog(set):
@@ -129,10 +216,12 @@ def mode_icon(n):
     return f'<i class="icon" data-derived="mode">{ic}</i> ' if ic else ""
 
 
-def row_text(n, refs):
+def row_text(n, refs, sc=None):
     """<b.title> - <span.duration> - <span.note> — campos separados, no un blob.
     El separador vive DENTRO del span que sigue: ocultar un campo por CSS
-    (p.ej. la nota en la barra del mapa) se lleva su separador consigo."""
+    (p.ej. la nota en la barra del mapa) se lleva su separador consigo.
+    Sin duration en el YAML, se emite la inferida (~hueco) marcada derivada."""
+    sc = sc or {}
     parts = []
     if n.get("title"):
         title = str(n["title"]).replace("*", "")   # defensa; migrate_yaml ya los quita
@@ -140,24 +229,28 @@ def row_text(n, refs):
     if n.get("duration") not in (None, 0, "0"):
         sep = '<span class="sep"> - </span>' if parts else ""
         parts.append(f'<span class="duration">{sep}{html.escape(str(n["duration"]))}</span>')
+    elif sc.get("dur") and sc.get("dur_derived"):
+        sep = '<span class="sep"> - </span>' if parts else ""
+        parts.append(f'<span class="duration" data-derived="duracion">{sep}~{fmt_dur(sc["dur"])}</span>')
     if n.get("note"):
         sep = '<span class="sep"> - </span>' if parts else ""
         parts.append(f'<span class="note">{sep}{md(str(n["note"]).strip(), refs)}</span>')
     return "".join(parts)
 
 
-def time_cell(n):
+def time_cell(n, sc=None):
+    """hora explícita + (derivados: inicio encadenado si falta, y la hora-fin).
+    El itinerario esconde lo derivado por CSS; el mapa muestra DESDE–HASTA."""
+    sc = sc or {}
     t = str(n.get("time") or "")
     cls = "time fixed" if n.get("fixed") else "time"
     dt = f' datetime="{t}"' if re.match(r"^\d{1,2}:\d{2}$", t) else ""
-    # hora de FIN calculada (time + duration): derivada; el itinerario la
-    # esconde por CSS, la barra del mapa la muestra como rango DESDE–HASTA
-    to = ""
-    if dt and n.get("duration") not in (None, 0, "0"):
-        fin = add_min(t, dmin(n["duration"]))
-        if fin:
-            to = f'<span class="to" data-derived="fin">–{fin}</span>'
-    return f'<time class="{cls}"{dt}>{html.escape(t)}{to}</time>'
+    inner = html.escape(t)
+    if not t and sc.get("start_derived"):
+        inner = f'<span class="from" data-derived="inicio">{fmt_hm(sc["start"])}</span>'
+    if sc.get("end") is not None and inner:
+        inner += f'<span class="to" data-derived="fin">–{fmt_hm(sc["end"])}</span>'
+    return f'<time class="{cls}"{dt}>{inner}</time>'
 
 
 def resto_link(opt, refs):
@@ -171,7 +264,7 @@ def resto_link(opt, refs):
     return lk + (f' <span class="precio">{html.escape(str(precio))}</span>' if precio else "")
 
 
-def render_options(node, refs):
+def render_options(node, refs, ctx=""):
     """options unificadas: MISMO markup para tiers de comida y planes en
     paralelo (en el YAML son la misma clave). El CSS decide el render por
     item: con sub-steps (:has) = tarjeta plan, sin ellos = cajita tier."""
@@ -180,8 +273,10 @@ def render_options(node, refs):
         if not isinstance(o, dict):
             continue
         if "steps" in o:
-            title = md(str(o.get("title", "")).replace("*", ""), refs)
-            subs = "\n".join(render_li(s, refs) for s in o["steps"])
+            plan_title = str(o.get("title", "")).replace("*", "")
+            title = md(plan_title, refs)
+            sched = derive_schedule(o["steps"], f'{ctx} plan «{plan_title[:24]}»')
+            subs = "\n".join(render_li(s, refs, sc=sched[i], ctx=ctx) for i, s in enumerate(o["steps"]))
             items.append(f'<li><b>{title}</b><ul class="steps">\n{subs}\n</ul></li>')
         else:
             label = html.escape(str(o.get("title", "")))
@@ -190,10 +285,10 @@ def render_options(node, refs):
     return '<ul class="options">' + "".join(items) + "</ul>"
 
 
-def render_li(n, refs, row_id=None):
-    body = row_text(n, refs)
+def render_li(n, refs, row_id=None, sc=None, ctx=""):
+    body = row_text(n, refs, sc)
     if "options" in n:
-        body += render_options(n, refs)
+        body += render_options(n, refs, ctx or row_id or "")
     elif "transit" in n:
         # los trayectos van en gris para que resalten los lugares
         body = f'<span class="transit">{body}</span>'
@@ -209,7 +304,7 @@ def render_li(n, refs, row_id=None):
         attrs += f' data-mode="{html.escape(str(n["mode"]))}"'
     if n.get("solo_seleccion"):
         attrs += " data-solo-seleccion"
-    return f'    <li{attrs}>{time_cell(n)}<div class="body">{body}</div></li>'
+    return f'    <li{attrs}>{time_cell(n, sc)}<div class="body">{body}</div></li>'
 
 
 def render_day(day, refs, num):
@@ -224,7 +319,8 @@ def render_day(day, refs, num):
             f'<span class="ancla">Ancla: {ancla}</span></header>')
     # TODOS los pasos van al DOM (hidden-summary incluidos, ocultos por CSS):
     # la fila rNN es EXACTAMENTE el paso N del YAML
-    lis = "\n".join(render_li(s, refs, f"d{num}-r{i + 1:02d}")
+    sched = derive_schedule(day.get("steps", []), f"d{num}")
+    lis = "\n".join(render_li(s, refs, f"d{num}-r{i + 1:02d}", sched[i], ctx=f"d{num}")
                     for i, s in enumerate(day.get("steps", [])))
     return (f'  <section class="day" id="d{num}" data-fecha="{fecha}">{head}\n'
             f'  <ul class="steps">\n{lis}\n  </ul></section>')
@@ -381,3 +477,7 @@ def build_page(trip, template_name, out_name, extra=None):
     for asset in os.listdir(ASSETS):
         shutil.copyfile(os.path.join(ASSETS, asset), os.path.join(pages_dir, asset))
     print(f"pages/{trip}/{out_name} · {len(DAYS)} días · {len(refs.order)} modales · {len(page) // 1024} KB")
+    if DIAGNOSTICS:
+        print(f"⚠️ horario incompleto en el YAML ({len(DIAGNOSTICS)} pasos):")
+        for d in DIAGNOSTICS:
+            print("  ·", d)

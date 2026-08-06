@@ -138,6 +138,8 @@ def parse_step(li):
     if wrap is not None:
         inner = wrap.children + [c for c in inner if c is not wrap]
     for c in nodes(inner):
+        if "data-derived" in c.attrs:      # duración inferida etc.: no es dato
+            continue
         if c.tag == "b" and "title" in c.cls():
             d["title"] = to_md(c.children).strip()
         elif c.tag == "span" and "duration" in c.cls():
