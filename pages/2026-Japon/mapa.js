@@ -20,7 +20,7 @@
   days.forEach(function (day) {
     var head = day.querySelector('.day-head');
     var rows = Array.prototype.slice.call(
-      day.querySelectorAll(':scope > ul.steps > li:not(.hidden-summary)'));
+      day.querySelectorAll(':scope > ul.steps > li'));   // incluye los solo-mapa
 
     // casilla por fila (prender/apagar su capa cuando existan capas)
     rows.forEach(function (li) {
@@ -155,6 +155,72 @@
   function clearTemp() {
     if (tempLayer && map) { map.removeLayer(tempLayer); tempLayer = null; }
   }
+
+  // ---------- grupos de options: colapsables y seleccionables ----------
+  // elegir un grupo (plan o tier) enciende TODA su geometría de un golpe
+  var selGroupEl = null;
+  function groupKeys(g) {
+    var keys = [];
+    g.querySelectorAll('[data-location],[data-transit]').forEach(function (el) {
+      var k = el.dataset.location || el.dataset.transit;
+      if (k && keys.indexOf(k) < 0) keys.push(k);
+    });
+    g.querySelectorAll('a.modal-link').forEach(function (a) {
+      var h = a.getAttribute('href') || '';
+      if (h.indexOf('#m-') === 0 && keys.indexOf(h.slice(3)) < 0) keys.push(h.slice(3));
+    });
+    return keys;
+  }
+  function showGroupGeometry(g) {
+    if (!map) return;
+    clearTemp();
+    var layers = [];
+    groupKeys(g).forEach(function (key) {
+      var loc = GEO.locations[key];
+      var tr = GEO.transits[key];
+      if (loc) {
+        layers.push(L.circleMarker(loc, {
+          radius: 7, color: '#fff', weight: 2, fillColor: '#b23a2a', fillOpacity: 1
+        }).bindTooltip(key));
+      } else if (tr && tr.coords.length) {
+        layers.push(L.polyline(tr.coords, {
+          color: tr.color, weight: tr.mode === 'walk' ? 3 : 5, opacity: .9,
+          dashArray: tr.mode === 'walk' ? '4 7' : null
+        }));
+      }
+    });
+    if (!layers.length) return;
+    tempLayer = L.layerGroup(layers).addTo(map);
+    var bounds = null;
+    layers.forEach(function (l) {
+      var b = l.getBounds ? l.getBounds() : L.latLngBounds([l.getLatLng()]);
+      bounds = bounds ? bounds.extend(b) : L.latLngBounds(b.getSouthWest(), b.getNorthEast());
+    });
+    map.flyToBounds(bounds.pad(.2), { duration: .5 });
+  }
+  function selectGroup(g) {
+    if (selGroupEl) selGroupEl.classList.remove('sel-group');
+    selGroupEl = g;
+    g.classList.add('sel-group');
+    showGroupGeometry(g);
+  }
+  document.querySelectorAll('.panel .options > li').forEach(function (g) {
+    var label = g.querySelector(':scope > b');
+    if (!label) return;
+    var caret = document.createElement('span');
+    caret.className = 'group-caret';
+    caret.textContent = '▼';
+    label.insertBefore(caret, label.firstChild);
+    caret.addEventListener('click', function (e) {
+      e.stopPropagation();
+      g.classList.toggle('closed');
+    });
+    label.addEventListener('click', function (e) {
+      e.stopPropagation();
+      selectGroup(g);
+      closePanelIfNarrow();
+    });
+  });
   // popup con la tarjeta COMPLETA (en teléfono es la única vista); si es alta
   // se colapsa tras «Ver más» y expandida scrollea con tope de 40% de pantalla
   function openCardPopup(latlng, content) {
