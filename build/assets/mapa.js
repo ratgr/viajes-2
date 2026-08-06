@@ -204,6 +204,22 @@
     g.classList.add('sel-group');
     showGroupGeometry(g);
   }
+  // la FILA principal de una elección también se pliega: su caret colapsa
+  // el conjunto de options completo
+  document.querySelectorAll('.panel .steps > li').forEach(function (li) {
+    var opts = li.querySelector(':scope > .body > ul.options');
+    var title = li.querySelector('.title');
+    if (!opts || !title) return;
+    var caret = document.createElement('span');
+    caret.className = 'group-caret row-caret';
+    caret.textContent = '▼';
+    title.insertBefore(caret, title.firstChild);
+    caret.addEventListener('click', function (e) {
+      e.stopPropagation();
+      li.classList.toggle('opts-closed');
+    });
+  });
+
   // cada ul.options es un CONJUNTO DE ELECCIÓN: sus grupos llevan radio
   // (mutuamente excluyentes); elegir uno marca la opción y enciende su geometría
   document.querySelectorAll('.panel .options').forEach(function (set, si) {
