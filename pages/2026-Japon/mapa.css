@@ -63,6 +63,7 @@ body.show-free .panel .steps > li[data-free]::after { content: '⏳ ' attr(data-
 /* grupos de options: caret colapsa; click en el título selecciona TODA su geometría */
 .panel .options > li > b:first-child { cursor: pointer; }
 .panel .options .group-caret { display: inline-block; color: var(--ink-soft); font-size: 9px; margin-right: 4px; transition: transform .15s; }
+.panel .options .group-choice { margin: 0 5px 0 0; accent-color: var(--shu); vertical-align: -1px; }
 .panel .options > li.closed .group-caret { transform: rotate(-90deg); }
 .panel .options > li.closed { max-height: 30px; overflow: hidden; }
 .panel .options > li.sel-group { box-shadow: inset 0 0 0 2px var(--shu); }

@@ -204,21 +204,31 @@
     g.classList.add('sel-group');
     showGroupGeometry(g);
   }
-  document.querySelectorAll('.panel .options > li').forEach(function (g) {
-    var label = g.querySelector(':scope > b');
-    if (!label) return;
-    var caret = document.createElement('span');
-    caret.className = 'group-caret';
-    caret.textContent = '▼';
-    label.insertBefore(caret, label.firstChild);
-    caret.addEventListener('click', function (e) {
-      e.stopPropagation();
-      g.classList.toggle('closed');
-    });
-    label.addEventListener('click', function (e) {
-      e.stopPropagation();
-      selectGroup(g);
-      closePanelIfNarrow();
+  // cada ul.options es un CONJUNTO DE ELECCIÓN: sus grupos llevan radio
+  // (mutuamente excluyentes); elegir uno marca la opción y enciende su geometría
+  document.querySelectorAll('.panel .options').forEach(function (set, si) {
+    set.querySelectorAll(':scope > li').forEach(function (g) {
+      var label = g.querySelector(':scope > b');
+      if (!label) return;
+      var caret = document.createElement('span');
+      caret.className = 'group-caret';
+      caret.textContent = '▼';
+      label.insertBefore(caret, label.firstChild);
+      var radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.name = 'choice-' + si;
+      radio.className = 'group-choice';
+      label.insertBefore(radio, caret);
+      caret.addEventListener('click', function (e) {
+        e.stopPropagation();          // colapsar NO elige
+        g.classList.toggle('closed');
+      });
+      label.addEventListener('click', function (e) {
+        e.stopPropagation();
+        radio.checked = true;
+        selectGroup(g);
+        closePanelIfNarrow();
+      });
     });
   });
   // popup con la tarjeta COMPLETA (en teléfono es la única vista); si es alta
