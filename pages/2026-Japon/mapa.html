@@ -3,19 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Itinerario día por día del viaje familiar a Japón — 4 al 18 de octubre de 2026: Osaka, Kioto y Tokio, hora por hora.">
+<meta name="description" content="Mapa por día del viaje familiar a Japón — 4 al 18 de octubre de 2026.">
 <meta name="theme-color" content="#b23a2a">
-<title>Japón 2026 · itinerario</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⛩️</text></svg>">
+<title>Japón 2026 · mapa por día</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🗺️</text></svg>">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="itinerario.css">
+<link rel="stylesheet" href="mapa.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
-<div class="wrap">
-<nav class="day-nav" aria-label="Días"><a href="#d1">dom 4</a><a href="#d2">lun 5</a><a href="#d3">mar 6</a><a href="#d4">mié 7</a><a href="#d5">jue 8</a><a href="#d6">vie 9</a><a href="#d7">sáb 10</a><a href="#d8">dom 11</a><a href="#d9">lun 12</a><a href="#d10">mar 13</a><a href="#d11">mié 14</a><a href="#d12">jue 15</a><a href="#d13">vie 16</a><a href="#d14">sáb 17</a><a href="#d15">dom 18</a></nav>
-<section>
-  <h2>El marco, día por día — hora por hora</h2>
-  <p class="intro">Física de 10 personas, ya sumada en cada hora: <b>+15 min de reagrupe en cada movimiento</b> (alguien siempre está en el baño), <b>ninguna comida sentada dura menos de 1 h</b> (con 10 son 1 h 15 reales), y cada conmutación viene con su línea, estación y transbordo — nivel Keep de Juan, y un poco más. Días de ~12 horas <b>con holgura a propósito</b>: si un lugar les gusta, se quedan — los bloques de tarde son los que se sacrifican, nunca el ancla de la mañana. Las horas en <b class="red">rojo</b> son las únicas fijas (vuelos, aperturas, reservas, el tour); todo lo demás se estira o se cae sin culpa. Kioto madruga a las 6:00 porque ahí el silencio se compra con sueño; Tokio abre tarde y ahí se descansa. Regla de los 10: mañana juntos en el ancla, tarde en subgrupos, cena juntos si sale natural. <b>Comidas:</b> las opciones son de donde ESTÁN a esa hora; las recomendaciones grandes (★) solo aparecen en noches libres, cuando sí pueden moverse a ellas; cada columna trae 3 opciones clickeables (toca cualquier lugar para ver qué es, quién lo recomienda y su Google Maps) y el orden de precio es fijo — Take barato, Ai medio, Shu caro: juntas son el rango del momento; los barrios 🏮 son la opción de llegar y escoger ahí, y los huecos libres de mediodía sirven para peregrinar a un lugar específico. <b>Desayunos:</b> 🏨 = incluido en el hotel · ☕ = comprarlo cerca · 🏪 = konbini precomprado la noche anterior (los madrugones no perdonan el buffet).</p>
-
+<aside class="panel">
+  <div class="phead">
+    <h1>⛩️ Japón 2026 · mapa por día</h1>
+    <p class="sub">Casilla = prender/apagar en el mapa · toca un nombre para su tarjeta.</p>
+  </div>
+  <nav class="day-nav" aria-label="Días"><a href="#d1">dom 4</a><a href="#d2">lun 5</a><a href="#d3">mar 6</a><a href="#d4">mié 7</a><a href="#d5">jue 8</a><a href="#d6">vie 9</a><a href="#d7">sáb 10</a><a href="#d8">dom 11</a><a href="#d9">lun 12</a><a href="#d10">mar 13</a><a href="#d11">mié 14</a><a href="#d12">jue 15</a><a href="#d13">vie 16</a><a href="#d14">sáb 17</a><a href="#d15">dom 18</a></nav>
   <section class="day" id="d1" data-fecha="2026-10-04"><header class="day-head"><h3>dom 4 · llegada + Osaka</h3><span class="note">se llega VOLANDO — y con crucero reservado</span><span class="ancla">Ancla: Dotonbori desde el río</span></header>
   <ul class="steps">
     <li id="d1-r01" data-location="haneda-t3"><time class="time fixed" datetime="04:45">04:45</time><div class="body"><b class="title">Aterrizan en Haneda (T3)</b><span class="note"> - Migración con el QR de Visit Japan Web listo, maletas, eSIM, yenes.<br>Con 10: ~2 h. Desayuno 🏪: lo del avión + onigiri del 7-Eleven del pasillo.</span></div></li>
@@ -428,7 +431,8 @@
     <li id="d15-r05" class="hidden-summary" data-transit="d18-e2"><time class="time"></time><div class="body"><span class="transit"><b class="title"><i class="icon" data-derived="mode">🚶</i> Hotel → Busta Shinjuku</b></span></div></li>
     <li id="d15-r06" class="hidden-summary" data-transit="d18-e3"><time class="time"></time><div class="body"><span class="transit"><b class="title"><i class="icon" data-derived="mode">🚌</i> Busta Shinjuku → Haneda T3</b></span></div></li>
   </ul></section>
-</section>
+</aside>
+<div id="map"></div>
 <template id="modal-store">
 <div class="modal" id="m-itami-monorail" style="--lc:#0d6bb7">
   <h3>Osaka Monorail <span class="h3-range" data-derived="horario">· 10:30 – 10:45</span></h3>
@@ -3285,6 +3289,6 @@
 </template>
 <dialog class="overlay" id="overlay"><button class="overlay-close" type="button" aria-label="Cerrar">×</button><div id="overlay-body"></div></dialog>
 <script src="itinerario.js"></script>
-</div>
+<script src="mapa.js"></script>
 </body>
 </html>

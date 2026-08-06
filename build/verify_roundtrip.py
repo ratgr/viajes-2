@@ -128,9 +128,9 @@ def parse_step(li):
         if c.tag == "b" and "title" in c.cls():
             d["title"] = to_md(c.children).strip()
         elif c.tag == "span" and "duration" in c.cls():
-            d["duration"] = text_of(c).strip()
+            d["duration"] = re.sub(r"^\s*-\s*", "", text_of(c)).strip()
         elif c.tag == "span" and "note" in c.cls():
-            d["note"] = to_md(c.children).strip()
+            d["note"] = re.sub(r"^\s*-\s", "", to_md(c.children)).strip()
         elif c.tag == "ul" and "options" in c.cls():
             d["options"] = [parse_opt(o) for o in nodes(c.children, "li")]
     return d
@@ -252,9 +252,10 @@ def diff(a, b, path, out):
 
 def main():
     trip = resolve_trip(sys.argv)
+    page = sys.argv[2] if len(sys.argv) > 2 else "itinerario.html"
     src_dir, pages_dir, _ = trip_paths(trip)
     Y = yaml.safe_load(open(os.path.join(src_dir, "viaje.yaml"), encoding="utf-8"))
-    html_days = parse_days(open(os.path.join(pages_dir, "itinerario.html"), encoding="utf-8").read())
+    html_days = parse_days(open(os.path.join(pages_dir, page), encoding="utf-8").read())
     yaml_days = [norm_day(d) for d in Y.get("days", [])]
     problems = []
     if len(html_days) != len(yaml_days):

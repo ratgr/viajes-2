@@ -1,0 +1,36 @@
+/* mapa.css — cromo del mapa SOBRE el markup del itinerario (no lo cambia):
+   disposición barra-lateral + mapa, filas compactas con casilla, días colapsables. */
+
+/* ---------- disposición: barra lateral + mapa ---------- */
+html, body { height: 100%; }
+body { display: flex; padding: 0; overflow: hidden; }
+.panel { width: 380px; min-width: 300px; overflow-y: auto; padding: 0 14px 40px; border-right: 1px solid var(--line); background: var(--paper); }
+#map { flex: 1; min-width: 0; }
+
+/* ---------- cabecera de la barra ---------- */
+.phead { padding: 10px 0 4px; }
+.phead h1 { font-family: "Palatino Linotype", Palatino, "Book Antiqua", serif; font-size: 16px; font-weight: 600; margin: 0; }
+.phead .sub { color: var(--ink-soft); font-size: 11.5px; margin: 2px 0 0; }
+.panel .day-nav { margin: 8px -14px 10px; }
+
+/* ---------- días colapsables (el caret y las casillas los pone mapa.js) ---------- */
+.panel .day { margin-top: 10px; }
+.panel section.day > ul.steps { display: none; }
+.panel section.day.open > ul.steps { display: block; }
+.panel .day-head { cursor: pointer; user-select: none; gap: 7px; padding-bottom: 4px; }
+.panel .day-head h3 { font-size: 13.5px; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.panel .day-head .caret { color: var(--ink-soft); font-size: 10px; transition: transform .15s; flex: 0 0 auto; }
+.panel section.day.open .day-head .caret { transform: rotate(90deg); }
+.panel .day-head .note, .panel .day-head .ancla { display: none; }  /* no caben en 380px */
+
+/* ---------- filas compactas con casilla (columna extra para el checkbox) ---------- */
+.panel .steps > li { grid-template-columns: 16px 42px minmax(0, 1fr); gap: 8px; padding: 4px 0; font-size: 12.5px; scroll-margin-top: 46px; }
+.panel .steps > li .note { display: none; }     /* la nota es del itinerario; el mapa respira */
+.panel .steps .time { font-size: 11px; }
+.panel .ck { margin: 3px 0 0; accent-color: var(--shu); }
+.panel .day-head .ck { margin: 0; align-self: center; }
+
+/* options en columna única dentro de la barra */
+.panel .options { grid-template-columns: 1fr; }
+.panel .options > li:has(> .steps) { padding: 4px 8px 6px; }
+.panel .options .steps > li { grid-template-columns: 42px minmax(0, 1fr); }
