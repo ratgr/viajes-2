@@ -47,6 +47,9 @@ a { color: var(--shu); }
 .steps > li { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; scroll-margin-top: 58px; }
 .steps > li.flash { animation: row-flash 1.8s ease-out 1; }
 @keyframes row-flash { 0%, 55% { background: var(--shu-soft); } 100% { background: transparent; } }
+/* pasos solo-mapa: presentes en el DOM (proyección 1:1 del YAML), no se ven */
+.steps li.hidden-summary { display: none; }
+.title .icon { font-style: normal; }
 .steps .time { color: var(--ink-soft); font-variant-numeric: tabular-nums; font-size: 12px; padding-top: 2px; white-space: nowrap; letter-spacing: .06em; font-weight: 600; }
 .steps .time.fixed { color: var(--shu); }
 .steps b { font-weight: 600; }
@@ -56,7 +59,13 @@ a { color: var(--shu); }
    Mismo markup (ul.options > li), como en el YAML son la misma clave.
    Un li CON sub-.steps (:has) es un plan-tarjeta; sin ellos, un tier-cajita. */
 .options { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin: 6px 0 0; padding: 0; list-style: none; }
-@media (max-width: 900px) { .options { grid-template-columns: 1fr; } }
+/* angosto: carrusel horizontal (touch + arrastre de mouse), nunca apilar */
+@media (max-width: 900px) {
+  .options, .options:has(> li > .steps) { display: flex; overflow-x: auto; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; scrollbar-width: none; cursor: grab; }
+  .options::-webkit-scrollbar { display: none; }
+  .options > li { flex: 0 0 auto; min-width: 64%; max-width: 85%; scroll-snap-align: center; }
+  .options > li:has(> .steps) { min-width: 86%; max-width: 86%; }
+}
 .options > li { font-size: 13px; border-radius: 4px; padding: 6px 10px; }
 .options > li > b:first-child { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; display: block; }
 /* tiers hoja: color por tier; cualquier otro tier (🏮 barrio) = neutro punteado */

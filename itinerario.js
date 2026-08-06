@@ -86,4 +86,28 @@
     }, { rootMargin: '-50px 0px -55% 0px' });
     days.forEach(function (d) { observer.observe(d); });
   }
+
+  // carruseles (.options angostas, barra de días): arrastre lateral con mouse;
+  // el touch ya scrollea nativo. Un arrastre real suprime el click que suelta.
+  var drag = null, dragged = false;
+  document.addEventListener('pointerdown', function (e) {
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    var el = e.target.closest('.options, .day-nav');
+    if (!el || el.scrollWidth <= el.clientWidth + 4) return;
+    drag = { el: el, x: e.clientX, left: el.scrollLeft };
+    dragged = false;
+  });
+  document.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    var dx = e.clientX - drag.x;
+    if (Math.abs(dx) > 5) dragged = true;
+    if (dragged) {
+      drag.el.scrollLeft = drag.left - dx;
+      e.preventDefault();
+    }
+  });
+  document.addEventListener('pointerup', function () { drag = null; });
+  document.addEventListener('click', function (e) {
+    if (dragged) { e.preventDefault(); e.stopPropagation(); dragged = false; }
+  }, true);
 })();

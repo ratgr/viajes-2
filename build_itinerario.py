@@ -116,12 +116,13 @@ FIXED_TITLES = []   # títulos que traían *asteriscos* (emphasis roto en el vie
 
 
 def mode_icon(n):
-    """icono del paso de transporte, derivado de su mode (step o transit)."""
+    """icono del paso de transporte, derivado de su mode (step o transit).
+    Es un nodo de texto real (copiable), marcado como derivado."""
     if "transit" not in n and not n.get("mode"):
         return ""
     mode = n.get("mode") or TRANSITS.get(n.get("transit"), {}).get("mode", "walk")
     ic = MODE_ICON.get(mode, "")
-    return ic + " " if ic else ""
+    return f'<i class="icon" data-derived="mode">{ic}</i> ' if ic else ""
 
 
 def row_text(n, refs):
@@ -171,7 +172,7 @@ def render_options(node, refs):
             continue
         if "steps" in o:
             title = md(str(o.get("title", "")).replace("*", ""), refs)
-            subs = "\n".join(render_li(s, refs) for s in o["steps"] if not s.get("hidden-summary"))
+            subs = "\n".join(render_li(s, refs) for s in o["steps"])
             items.append(f'<li><b>{title}</b><ul class="steps">\n{subs}\n</ul></li>')
         else:
             label = html.escape(str(o.get("title", "")))
@@ -188,13 +189,19 @@ def render_li(n, refs, row_id=None):
     # los trayectos van en gris para que resalten los lugares
     if "transit" in n and "options" not in n:
         body = f'<span class="transit">{body}</span>'
-    # la fila lleva su clave YAML (location/transit) como data-* — el HTML es
-    # una proyección legible del YAML
+    # la fila lleva TODO su paso YAML: claves como data-*, flags como clase —
+    # el HTML es una proyección completa (verify_roundtrip.py lo comprueba)
     attrs = f' id="{row_id}"' if row_id else ""
+    if n.get("hidden-summary"):
+        attrs += ' class="hidden-summary"'
     if n.get("location"):
         attrs += f' data-location="{html.escape(str(n["location"]))}"'
     elif n.get("transit"):
         attrs += f' data-transit="{html.escape(str(n["transit"]))}"'
+    if n.get("mode"):
+        attrs += f' data-mode="{html.escape(str(n["mode"]))}"'
+    if n.get("solo_seleccion"):
+        attrs += ' data-solo-seleccion'
     return f'    <li{attrs}>{time_cell(n)}<div class="body">{body}</div></li>'
 
 
@@ -208,8 +215,10 @@ def render_day(day, refs, num):
     head = (f'<header class="day-head"><h3>{titulo}</h3>'
             f'<span class="note">{note}</span>'
             f'<span class="ancla">Ancla: {ancla}</span></header>')
-    visible = [s for s in day.get("steps", []) if not s.get("hidden-summary")]
-    lis = "\n".join(render_li(s, refs, f"d{num}-r{i + 1:02d}") for i, s in enumerate(visible))
+    # TODOS los pasos van al DOM (los hidden-summary con su clase, el CSS los
+    # oculta) → la fila rNN es EXACTAMENTE el paso N del YAML
+    steps = day.get("steps", [])
+    lis = "\n".join(render_li(s, refs, f"d{num}-r{i + 1:02d}") for i, s in enumerate(steps))
     return (f'  <section class="day" id="d{num}" data-fecha="{fecha}">{head}\n'
             f'  <ul class="steps">\n{lis}\n  </ul></section>')
 
@@ -242,7 +251,7 @@ def render_line_modal(key, ident, ride=None, guia=None, horario=None):
     nombre = html.escape(ident.get("nombre", key))
     rng = ""
     if horario and horario.get("desde") and horario.get("hasta"):
-        rng = (f' <span class="h3-range">· {html.escape(str(horario["desde"]))}'
+        rng = (f' <span class="h3-range" data-derived="horario">· {html.escape(str(horario["desde"]))}'
                f' – {html.escape(str(horario["hasta"]))}</span>')
     h = [f'<h3>{nombre}{rng}</h3>']
 
@@ -267,7 +276,7 @@ def render_line_modal(key, ident, ride=None, guia=None, horario=None):
         d = html.escape(str(horario.get("destino", "")))
         desde = html.escape(str(horario.get("desde", "")))
         hasta = html.escape(str(horario.get("hasta", "")))
-        h.append(f'<div class="ride">'
+        h.append(f'<div class="ride" data-derived="horario">'
                  f'<span>🟢 <b>Sale {desde}</b><br><span class="stn">{o}</span></span>'
                  f'<span class="arrow">→</span>'
                  f'<span class="arr">🔴 <b>Llega {hasta}</b><br><span class="stn">{d}</span></span></div>')
@@ -287,8 +296,8 @@ def render_line_modal(key, ident, ride=None, guia=None, horario=None):
             h.append('<div class="stations">')
             for i, st in enumerate(est):
                 code, sjp, srom = (list(st) + ["", "", ""])[:3]
-                tag = " 🟢 <small><b>SUBIR</b></small>" if i == 0 else (
-                    " 🔴 <small><b>BAJAR</b></small>" if i == len(est) - 1 else "")
+                tag = ' 🟢 <small data-derived="pos"><b>SUBIR</b></small>' if i == 0 else (
+                    ' 🔴 <small data-derived="pos"><b>BAJAR</b></small>' if i == len(est) - 1 else "")
                 dot = (f'<span class="station-code">{html.escape(str(code))}</span> ') if code else "· "
                 h.append(f'<div class="station">{dot}<b lang="ja">{html.escape(str(sjp))}</b> '
                          f'<span class="romaji">{html.escape(str(srom))}</span>{tag}</div>')
@@ -297,7 +306,7 @@ def render_line_modal(key, ident, ride=None, guia=None, horario=None):
             dest = est[-1]
             djp, drom = html.escape(str(dest[1])), html.escape(str(dest[2]))
             eki = "駅" if (veh == "tren" and "駅" not in str(dest[1]) and "ターミナル" not in str(dest[1])) else ""
-            h.append(f'<div class="phrase">'
+            h.append(f'<div class="phrase" data-derived="frase">'
                      f'<div class="jp" lang="ja">すみません、{djp}{eki}へ行きたいです。この{VEH_JP.get(veh, "電車")}で合っていますか？</div>'
                      f'<div class="romaji">Sumimasen, {drom}{"-eki" if eki else ""} e ikitai desu. '
                      f'Kono {VEH_RO.get(veh, "densha")} de atte imasu ka?</div>'
@@ -385,6 +394,9 @@ a { color: var(--shu); }
 .steps > li { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; scroll-margin-top: 58px; }
 .steps > li.flash { animation: row-flash 1.8s ease-out 1; }
 @keyframes row-flash { 0%, 55% { background: var(--shu-soft); } 100% { background: transparent; } }
+/* pasos solo-mapa: presentes en el DOM (proyección 1:1 del YAML), no se ven */
+.steps li.hidden-summary { display: none; }
+.title .icon { font-style: normal; }
 .steps .time { color: var(--ink-soft); font-variant-numeric: tabular-nums; font-size: 12px; padding-top: 2px; white-space: nowrap; letter-spacing: .06em; font-weight: 600; }
 .steps .time.fixed { color: var(--shu); }
 .steps b { font-weight: 600; }
@@ -394,7 +406,13 @@ a { color: var(--shu); }
    Mismo markup (ul.options > li), como en el YAML son la misma clave.
    Un li CON sub-.steps (:has) es un plan-tarjeta; sin ellos, un tier-cajita. */
 .options { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin: 6px 0 0; padding: 0; list-style: none; }
-@media (max-width: 900px) { .options { grid-template-columns: 1fr; } }
+/* angosto: carrusel horizontal (touch + arrastre de mouse), nunca apilar */
+@media (max-width: 900px) {
+  .options, .options:has(> li > .steps) { display: flex; overflow-x: auto; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; scrollbar-width: none; cursor: grab; }
+  .options::-webkit-scrollbar { display: none; }
+  .options > li { flex: 0 0 auto; min-width: 64%; max-width: 85%; scroll-snap-align: center; }
+  .options > li:has(> .steps) { min-width: 86%; max-width: 86%; }
+}
 .options > li { font-size: 13px; border-radius: 4px; padding: 6px 10px; }
 .options > li > b:first-child { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; display: block; }
 /* tiers hoja: color por tier; cualquier otro tier (🏮 barrio) = neutro punteado */
@@ -553,6 +571,30 @@ SCRIPT = """(function () {
     }, { rootMargin: '-50px 0px -55% 0px' });
     days.forEach(function (d) { observer.observe(d); });
   }
+
+  // carruseles (.options angostas, barra de días): arrastre lateral con mouse;
+  // el touch ya scrollea nativo. Un arrastre real suprime el click que suelta.
+  var drag = null, dragged = false;
+  document.addEventListener('pointerdown', function (e) {
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    var el = e.target.closest('.options, .day-nav');
+    if (!el || el.scrollWidth <= el.clientWidth + 4) return;
+    drag = { el: el, x: e.clientX, left: el.scrollLeft };
+    dragged = false;
+  });
+  document.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    var dx = e.clientX - drag.x;
+    if (Math.abs(dx) > 5) dragged = true;
+    if (dragged) {
+      drag.el.scrollLeft = drag.left - dx;
+      e.preventDefault();
+    }
+  });
+  document.addEventListener('pointerup', function () { drag = null; });
+  document.addEventListener('click', function (e) {
+    if (dragged) { e.preventDefault(); e.stopPropagation(); dragged = false; }
+  }, true);
 })();"""
 
 INTRO = """Física de 10 personas, ya sumada en cada hora: <b>+15 min de reagrupe en cada movimiento</b> (alguien siempre está en el baño), <b>ninguna comida sentada dura menos de 1 h</b> (con 10 son 1 h 15 reales), y cada conmutación viene con su línea, estación y transbordo — nivel Keep de Juan, y un poco más. Días de ~12 horas <b>con holgura a propósito</b>: si un lugar les gusta, se quedan — los bloques de tarde son los que se sacrifican, nunca el ancla de la mañana. Las horas en <b class="red">rojo</b> son las únicas fijas (vuelos, aperturas, reservas, el tour); todo lo demás se estira o se cae sin culpa. Kioto madruga a las 6:00 porque ahí el silencio se compra con sueño; Tokio abre tarde y ahí se descansa. Regla de los 10: mañana juntos en el ancla, tarde en subgrupos, cena juntos si sale natural. <b>Comidas:</b> las opciones son de donde ESTÁN a esa hora; las recomendaciones grandes (★) solo aparecen en noches libres, cuando sí pueden moverse a ellas; cada columna trae 3 opciones clickeables (toca cualquier lugar para ver qué es, quién lo recomienda y su Google Maps) y el orden de precio es fijo — Take barato, Ai medio, Shu caro: juntas son el rango del momento; los barrios 🏮 son la opción de llegar y escoger ahí, y los huecos libres de mediodía sirven para peregrinar a un lugar específico. <b>Desayunos:</b> 🏨 = incluido en el hotel · ☕ = comprarlo cerca · 🏪 = konbini precomprado la noche anterior (los madrugones no perdonan el buffet)."""
@@ -611,3 +653,9 @@ if FIXED_TITLES:
     print(f"títulos normalizados (asteriscos sueltos del pipeline viejo): {len(FIXED_TITLES)}")
     for t in FIXED_TITLES:
         print("  ·", t[:80])
+
+# el HTML debe ser proyección 1:1 del YAML — comprobarlo en cada build
+import subprocess
+r = subprocess.run([sys.executable, os.path.join(SD, "verify_roundtrip.py")],
+                   capture_output=True, text=True, encoding="utf-8")
+print(r.stdout.strip() or r.stderr.strip())
