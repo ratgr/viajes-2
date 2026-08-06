@@ -99,3 +99,8 @@ body.show-free .panel .steps > li[data-free]::after { content: '⏳ ' attr(data-
 .dev-drawer .dev-save { background: var(--shu); color: #fff; border-color: var(--shu); }
 .dev-drawer .dev-rebuild { background: var(--ai); color: #fff; border-color: var(--ai); }
 .dev-drawer .dev-msg { font: 11px ui-monospace, Consolas, monospace; color: var(--ink-soft); }
+.dev-drawer .dev-refs { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px; }
+.dev-drawer .dev-refs button { border: 1px solid var(--line); background: var(--paper-2); color: var(--ink); border-radius: 999px; padding: 3px 10px; font: 600 11px "Segoe UI", system-ui, sans-serif; cursor: pointer; }
+.dev-drawer .dev-refs button:hover { border-color: var(--shu); color: var(--shu); }
+.dev-drawer .dev-entity { margin-top: 6px; min-height: 140px; }
+.dev-drawer .dev-entity-name { font: 11px ui-monospace, Consolas, monospace; color: var(--ink-soft); }

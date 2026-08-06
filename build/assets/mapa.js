@@ -333,14 +333,67 @@
     drawer = document.createElement('div');
     drawer.className = 'dev-drawer';
     drawer.innerHTML = '<div class="dev-info"></div>' +
-      '<textarea spellcheck="false">cargando…</textarea>' +
+      '<textarea class="dev-step" spellcheck="false">cargando…</textarea>' +
       '<div class="dev-btns"><button class="dev-save" type="button">Guardar</button>' +
       '<button class="dev-rebuild" type="button">Rebuild</button>' +
-      '<button class="dev-close" type="button">Cancelar</button><span class="dev-msg"></span></div>';
+      '<button class="dev-close" type="button">Cancelar</button><span class="dev-msg"></span></div>' +
+      '<div class="dev-refs"></div>' +
+      '<textarea class="dev-entity" spellcheck="false" hidden></textarea>' +
+      '<div class="dev-btns dev-entity-btns" hidden>' +
+      '<button class="dev-save-entity" type="button">Guardar referencia</button>' +
+      '<span class="dev-entity-name"></span></div>';
     drawer.querySelector('.dev-info').textContent = facts.join('\n');
     document.body.appendChild(drawer);
-    var ta = drawer.querySelector('textarea');
+    var ta = drawer.querySelector('.dev-step');
     var msg = drawer.querySelector('.dev-msg');
+
+    // lo REFERENCIADO por la fila (location/transit + @refs de los textos):
+    // un botón por clave carga su YAML del catálogo para editarlo también
+    var refKeys = [];
+    if (li.dataset.location) refKeys.push(li.dataset.location);
+    if (li.dataset.transit) refKeys.push(li.dataset.transit);
+    li.querySelectorAll('.modal-link').forEach(function (a) {
+      var h = a.getAttribute('href') || '';
+      if (h.indexOf('#m-') === 0 && refKeys.indexOf(h.slice(3)) < 0) refKeys.push(h.slice(3));
+    });
+    var refsBox = drawer.querySelector('.dev-refs');
+    var entTa = drawer.querySelector('.dev-entity');
+    var entBtns = drawer.querySelector('.dev-entity-btns');
+    var entName = drawer.querySelector('.dev-entity-name');
+    var entCur = null;    // {kind, key} de la entidad cargada
+    refKeys.forEach(function (key) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = key;
+      b.addEventListener('click', function () {
+        msg.textContent = '';
+        fetch('/api/entity?trip=' + encodeURIComponent(TRIP) + '&key=' + encodeURIComponent(key))
+          .then(function (r) { return r.json(); })
+          .then(function (d) {
+            if (!d.ok) { msg.textContent = 'error: ' + d.error; return; }
+            entCur = { kind: d.kind, key: key };
+            entName.textContent = d.kind + ' · ' + key;
+            entTa.value = d.yaml;
+            entTa.hidden = false;
+            entBtns.hidden = false;
+          })
+          .catch(function (e) { msg.textContent = 'error: ' + e; });
+      });
+      refsBox.appendChild(b);
+    });
+    drawer.querySelector('.dev-save-entity').addEventListener('click', function () {
+      if (!entCur) return;
+      msg.textContent = 'guardando referencia…';
+      fetch('/api/entity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ trip: TRIP, kind: entCur.kind, key: entCur.key, yaml: entTa.value })
+      }).then(function (r) { return r.json(); })
+        .then(function (d) {
+          msg.textContent = d.ok ? 'referencia guardada ✓ (pendiente rebuild)' : 'error: ' + d.error;
+        })
+        .catch(function (e) { msg.textContent = 'error: ' + e; });
+    });
     fetch('/api/step?trip=' + encodeURIComponent(TRIP) + '&day=' + m[1] + '&step=' + m[2])
       .then(function (r) { return r.json(); })
       .then(function (d) { ta.value = d.ok ? d.yaml : 'error: ' + d.error; })

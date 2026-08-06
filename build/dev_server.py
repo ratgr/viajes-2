@@ -8,6 +8,9 @@ pasos del YAML directamente desde la página:
     GET  /api/step?trip=X&day=N&step=M     YAML del paso (para el editor)
     POST /api/step {trip, day, step, yaml} valida y escribe src/<trip>/viaje.yaml
                                            (SIN rebuild: se editan varios y luego…)
+    GET  /api/entity?trip=X&key=K[&kind=]  YAML de la entidad referenciada
+                                           (busca en places → transits → lines)
+    POST /api/entity {trip,kind,key,yaml}  escribe la entidad en su catálogo
     POST /api/rebuild {trip}               reconstruye pages/<trip>/
 
 La fila dN-rMM del HTML ES el paso M del día N del YAML (proyección 1:1),
@@ -33,6 +36,7 @@ sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 SERVE_DIR = os.path.dirname(ROOT)
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8791
 DUMP = dict(allow_unicode=True, sort_keys=False, default_flow_style=None, width=100000)
+CATALOGS = ("places", "transits", "lines")
 
 
 def yaml_path(trip):
@@ -99,6 +103,17 @@ class Handler(SimpleHTTPRequestHandler):
                 self._json(200, {"ok": True,
                                  "yaml": yaml.dump(step, allow_unicode=True, sort_keys=False,
                                                    default_flow_style=False)})
+            elif u.path == "/api/entity":
+                Y = load(q["trip"])
+                key = q["key"]
+                kinds = [q["kind"]] if q.get("kind") in CATALOGS else CATALOGS
+                for kind in kinds:
+                    if key in (Y.get(kind) or {}):
+                        self._json(200, {"ok": True, "kind": kind,
+                                         "yaml": yaml.dump(Y[kind][key], allow_unicode=True,
+                                                           sort_keys=False, default_flow_style=False)})
+                        return
+                self._json(404, {"error": f"'{key}' no está en {'/'.join(kinds)}"})
             else:
                 self._json(404, {"error": "endpoint desconocido"})
         except Exception as e:
@@ -116,6 +131,17 @@ class Handler(SimpleHTTPRequestHandler):
                 trip = req["trip"]
                 Y = load(trip)
                 Y["days"][int(req["day"]) - 1]["steps"][int(req["step"]) - 1] = step
+                save(trip, Y)
+                self._json(200, {"ok": True})
+            elif u.path == "/api/entity":
+                obj = yaml.safe_load(req["yaml"])
+                if not isinstance(obj, dict):
+                    return self._json(400, {"error": "el YAML debe ser un mapeo (una entidad)"})
+                if req.get("kind") not in CATALOGS:
+                    return self._json(400, {"error": f"kind debe ser uno de {CATALOGS}"})
+                trip = req["trip"]
+                Y = load(trip)
+                Y.setdefault(req["kind"], {})[req["key"]] = obj
                 save(trip, Y)
                 self._json(200, {"ok": True})
             elif u.path == "/api/rebuild":
