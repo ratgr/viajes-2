@@ -147,6 +147,31 @@ class Handler(SimpleHTTPRequestHandler):
                 Y.setdefault(req["kind"], {})[req["key"]] = obj
                 save(trip, Y)
                 self._json(200, {"ok": True})
+            elif u.path == "/api/step-insert":
+                # inserta {title: (nuevo paso)} antes/después de la fila dada;
+                # responde el número (1-based) del paso nuevo
+                trip = req["trip"]
+                Y = load(trip)
+                steps = Y["days"][int(req["day"]) - 1]["steps"]
+                i = int(req["step"]) - 1
+                if not 0 <= i < len(steps):
+                    return self._json(400, {"error": "paso fuera de rango"})
+                pos = i if req.get("where") == "before" else i + 1
+                steps.insert(pos, {"title": "(nuevo paso)"})
+                save(trip, Y)
+                self._json(200, {"ok": True, "step": pos + 1})
+            elif u.path == "/api/step-move":
+                # mueve la fila una posición (dir=-1 sube, dir=1 baja)
+                trip = req["trip"]
+                Y = load(trip)
+                steps = Y["days"][int(req["day"]) - 1]["steps"]
+                i = int(req["step"]) - 1
+                j = i + int(req.get("dir", 0))
+                if not (0 <= i < len(steps) and 0 <= j < len(steps) and i != j):
+                    return self._json(400, {"error": "movimiento fuera de rango"})
+                steps.insert(j, steps.pop(i))
+                save(trip, Y)
+                self._json(200, {"ok": True, "step": j + 1})
             elif u.path == "/api/rebuild":
                 self._json(200, {"ok": True, "build": rebuild(req["trip"])})
             else:

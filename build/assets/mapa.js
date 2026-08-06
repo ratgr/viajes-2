@@ -45,16 +45,21 @@
       // abrir un día también lo ENCUADRA (toda su geometría, sin dibujarla)
       if (day.classList.toggle('open')) focusKeys(keysUnder(day));
     });
+    // el maestro prende TODO el día, incluidos los sub-pasos de las opciones
+    // (aunque estén ocultas/plegadas: su geometría también cuenta)
     master.addEventListener('change', function () {
-      rows.forEach(function (li) { li.querySelector('.ck').checked = master.checked; });
+      Array.prototype.forEach.call(day.querySelectorAll('.ck:not(.ck-day)'), function (ck) {
+        ck.checked = master.checked;
+      });
       if (master.checked) day.classList.add('open');
     });
-    // maestro tri-estado según las filas
+    // maestro tri-estado según TODAS las casillas del día
     day.addEventListener('change', function (e) {
       if (e.target === master || !e.target.classList.contains('ck')) return;
-      var on = rows.filter(function (li) { return li.querySelector('.ck').checked; }).length;
-      master.checked = on === rows.length && on > 0;
-      master.indeterminate = on > 0 && on < rows.length;
+      var cks = Array.prototype.slice.call(day.querySelectorAll('.ck:not(.ck-day)'));
+      var on = cks.filter(function (c) { return c.checked; }).length;
+      master.checked = on === cks.length && on > 0;
+      master.indeterminate = on > 0 && on < cks.length;
     });
   });
 
@@ -400,7 +405,7 @@
     }
     return pop;
   }
-  function showOnMap(key, fallbackTitle, activeRowId) {
+  function showOnMap(key, fallbackTitle, activeRowId, zoomOpt) {
     if (!map) return false;
     var content = modalHtml(key) ||
       '<div class="modal"><h3>' + (fallbackTitle || key) + '</h3></div>';
@@ -409,13 +414,17 @@
     clearTemp();
     haloFor([key]);
     if (loc) {
-      map.flyTo(loc, Math.max(map.getZoom(), 15), { duration: .5 });
+      map.flyTo(loc, zoomOpt || Math.max(map.getZoom(), 15), { duration: .5 });
       openCardPopup(loc, content + dayPieces(key, activeRowId));
       return true;
     }
     if (tr && tr.coords.length) {
       tempLayer = transitGroup(key, tr, tr.coords).addTo(map);
-      map.flyToBounds(tempLayer.getBounds().pad(.25), { duration: .5 });
+      if (zoomOpt) {
+        map.flyTo(tempLayer.getBounds().getCenter(), zoomOpt, { duration: .5 });
+      } else {
+        map.flyToBounds(tempLayer.getBounds().pad(.25), { duration: .5 });
+      }
       openCardPopup(tr.coords[Math.floor(tr.coords.length / 2)], content);
       return true;
     }
@@ -486,6 +495,8 @@
       color: tr.color, weight: tr.mode === 'walk' ? 3 : 5, opacity: .85,
       dashArray: tr.mode === 'walk' ? '4 7' : null
     });
+    // línea de IMPACTO invisible y gorda: las punteadas casi no se atinan
+    g.addLayer(L.polyline(coords, { weight: 16, opacity: 0.001, interactive: true }));
     g.addLayer(line);
     g._line = line;
     g._decos = chevronMarkers(coords, tr.color);
@@ -502,10 +513,10 @@
   }
   function locIcon(key, ghost) {
     var label = seqLabels[key] || '';
-    var w = label.length > 2 ? 8 + label.length * 7 : 18;
+    var w = label.length > 2 ? 10 + label.length * 8 : 22;
     return L.divIcon({
       className: 'seq-badge' + (ghost ? ' ghost' : '') + (label ? '' : ' plain'),
-      html: label, iconSize: label ? [w, 18] : [12, 12]
+      html: label, iconSize: label ? [w, 22] : [16, 16]
     });
   }
   function makeLayer(key) {
@@ -518,16 +529,39 @@
       ly = transitGroup(key, tr, tr.coords);
     }
     if (ly) {
+      // click en la geometría: SIEMPRE (re)abre su tarjeta — aun ya
+      // seleccionada — y selecciona la fila correspondiente en la barra
       ly.on('click', function () {
         var content = modalHtml(key) || '<div class="modal"><h3>' + key + '</h3></div>';
         if (loc) content += dayPieces(key, null);
         openCardPopup(loc || tr.coords[Math.floor(tr.coords.length / 2)], content);
+        selectByKey(key);
       });
     }
     return ly;
   }
+  // geometría → barra: seleccionar la fila del elemento clickeado en el mapa
+  // (si la clave se repite, gana la de un día abierto)
+  function selectByKey(key) {
+    var idx = -1;
+    for (var j = 0; j < stEls.length; j++) {
+      if ((stEls[j].dataset.location || stEls[j].dataset.transit) !== key) continue;
+      var day = stEls[j].closest('section.day');
+      if (day && day.classList.contains('open')) { idx = j; break; }
+      if (idx < 0) idx = j;
+    }
+    if (idx < 0) return;
+    var li = rowOf(stEls[idx]) || stEls[idx];
+    openDayOf(li);
+    selectRow(li);
+    li.scrollIntoView({ block: 'center' });
+    stCur = idx;
+    stMode = null;
+    stRender();
+  }
   // estado fantasma: elemento marcado dentro de una opción NO elegida —
-  // con 👁 su geometría se dibuja atenuada; con 🙈 no se dibuja
+  // con 👁 su geometría se dibuja atenuada; con 🙈 va en línea GORDA tenue
+  // (sigue visible: distinta, no borrada)
   function ghostState(el) {
     var set = el.closest('.options');
     if (!set) return 'full';
@@ -535,19 +569,22 @@
     if (!chosen) return 'full';
     var container = el.closest('.option') || el.closest('.options > li');
     if (!container || container.contains(chosen)) return 'full';
-    if (set.classList.contains('eye-hide')) return 'skip';
+    if (set.classList.contains('eye-hide')) return 'hidden';
     return set.classList.contains('eye-ghost') ? 'ghost' : 'full';
   }
+  var ST_RANK = { full: 3, ghost: 2, hidden: 1 };
   function applyLayerState(key, st) {
     var ly = liveLayers[key];
     if (!ly) return;
-    var ghost = st === 'ghost';
+    var lineOp = st === 'full' ? .85 : st === 'ghost' ? .25 : .12;
+    var markOp = st === 'full' ? 1 : st === 'ghost' ? .25 : .12;
     if (ly._line) {                       // grupo de transporte
-      ly._line.setStyle({ opacity: ghost ? .25 : .85 });
-      ly._decos.forEach(function (d) { d.setOpacity(ghost ? .25 : 1); });
-      ly._dots.forEach(function (d) { d.setStyle({ opacity: ghost ? .25 : 1, fillOpacity: ghost ? .25 : 1 }); });
+      var w = GEO.transits[key] && GEO.transits[key].mode === 'walk' ? 3 : 5;
+      ly._line.setStyle({ opacity: lineOp, weight: st === 'hidden' ? w + 7 : w });
+      ly._decos.forEach(function (d) { d.setOpacity(markOp); });
+      ly._dots.forEach(function (d) { d.setStyle({ opacity: markOp, fillOpacity: markOp }); });
     } else if (ly.setIcon) {              // marcador de lugar (insignia numerada)
-      ly.setIcon(locIcon(key, ghost));
+      ly.setIcon(locIcon(key, st !== 'full'));
     }
   }
   // punto de anclaje de una fila con geometría: lugar → su gps;
@@ -569,15 +606,14 @@
     var states = els.map(function (el) {
       var ck = el.querySelector(':scope > .ck');
       if (!ck || !ck.checked) return null;
-      var st = ghostState(el);
-      return st === 'skip' ? null : st;
+      return ghostState(el);
     });
     els.forEach(function (el, i) {
       var st = states[i];
       if (!st) return;
       var key = el.dataset.location || el.dataset.transit;
       if (GEO.locations[key] || (GEO.transits[key] && GEO.transits[key].coords.length)) {
-        if (st === 'full' || !want[key]) want[key] = st;
+        if (!want[key] || ST_RANK[st] > ST_RANK[want[key]]) want[key] = st;
         return;
       }
       if (!el.dataset.transit) return;
@@ -642,9 +678,9 @@
         g._decos.forEach(function (d) { g.addLayer(d); });
         autoLayers[id] = g.addTo(map);
       }
-      var ghost = sp.st === 'ghost';
-      autoLayers[id]._line.setStyle({ opacity: ghost ? .2 : .7 });
-      autoLayers[id]._decos.forEach(function (d) { d.setOpacity(ghost ? .2 : .8); });
+      var op = sp.st === 'full' ? .7 : sp.st === 'ghost' ? .2 : .1;
+      autoLayers[id]._line.setStyle({ opacity: op, weight: sp.st === 'hidden' ? 9 : 2.5 });
+      autoLayers[id]._decos.forEach(function (d) { d.setOpacity(sp.st === 'full' ? .8 : op); });
     });
   }
   function fitToLayers() {
@@ -739,10 +775,23 @@
     '<button class="st-jump-toggle" type="button">saltar a ▾</button>' +
     '<div class="st-jump-body"></div></div>';
   document.getElementById('map').appendChild(stBar);
-  ['pointerdown', 'dblclick', 'wheel'].forEach(function (ev) {
+  // parar TODO lo de ratón: un click en la barra que burbujee hasta Leaflet
+  // CIERRA el popup recién abierto por ese mismo click
+  ['pointerdown', 'mousedown', 'mouseup', 'click', 'touchstart', 'dblclick', 'wheel'].forEach(function (ev) {
     stBar.addEventListener(ev, function (e) { e.stopPropagation(); });
   });
 
+  // zoom esperado de un elemento: lugar = 16; línea = el que la encuadra
+  function expectedZoomFor(el) {
+    if (!el || !map) return map ? map.getZoom() : 14;
+    var key = el.dataset.location || el.dataset.transit;
+    if (GEO.locations[key]) return 16;
+    var tr = GEO.transits[key];
+    if (tr && tr.coords.length) {
+      return Math.min(16, map.getBoundsZoom(L.latLngBounds(tr.coords).pad(.25)));
+    }
+    return map.getZoom();
+  }
   function stGoTo(i) {
     stCur = i;
     stMode = null;
@@ -752,12 +801,27 @@
     selectRow(li);
     li.scrollIntoView({ block: 'center' });
     var key = el.dataset.location || el.dataset.transit;
-    if (!showOnMap(key, stTitle(el), li.id)) {
-      // sin geometría (conector automático): encuadrar sus puntos vecinos
+    // suavizar el zoom entre pasos (regla del usuario): promedio aritmético
+    // de (2 × zoom nuevo + zoom actual + zoom esperado del paso siguiente) / 4
+    var blend = null;
+    if (map) {
+      var nxI = nextConcrete(i, 1);
+      var zNew = expectedZoomFor(el);
+      var zNext = nxI >= 0 ? expectedZoomFor(stEls[nxI]) : zNew;
+      blend = Math.round((2 * zNew + map.getZoom() + zNext) / 4 * 2) / 2;
+    }
+    if (!showOnMap(key, stTitle(el), li.id, blend)) {
+      // sin geometría (conector automático): encuadrar sus puntos vecinos y
+      // abrir su tarjeta ahí mismo (el popup SIEMPRE acompaña al paso)
       var pts = [], j, p;
       for (j = i - 1; j >= 0; j--) { p = anchorPoint(stEls[j], true); if (p) { pts.push(p); break; } }
       for (j = i + 1; j < stEls.length; j++) { p = anchorPoint(stEls[j], false); if (p) { pts.push(p); break; } }
-      if (pts.length && map) map.flyToBounds(L.latLngBounds(pts).pad(.3), { duration: .5 });
+      if (pts.length && map) {
+        var c = L.latLngBounds(pts).getCenter();
+        map.flyTo(c, blend || map.getZoom(), { duration: .5 });
+        openCardPopup(c, modalHtml(key) ||
+          '<div class="modal"><h3>' + stTitle(el) + '</h3></div>');
+      }
     }
     stRender();
   }
@@ -785,6 +849,7 @@
         b.type = 'button';
         b.className = 'st-opt';
         b.textContent = label;
+        if (li.dataset.tier) b.dataset.tier = li.dataset.tier;   // color del tier
         if (curEl && cont.contains(curEl)) b.classList.add('on');
         var r = cont.querySelector('.option-choice, .group-choice');
         if (r && r.checked) b.classList.add('chosen');
@@ -792,17 +857,17 @@
         return b;
       }
       if (opts.length) {
+        // columna por grupo con su etiqueta fija (solo el «saltar a» se pliega)
         var col = document.createElement('div');
         col.className = 'st-col';
         var head = li.querySelector('b');
         if (head) {
-          var hb = document.createElement('button');
-          hb.type = 'button';
-          hb.className = 'st-col-head';
-          hb.textContent = head.textContent.replace(/\s+/g, ' ')
-            .replace(/^[▼▾▸▶ ]+/, '').trim() + ' ▾';
-          hb.addEventListener('click', function () { col.classList.toggle('closed'); });
-          col.appendChild(hb);
+          var hs = document.createElement('span');
+          hs.className = 'st-col-head';
+          if (li.dataset.tier) hs.dataset.tier = li.dataset.tier;
+          hs.textContent = head.textContent.replace(/\s+/g, ' ')
+            .replace(/^[▼▾▸▶ ]+/, '').trim();
+          col.appendChild(hs);
         }
         opts.forEach(function (o) { col.appendChild(mkBtn(o, optLabel(o))); });
         box.appendChild(col);
@@ -839,6 +904,7 @@
     } else {
       jump.hidden = true;
     }
+    if (dayBar) dsRender();
   }
   stBar.querySelector('.st-prev').addEventListener('click', function () {
     var p = nextConcrete(stCur, -1);
@@ -863,6 +929,60 @@
       if (stEls[j] === li || li.contains(stEls[j])) { stCur = j; stMode = null; stRender(); return; }
     }
   }
+
+  // ---------- STEPPER DE DÍA (barra inferior) ----------
+  // ‹ día / día › saltan al PRIMER paso concreto del día vecino: apagan y
+  // pliegan el día actual, prenden y muestran el nuevo completo
+  var dayBar = document.createElement('div');
+  dayBar.className = 'day-stepper';
+  dayBar.innerHTML =
+    '<button class="ds-prev" type="button">‹ día</button>' +
+    '<span class="ds-cur"></span>' +
+    '<button class="ds-next" type="button">día ›</button>';
+  document.getElementById('map').appendChild(dayBar);
+  ['pointerdown', 'mousedown', 'mouseup', 'click', 'touchstart', 'dblclick', 'wheel'].forEach(function (ev) {
+    dayBar.addEventListener(ev, function (e) { e.stopPropagation(); });
+  });
+  function dayIndexOf(el) {
+    return el ? days.indexOf(el.closest('section.day')) : -1;
+  }
+  function setDayChecked(day, on) {
+    var m = day.querySelector('.ck-day');
+    if (m) { m.checked = on; m.indeterminate = false; }
+    Array.prototype.forEach.call(day.querySelectorAll('.ck:not(.ck-day)'), function (c) {
+      c.checked = on;
+    });
+  }
+  function firstConcreteOfDay(di) {
+    for (var j = 0; j < stEls.length; j++) {
+      if (stEls[j].closest('section.day') === days[di] && onChosenPath(stEls[j])) return j;
+    }
+    return -1;
+  }
+  function goDay(di) {
+    if (di < 0 || di >= days.length) return;
+    var cur = dayIndexOf(stEls[stCur]);
+    if (cur >= 0 && cur !== di) setDayChecked(days[cur], false);   // ocultar el actual
+    setDayChecked(days[di], true);                                 // mostrar el nuevo
+    days.forEach(function (d, i2) { d.classList.toggle('open', i2 === di); });
+    syncLayers();
+    var j = firstConcreteOfDay(di);
+    if (j >= 0) stGoTo(j); else stRender();
+  }
+  function dsRender() {
+    var di = dayIndexOf(stEls[stCur]);
+    var h3 = di >= 0 ? days[di].querySelector('h3') : null;
+    dayBar.querySelector('.ds-cur').textContent =
+      h3 ? h3.textContent.replace(/\s+/g, ' ').trim() : '—';
+    dayBar.querySelector('.ds-prev').disabled = di <= 0;
+    dayBar.querySelector('.ds-next').disabled = di < 0 || di >= days.length - 1;
+  }
+  dayBar.querySelector('.ds-prev').addEventListener('click', function () {
+    goDay(dayIndexOf(stEls[stCur]) - 1);
+  });
+  dayBar.querySelector('.ds-next').addEventListener('click', function () {
+    goDay(dayIndexOf(stEls[stCur]) + 1);
+  });
   stRender();
 
   // teléfono: el panel es un sobrepuesto que abre el botón ☰; al elegir algo
@@ -1014,7 +1134,17 @@
     var tr = GEO.transits[key];
     var coords = tr && tr.coords.length
       ? tr.coords.map(function (c) { return [c[0], c[1]]; })
-      : (function () {   // sin geometría: arrancar con un tramo en el centro de la vista
+      : (function () {
+        // transit NUEVO sin geometría: sembrar la línea entre el último punto
+        // del paso previo y el primero del siguiente (donde se referencia)
+        for (var j = 0; j < stEls.length; j++) {
+          if (stEls[j].dataset.transit !== key) continue;
+          var pts = [], a, p;
+          for (a = j - 1; a >= 0; a--) { p = anchorPoint(stEls[a], true); if (p) { pts.push([p[0], p[1]]); break; } }
+          for (a = j + 1; a < stEls.length; a++) { p = anchorPoint(stEls[a], false); if (p) { pts.push([p[0], p[1]]); break; } }
+          if (pts.length === 2) return pts;
+          break;
+        }
         var c = map.getCenter(), d = 0.002;
         return [[c.lat, c.lng - d], [c.lat, c.lng + d]];
       })();
@@ -1061,10 +1191,14 @@
     var msg = geomEd.msg;
     msg.textContent = 'ajustando a calles…';
     // punto por punto contra /nearest (el /match del OSRM público rechaza
-    // trazas largas con TooBig); cada vértice se pega a su vialidad más cercana
+    // trazas largas con TooBig); caminatas van al perfil PEATONAL de FOSSGIS
+    // (incluye calles peatonales), lo demás al de auto
+    var tr0 = GEO.transits[geomEd.key];
+    var base = (!tr0 || tr0.mode === 'walk')
+      ? 'https://routing.openstreetmap.de/routed-foot/nearest/v1/foot/'
+      : 'https://router.project-osrm.org/nearest/v1/driving/';
     var reqs = geomEd.coords.map(function (c) {
-      return fetch('https://router.project-osrm.org/nearest/v1/driving/' +
-                   c[1].toFixed(6) + ',' + c[0].toFixed(6))
+      return fetch(base + c[1].toFixed(6) + ',' + c[0].toFixed(6))
         .then(function (r) { return r.json(); })
         .then(function (d) {
           var w = d.code === 'Ok' && d.waypoints && d.waypoints[0];
@@ -1103,6 +1237,11 @@
       '<div class="dev-btns"><button class="dev-save" type="button">Guardar</button>' +
       '<button class="dev-rebuild" type="button">Rebuild</button>' +
       '<button class="dev-close" type="button">Cancelar</button><span class="dev-msg"></span></div>' +
+      '<div class="dev-btns dev-step-ops">' +
+      '<button class="dev-add-before" type="button" title="Insertar un paso nuevo ANTES de esta fila">+ antes</button>' +
+      '<button class="dev-add-after" type="button" title="Insertar un paso nuevo DESPUÉS de esta fila">+ después</button>' +
+      '<button class="dev-move-up" type="button" title="Subir esta fila un lugar">▲ subir</button>' +
+      '<button class="dev-move-down" type="button" title="Bajar esta fila un lugar">▼ bajar</button></div>' +
       '<div class="dev-refs"></div>' +
       '<textarea class="dev-entity" spellcheck="false" hidden></textarea>' +
       '<div class="dev-btns dev-entity-btns" hidden>' +
@@ -1224,6 +1363,48 @@
         })
         .catch(function (e) { msg.textContent = 'error: ' + e; });
     });
+    // insertar / mover pasos: el server reescribe days[].steps[] y al aceptar
+    // se pregunta si recalcular (rebuild + recarga posicionada en el paso)
+    function stepOp(path, body) {
+      msg.textContent = '…';
+      fetch(path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(Object.assign({ trip: TRIP, day: +m[1], step: +m[2] }, body))
+      }).then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (!d.ok) { msg.textContent = 'error: ' + d.error; return; }
+          var target = 'd' + m[1] + '-r' + String(d.step).padStart(2, '0');
+          if (window.confirm('Guardado. ¿Recalcular (rebuild) ahora?')) {
+            fetch('/api/rebuild', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ trip: TRIP })
+            }).then(function (r) { return r.json(); })
+              .then(function (d2) {
+                if (!d2.ok) { msg.textContent = 'error: ' + d2.error; return; }
+                location.hash = '#@' + target;
+                location.reload();
+              })
+              .catch(function (e) { msg.textContent = 'error: ' + e; });
+          } else {
+            msg.textContent = 'guardado ✓ (pendiente rebuild — los ids de fila ya cambiaron)';
+          }
+        })
+        .catch(function (e) { msg.textContent = 'error: ' + e; });
+    }
+    drawer.querySelector('.dev-add-before').addEventListener('click', function () {
+      stepOp('/api/step-insert', { where: 'before' });
+    });
+    drawer.querySelector('.dev-add-after').addEventListener('click', function () {
+      stepOp('/api/step-insert', { where: 'after' });
+    });
+    drawer.querySelector('.dev-move-up').addEventListener('click', function () {
+      stepOp('/api/step-move', { dir: -1 });
+    });
+    drawer.querySelector('.dev-move-down').addEventListener('click', function () {
+      stepOp('/api/step-move', { dir: 1 });
+    });
   }
 
   // ---------- llegada: restaurar el DÓNDE ESTAMOS desde el hash ----------
@@ -1235,16 +1416,29 @@
     var m = /^#(?:m-([^@]+))?(?:@(.+))?$/.exec(location.hash || '');
     var dm = /^#(d\d+)$/.exec(location.hash || '');
     if (dm) {
+      // #dN: ese día completo seleccionado y el stepper en su primer paso
       var sec = document.getElementById(dm[1]);
-      if (sec) days.forEach(function (d) { d.classList.toggle('open', d === sec); });
+      if (sec) goDay(days.indexOf(sec));
       return;
     }
-    if (!m || (!m[1] && !m[2])) return;
+    if (!m || (!m[1] && !m[2])) {
+      // sin posición en el hash: día 1 completo seleccionado, stepper en su
+      // primer paso concreto (sin volar: el encuadre inicial ya lo hace)
+      if (days.length) {
+        setDayChecked(days[0], true);
+        days.forEach(function (d, i2) { d.classList.toggle('open', i2 === 0); });
+        var j0 = firstConcreteOfDay(0);
+        if (j0 >= 0) { stCur = j0; stRender(); }
+        schedSync();
+      }
+      return;
+    }
     if (overlayEl && overlayEl.open) overlayEl.close();
     var li = m[2] ? document.getElementById(m[2]) : null;
     if (li) {
       openDayOf(li);
       selectRow(li);
+      stSyncTo(li);
       li.scrollIntoView({ block: 'center' });
     }
     if (devMode && li) {
