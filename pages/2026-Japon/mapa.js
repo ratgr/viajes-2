@@ -275,6 +275,19 @@
             var key = a && (a.getAttribute('href') || '').slice(3);
             if (key) showOnMap(key, a.textContent);
           });
+          // pliegue propio de la opción: colapsa sus sub-pasos (ida/lugar/regreso)
+          var sub = opt.querySelector(':scope > ul.steps');
+          if (sub) {
+            var oc = document.createElement('span');
+            oc.className = 'group-caret option-caret';
+            oc.textContent = '▼';
+            opt.insertBefore(oc, r.nextSibling);
+            opt.classList.add('closed');   // plegada por defecto
+            oc.addEventListener('click', function (e) {
+              e.stopPropagation();
+              opt.classList.toggle('closed');
+            });
+          }
         });
       }
     });

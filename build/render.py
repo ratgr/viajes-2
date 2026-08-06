@@ -346,9 +346,11 @@ def row_text(n, refs, sc=None):
         else:
             parts.append(f'<b class="title">{mode_icon(n)}{md(title, refs)}</b>')
     elif n.get("location") and PLACES.get(n["location"], {}).get("name"):
-        # paso-lugar sin título: el nombre del catálogo como título derivado
-        nombre = html.escape(PLACES[n["location"]]["name"])
-        parts.append(f'<b class="title" data-derived="title">{mode_icon(n)}{nombre}</b>')
+        # paso-lugar sin título: el LUGAR MISMO como título derivado (ref
+        # clickeable al catálogo, igual que en cualquier otro texto)
+        key = n["location"]
+        ref = md(f"@[{PLACES[key]['name']}]({key})", refs)
+        parts.append(f'<b class="title" data-derived="title">{mode_icon(n)}{ref}</b>')
     raw_dur = n.get("duration")
     flex = parse_flex(raw_dur) if raw_dur is not None else None
     dur_show = n.get("duration-show")
