@@ -28,11 +28,6 @@
       ck.type = 'checkbox';
       ck.className = 'ck';
       li.insertBefore(ck, li.firstChild);
-      // duración ARRIBA de la hora: se recoloca dentro de <time> (solo aquí,
-      // en el navegador — el HTML servido no cambia)
-      var dur = li.querySelector('.duration');
-      var t = li.querySelector('time');
-      if (dur && t) t.insertBefore(dur, t.firstChild);
     });
 
     // cabecera: maestro + caret
@@ -146,6 +141,17 @@
     selRow = li;
     if (li) li.classList.add('sel');
   }
+  // el DÓNDE ESTAMOS vive en el hash (#m-clave@fila · #@fila · #dN) para que
+  // una recarga (p.ej. tras rebuild) vuelva al mismo punto; la visibilidad
+  // de casillas NO se codifica (recarga = default)
+  function updateHash(mKey, rowId) {
+    var h = (mKey ? 'm-' + mKey : '') + (rowId ? '@' + rowId : '');
+    if (h) history.replaceState(null, '', '#' + h);
+  }
+  function openDayOf(li) {
+    var day = li.closest('section.day');
+    if (day) days.forEach(function (d) { d.classList.toggle('open', d === day); });
+  }
   function clearTemp() {
     if (tempLayer && map) { map.removeLayer(tempLayer); tempLayer = null; }
   }
@@ -221,6 +227,23 @@
     if (narrow.matches) document.body.classList.remove('panel-open');
   }
 
+  // toggle ⏳: ver el tiempo LIBRE entre pasos (huecos calculados, data-free)
+  var freeBtn = document.createElement('button');
+  freeBtn.className = 'free-toggle';
+  freeBtn.type = 'button';
+  freeBtn.textContent = '⏳';
+  freeBtn.title = 'Ver tiempo libre entre pasos';
+  document.body.appendChild(freeBtn);
+  if (localStorage.getItem('mapa-free') === '1') {
+    document.body.classList.add('show-free');
+    freeBtn.classList.add('on');
+  }
+  freeBtn.addEventListener('click', function () {
+    var on = document.body.classList.toggle('show-free');
+    localStorage.setItem('mapa-free', on ? '1' : '0');
+    freeBtn.classList.toggle('on', on);
+  });
+
   // links a modal: si la clave tiene geometría, la tarjeta va al popup del
   // mapa (captura, para ganarle al dialog de itinerario.js); si no, dialog
   document.addEventListener('click', function (e) {
@@ -244,6 +267,7 @@
       e.preventDefault();
       e.stopPropagation();
       selectRow(linkRow);
+      updateHash(key, linkRow && linkRow.id);
       closePanelIfNarrow();
     }
   }, true);
@@ -255,11 +279,16 @@
     var li = rowOf(e.target);
     if (!li) return;
     selectRow(li);
-    if (devMode) { openDevEditor(li); return; }
+    if (devMode) { updateHash(null, li.id); openDevEditor(li); return; }
     var key = li.dataset.location || li.dataset.transit;
     if (key) {
       var title = li.querySelector('.title');
-      if (showOnMap(key, title ? title.textContent : key, li.id)) closePanelIfNarrow();
+      if (showOnMap(key, title ? title.textContent : key, li.id)) {
+        updateHash(key, li.id);
+        closePanelIfNarrow();
+      }
+    } else {
+      updateHash(null, li.id);
     }
   });
 
@@ -305,7 +334,8 @@
     drawer.className = 'dev-drawer';
     drawer.innerHTML = '<div class="dev-info"></div>' +
       '<textarea spellcheck="false">cargando…</textarea>' +
-      '<div class="dev-btns"><button class="dev-save" type="button">Guardar → rebuild</button>' +
+      '<div class="dev-btns"><button class="dev-save" type="button">Guardar</button>' +
+      '<button class="dev-rebuild" type="button">Rebuild</button>' +
       '<button class="dev-close" type="button">Cancelar</button><span class="dev-msg"></span></div>';
     drawer.querySelector('.dev-info').textContent = facts.join('\n');
     document.body.appendChild(drawer);
@@ -316,6 +346,8 @@
       .then(function (d) { ta.value = d.ok ? d.yaml : 'error: ' + d.error; })
       .catch(function (e) { ta.value = 'error: ' + e; });
     drawer.querySelector('.dev-close').addEventListener('click', closeDrawer);
+    // Guardar SOLO escribe el YAML (se pueden editar varias filas); Rebuild
+    // reconstruye una vez y recarga — el hash #@fila nos regresa aquí mismo
     drawer.querySelector('.dev-save').addEventListener('click', function () {
       msg.textContent = 'guardando…';
       fetch('/api/step', {
@@ -324,9 +356,21 @@
         body: JSON.stringify({ trip: TRIP, day: +m[1], step: +m[2], yaml: ta.value })
       }).then(function (r) { return r.json(); })
         .then(function (d) {
+          msg.textContent = d.ok ? 'guardado ✓ (pendiente rebuild)' : 'error: ' + d.error;
+        })
+        .catch(function (e) { msg.textContent = 'error: ' + e; });
+    });
+    drawer.querySelector('.dev-rebuild').addEventListener('click', function () {
+      msg.textContent = 'rebuild…';
+      fetch('/api/rebuild', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ trip: TRIP })
+      }).then(function (r) { return r.json(); })
+        .then(function (d) {
           if (d.ok) {
             msg.textContent = 'rebuild ok — recargando…';
-            setTimeout(function () { location.reload(); }, 500);
+            setTimeout(function () { location.reload(); }, 400);
           } else {
             msg.textContent = 'error: ' + d.error;
           }
@@ -334,4 +378,33 @@
         .catch(function (e) { msg.textContent = 'error: ' + e; });
     });
   }
+
+  // ---------- llegada: restaurar el DÓNDE ESTAMOS desde el hash ----------
+  // #dN = día exclusivo · #@fila = fila seleccionada · #m-clave@fila = popup;
+  // en modo dev la fila reabre su editor. itinerario.js pudo abrir su dialog
+  // con el mismo hash: aquí manda el mapa, se cierra.
+  (function restore() {
+    var overlayEl = document.getElementById('overlay');
+    var m = /^#(?:m-([^@]+))?(?:@(.+))?$/.exec(location.hash || '');
+    var dm = /^#(d\d+)$/.exec(location.hash || '');
+    if (dm) {
+      var sec = document.getElementById(dm[1]);
+      if (sec) days.forEach(function (d) { d.classList.toggle('open', d === sec); });
+      return;
+    }
+    if (!m || (!m[1] && !m[2])) return;
+    if (overlayEl && overlayEl.open) overlayEl.close();
+    var li = m[2] ? document.getElementById(m[2]) : null;
+    if (li) {
+      openDayOf(li);
+      selectRow(li);
+      li.scrollIntoView({ block: 'center' });
+    }
+    if (devMode && li) {
+      openDevEditor(li);
+    } else if (m[1]) {
+      var title = li && li.querySelector('.title');
+      showOnMap(m[1], title ? title.textContent : m[1], li && li.id);
+    }
+  })();
 })();

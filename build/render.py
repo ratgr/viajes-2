@@ -218,10 +218,17 @@ def derive_schedule(steps, ctx=""):
                 fo["conflict"] = (f"termina {fmt_hm(fo['begin'] + fo['dur'])} pero lo "
                                   f"siguiente empieza {fmt_hm(nb)} (encimados {exceso} min)")
                 DIAGNOSTICS.append(f"{ctx} paso {i + 1} «{title}»: {fo['conflict']}")
+    # tiempo LIBRE tras cada paso: hueco entre su fin y el próximo inicio explícito
+    for i, fo in enumerate(info):
+        if fo is None or fo["end"] is None:
+            continue
+        nb = next_begin(i)
+        if nb is not None and nb > fo["end"]:
+            fo["free"] = nb - fo["end"]
     return [{} if fo is None else
             {"start": fo["begin"], "start_derived": fo["beg_derived"],
              "dur": fo["dur"], "dur_derived": fo["dur_derived"], "end": fo["end"],
-             "conflict": fo.get("conflict")}
+             "conflict": fo.get("conflict"), "free": fo.get("free")}
             for fo in info]
 
 
@@ -362,6 +369,8 @@ def render_li(n, refs, row_id=None, sc=None, ctx=""):
         attrs += f' data-mode="{html.escape(str(n["mode"]))}"'
     if n.get("solo_seleccion"):
         attrs += " data-solo-seleccion"
+    if sc and sc.get("free"):
+        attrs += f' data-free="{sc["free"]}"'   # hueco libre tras el paso (derivado)
     return f'    <li{attrs}>{time_cell(n, sc)}<div class="body">{body}</div></li>'
 
 

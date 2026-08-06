@@ -6,8 +6,9 @@ Cache-Control: no-store, y expone la API del modo dev del mapa — editar
 pasos del YAML directamente desde la página:
 
     GET  /api/step?trip=X&day=N&step=M     YAML del paso (para el editor)
-    POST /api/step {trip, day, step, yaml} valida, escribe src/<trip>/viaje.yaml
-                                           y reconstruye pages/<trip>/
+    POST /api/step {trip, day, step, yaml} valida y escribe src/<trip>/viaje.yaml
+                                           (SIN rebuild: se editan varios y luego…)
+    POST /api/rebuild {trip}               reconstruye pages/<trip>/
 
 La fila dN-rMM del HTML ES el paso M del día N del YAML (proyección 1:1),
 así que la identidad de la edición sale del id de la fila.
@@ -18,6 +19,7 @@ import json
 import os
 import subprocess
 import sys
+import threading
 import urllib.parse
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
@@ -40,8 +42,23 @@ def yaml_path(trip):
     return p
 
 
+# el servidor es multihilo: nunca leer el YAML mientras otro hilo lo escribe
+_YAML_LOCK = threading.Lock()
+
+
 def load(trip):
-    return yaml.safe_load(open(yaml_path(trip), encoding="utf-8"))
+    with _YAML_LOCK:
+        return yaml.safe_load(open(yaml_path(trip), encoding="utf-8"))
+
+
+def save(trip, data):
+    """escritura atómica: tmp + replace, bajo el lock."""
+    path = yaml_path(trip)
+    tmp = path + ".tmp"
+    with _YAML_LOCK:
+        with open(tmp, "w", encoding="utf-8") as f:
+            yaml.dump(data, f, **DUMP)
+        os.replace(tmp, path)
 
 
 def rebuild(trip):
@@ -90,18 +107,21 @@ class Handler(SimpleHTTPRequestHandler):
     def do_POST(self):
         u = urllib.parse.urlparse(self.path)
         try:
-            if u.path != "/api/step":
-                return self._json(404, {"error": "endpoint desconocido"})
             n = int(self.headers.get("Content-Length", 0))
             req = json.loads(self.rfile.read(n).decode("utf-8"))
-            step = yaml.safe_load(req["yaml"])
-            if not isinstance(step, dict):
-                return self._json(400, {"error": "el YAML debe ser un mapeo (un paso)"})
-            trip = req["trip"]
-            Y = load(trip)
-            Y["days"][int(req["day"]) - 1]["steps"][int(req["step"]) - 1] = step
-            yaml.dump(Y, open(yaml_path(trip), "w", encoding="utf-8"), **DUMP)
-            self._json(200, {"ok": True, "build": rebuild(trip)})
+            if u.path == "/api/step":
+                step = yaml.safe_load(req["yaml"])
+                if not isinstance(step, dict):
+                    return self._json(400, {"error": "el YAML debe ser un mapeo (un paso)"})
+                trip = req["trip"]
+                Y = load(trip)
+                Y["days"][int(req["day"]) - 1]["steps"][int(req["step"]) - 1] = step
+                save(trip, Y)
+                self._json(200, {"ok": True})
+            elif u.path == "/api/rebuild":
+                self._json(200, {"ok": True, "build": rebuild(req["trip"])})
+            else:
+                self._json(404, {"error": "endpoint desconocido"})
         except Exception as e:
             self._json(400, {"error": str(e)})
 

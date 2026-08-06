@@ -26,25 +26,26 @@ body { display: flex; padding: 0; overflow: hidden; }
 .panel .day-head .note, .panel .day-head .ancla { display: none; }  /* no caben en 380px */
 
 /* ---------- filas compactas con casilla ----------
-   Rejilla: [casilla | hora/duración | contenido]. El div.body (y el span
-   .transit) se aplanan con display:contents para colocar título a la derecha
-   y duración ABAJO de la hora, en la columna izquierda. */
-.panel .steps > li { grid-template-columns: 16px 52px minmax(0, 1fr); gap: 2px 8px; padding: 4px 0; font-size: 12.5px; scroll-margin-top: 46px; }
+   Rejilla: [casilla | hora | contenido | duración]. El div.body (y el span
+   .transit) se aplanan con display:contents: título al centro, duración
+   ARRIBA-DERECHA de la fila, rango DESDE–HASTA apilado a la izquierda. */
+.panel .steps > li { grid-template-columns: 16px 52px minmax(0, 1fr); gap: 2px 8px; padding: 4px 0; font-size: 12.5px; scroll-margin-top: 46px; position: relative; }
 .panel .steps > li > .ck { grid-column: 1; grid-row: 1; }
 .panel .steps > li > .time { grid-column: 2; grid-row: 1; font-size: 11px; }
 .panel .steps > li > .body, .panel .steps li .transit { display: contents; }
 .panel .steps li .title { grid-column: 3; grid-row: 1; }
+.panel .steps li .duration { position: absolute; top: 4px; right: 0; text-align: right; font-size: 10.5px; max-width: 96px; background: inherit; }
+.panel .steps li .title { padding-right: 74px; }   /* que el título no choque con la duración */
 .panel .steps li .options { grid-column: 1 / -1; grid-row: 2; }
 .panel .steps li .note, .panel .sep { display: none; }   /* la nota es del itinerario */
-/* columna izquierda: duración ARRIBA (mapa.js la mueve dentro de <time>),
-   luego la hora DESDE y la hora-fin derivada debajo.
-   Colores: explícita = azul-casi-gris · explícita y FIJA = rojo · calculada = gris */
-.panel time .duration { display: block; font-size: 10.5px; white-space: normal; }
-.panel .steps .time, .panel time .duration { color: light-dark(#566a82, #93a5bd); }
+/* Colores: explícita = verde · explícita y FIJA = rojo · calculada = gris */
+.panel .steps .time, .panel .steps li .duration { color: light-dark(#347132, #8fc07e); }
 .panel .steps .time.fixed { color: var(--shu); }
 .panel .steps .time .to, .panel .steps .time .from { display: block; font-weight: 400; color: var(--ink-soft); }
-.panel .steps li .duration[data-derived] { display: block; color: var(--ink-soft); }
+.panel .steps li .duration[data-derived] { color: var(--ink-soft); }
 .panel .steps .time .warn { display: inline-block; cursor: help; font-size: 12px; }
+/* tiempo libre entre pasos (toggle ⏳): el hueco tras la fila, ancho completo */
+body.show-free .panel .steps > li[data-free]::after { content: '⏳ ' attr(data-free) ' min libres'; grid-column: 1 / -1; font-size: 10.5px; color: var(--ink-soft); font-style: italic; border-top: 1px dashed var(--line); padding-top: 2px; margin-top: 2px; }
 .panel .ck { margin: 3px 0 0; accent-color: var(--shu); }
 .panel .day-head .ck { margin: 0; align-self: center; }
 
@@ -88,10 +89,13 @@ body { display: flex; padding: 0; overflow: hidden; }
 /* ---------- modo dev (solo localhost): editor de pasos YAML ---------- */
 .dev-toggle { display: block; position: absolute; top: 58px; right: 10px; z-index: 1100; width: 40px; height: 40px; border: none; border-radius: 10px; background: var(--card); color: var(--ink); box-shadow: 0 2px 8px rgba(0,0,0,.28); font-size: 17px; cursor: pointer; }
 .dev-toggle.on { background: var(--shu); }
+.free-toggle { display: block; position: absolute; top: 106px; right: 10px; z-index: 1100; width: 40px; height: 40px; border: none; border-radius: 10px; background: var(--card); color: var(--ink); box-shadow: 0 2px 8px rgba(0,0,0,.28); font-size: 17px; cursor: pointer; }
+.free-toggle.on { background: var(--matcha); }
 .dev-drawer { position: absolute; right: 10px; bottom: 10px; z-index: 1300; width: min(520px, 92vw); background: var(--card); color: var(--ink); border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,.35); padding: 12px; }
 .dev-drawer .dev-info { font: 11px ui-monospace, Consolas, monospace; color: var(--ink-soft); white-space: pre-wrap; margin-bottom: 8px; }
 .dev-drawer textarea { width: 100%; min-height: 200px; box-sizing: border-box; font: 12px ui-monospace, Consolas, monospace; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); color: var(--ink); padding: 8px; resize: vertical; }
 .dev-drawer .dev-btns { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
 .dev-drawer .dev-btns button { border: 1px solid var(--line); background: var(--paper-2); color: var(--ink); border-radius: 6px; padding: 6px 12px; font: 600 12px "Segoe UI", system-ui, sans-serif; cursor: pointer; }
 .dev-drawer .dev-save { background: var(--shu); color: #fff; border-color: var(--shu); }
+.dev-drawer .dev-rebuild { background: var(--ai); color: #fff; border-color: var(--ai); }
 .dev-drawer .dev-msg { font: 11px ui-monospace, Consolas, monospace; color: var(--ink-soft); }
