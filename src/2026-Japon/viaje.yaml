@@ -2359,4 +2359,4 @@ days:
   - {time-from: '09:25', title: 'Check-in AA (2 maletas de 23 kg por persona incluidas), migración, y el último onigiri con lágrima.'}
   - {time-from: '11:55', fixed: true, title: 'HND → LAX — comida y desayuno a bordo; llegan 6:00 AM del mismo domingo → LAX → GDL 14:52 — la cena ya es en casa 🇲🇽. Fin. ⛩️'}
   - {transit: d18-e2, hidden-summary: true, title: Hotel → Busta Shinjuku}
-  - {transit: d18-e3, hidden-summary: true,
+  - {transit: d18-e3, hidden-summary: true, title: Busta Shinjuku → Haneda T3}

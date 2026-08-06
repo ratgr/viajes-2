@@ -328,17 +328,29 @@ def row_text(n, refs, sc=None):
     """<b.title> - <span.duration> - <span.note> — campos separados, no un blob.
     El separador vive DENTRO del span que sigue: ocultar un campo por CSS
     (p.ej. la nota en la barra del mapa) se lleva su separador consigo.
-    Sin duration en el YAML, se emite la inferida (~hueco) marcada derivada."""
+    Sin duration en el YAML, se emite la inferida (~hueco) marcada derivada.
+    Convención *-show: `X-show` sustituye lo MOSTRADO; el dato base viaja en
+    data-value (verify lo reconstruye) y el show es dato explícito (verde)."""
     sc = sc or {}
     parts = []
     if n.get("title"):
         title = str(n["title"]).replace("*", "")   # defensa; migrate_yaml ya los quita
-        parts.append(f'<b class="title">{mode_icon(n)}{md(title, refs)}</b>')
+        show = n.get("title-show")
+        if show:
+            shown = md(str(show).replace("*", ""), refs)
+            base = html.escape(title, quote=True)
+            parts.append(f'<b class="title" data-value="{base}">{mode_icon(n)}{shown}</b>')
+        else:
+            parts.append(f'<b class="title">{mode_icon(n)}{md(title, refs)}</b>')
     raw_dur = n.get("duration")
     flex = parse_flex(raw_dur) if raw_dur is not None else None
-    if flex is not None:
+    dur_show = n.get("duration-show")
+    sep = '<span class="sep"> - </span>' if parts else ""
+    if dur_show and raw_dur not in (None, 0, "0"):
+        base = html.escape(str(raw_dur), quote=True)
+        parts.append(f'<span class="duration" data-value="{base}">{sep}{html.escape(str(dur_show))}</span>')
+    elif flex is not None:
         # elástica: rango ~min–max si tiene cotas; min+ · ≤max · relleno+
-        sep = '<span class="sep"> - </span>' if parts else ""
         lo, hi = flex
         if lo and hi:
             unit_lo = str(lo) if (lo < 60 and hi < 60) else fmt_dur(lo)
@@ -351,15 +363,18 @@ def row_text(n, refs, sc=None):
             val = fmt_dur(sc["dur"]) + "+" if sc.get("dur") else "flex"
         parts.append(f'<span class="duration" data-derived="duration">{sep}{val}</span>')
     elif raw_dur not in (None, 0, "0"):
-        sep = '<span class="sep"> - </span>' if parts else ""
         parts.append(f'<span class="duration">{sep}{html.escape(str(raw_dur))}</span>')
     elif sc.get("dur") and sc.get("dur_derived"):
-        sep = '<span class="sep"> - </span>' if parts else ""
         tilde = "~" if sc.get("approx") else ""
         parts.append(f'<span class="duration" data-derived="duration">{sep}{tilde}{fmt_dur(sc["dur"])}</span>')
     if n.get("note"):
         sep = '<span class="sep"> - </span>' if parts else ""
-        parts.append(f'<span class="note">{sep}{md(str(n["note"]).strip(), refs)}</span>')
+        show = n.get("note-show")
+        if show:
+            base = html.escape(str(n["note"]).strip(), quote=True)
+            parts.append(f'<span class="note" data-value="{base}">{sep}{md(str(show).strip(), refs)}</span>')
+        else:
+            parts.append(f'<span class="note">{sep}{md(str(n["note"]).strip(), refs)}</span>')
     return "".join(parts)
 
 

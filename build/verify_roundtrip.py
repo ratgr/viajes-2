@@ -148,12 +148,27 @@ def parse_step(li):
         if "data-derived" in c.attrs:      # duración inferida etc.: no es dato
             continue
         if c.tag == "b" and "title" in c.cls():
-            d["title"] = to_md(c.children).strip()
+            if "data-value" in c.attrs:    # convención *-show: base en data-value
+                d["title"] = c.attrs["data-value"]
+                d["title-show"] = to_md(c.children).strip()
+            else:
+                d["title"] = to_md(c.children).strip()
         elif c.tag == "span" and "duration" in c.cls():
-            if "data-derived" not in c.attrs:      # las derivadas no son dato
+            if "data-value" in c.attrs:
+                dur = c.attrs["data-value"]
+                if dur.startswith("flex"):
+                    dur = re.sub(r"\s+", "", dur)
+                d["duration"] = dur
+                d["duration-show"] = text_plain(c).strip()
+            else:
                 d["duration"] = text_plain(c).strip()
         elif c.tag == "span" and "note" in c.cls():
-            d["note"] = re.sub(r"^\s*-\s", "", to_md(c.children)).strip()
+            note_md = re.sub(r"^\s*-\s", "", to_md(c.children)).strip()
+            if "data-value" in c.attrs:
+                d["note"] = c.attrs["data-value"]
+                d["note-show"] = note_md
+            else:
+                d["note"] = note_md
         elif c.tag == "ul" and "options" in c.cls():
             d["options"] = [parse_opt(o) for o in nodes(c.children, "li")]
     return d
@@ -235,6 +250,13 @@ def norm_step(s):
         d["title"] = str(s["title"]).replace("*", "").strip()
     if s.get("note"):
         d["note"] = str(s["note"]).strip()
+    # convención *-show (lo mostrado; el campo base sigue siendo el dato)
+    if s.get("title-show"):
+        d["title-show"] = str(s["title-show"]).replace("*", "").strip()
+    if s.get("note-show"):
+        d["note-show"] = str(s["note-show"]).strip()
+    if s.get("duration-show"):
+        d["duration-show"] = str(s["duration-show"]).strip()
     if s.get("options"):
         d["options"] = [norm_opt(o) for o in s["options"] if isinstance(o, dict)]
     return d
