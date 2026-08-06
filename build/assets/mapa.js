@@ -587,6 +587,20 @@
       ly.setIcon(locIcon(key, st !== 'full'));
     }
   }
+  // ¿el2 está en la MISMA rama de opciones que el? Un paso dentro de una
+  // opción NO es vecino de los pasos de OTRA opción del mismo conjunto: su
+  // ruta automática debe brincar al siguiente paso real, no a la opción de
+  // al lado. (el2 fuera de todo conjunto siempre es válido.)
+  function sameBranch(el, el2) {
+    var node = el2;
+    for (var set = node.closest('.options'); set;
+         set = set.parentElement && set.parentElement.closest('.options')) {
+      if (!set.contains(el)) return false;                    // otra opción/conjunto
+      if (chosenContainer(set, el) !== chosenContainer(set, node)) return false;
+      node = set;
+    }
+    return true;
+  }
   // punto de anclaje de una fila con geometría: lugar → su gps;
   // transporte → su último/primer vértice (según sea el previo o el siguiente)
   function anchorPoint(el, end) {
@@ -623,10 +637,12 @@
       var a = null, b = null, j;
       for (j = i - 1; j >= 0 && !a; j--) {
         if (els[j].closest('section.day') !== day) break;
+        if (!sameBranch(el, els[j])) continue;      // no anclar en OTRA opción
         a = anchorPoint(els[j], true);
       }
       for (j = i + 1; j < els.length && !b; j++) {
         if (els[j].closest('section.day') !== day) break;
+        if (!sameBranch(el, els[j])) continue;
         b = anchorPoint(els[j], false);
       }
       if (a && b) autos['auto-' + i + '-' + key] = { a: a, b: b, st: st };
@@ -814,8 +830,16 @@
       // sin geometría (conector automático): encuadrar sus puntos vecinos y
       // abrir su tarjeta ahí mismo (el popup SIEMPRE acompaña al paso)
       var pts = [], j, p;
-      for (j = i - 1; j >= 0; j--) { p = anchorPoint(stEls[j], true); if (p) { pts.push(p); break; } }
-      for (j = i + 1; j < stEls.length; j++) { p = anchorPoint(stEls[j], false); if (p) { pts.push(p); break; } }
+      for (j = i - 1; j >= 0; j--) {
+        if (!sameBranch(el, stEls[j])) continue;
+        p = anchorPoint(stEls[j], true);
+        if (p) { pts.push(p); break; }
+      }
+      for (j = i + 1; j < stEls.length; j++) {
+        if (!sameBranch(el, stEls[j])) continue;
+        p = anchorPoint(stEls[j], false);
+        if (p) { pts.push(p); break; }
+      }
       if (pts.length && map) {
         var c = L.latLngBounds(pts).getCenter();
         map.flyTo(c, blend || map.getZoom(), { duration: .5 });
@@ -1140,8 +1164,16 @@
         for (var j = 0; j < stEls.length; j++) {
           if (stEls[j].dataset.transit !== key) continue;
           var pts = [], a, p;
-          for (a = j - 1; a >= 0; a--) { p = anchorPoint(stEls[a], true); if (p) { pts.push([p[0], p[1]]); break; } }
-          for (a = j + 1; a < stEls.length; a++) { p = anchorPoint(stEls[a], false); if (p) { pts.push([p[0], p[1]]); break; } }
+          for (a = j - 1; a >= 0; a--) {
+            if (!sameBranch(stEls[j], stEls[a])) continue;
+            p = anchorPoint(stEls[a], true);
+            if (p) { pts.push([p[0], p[1]]); break; }
+          }
+          for (a = j + 1; a < stEls.length; a++) {
+            if (!sameBranch(stEls[j], stEls[a])) continue;
+            p = anchorPoint(stEls[a], false);
+            if (p) { pts.push([p[0], p[1]]); break; }
+          }
           if (pts.length === 2) return pts;
           break;
         }
