@@ -105,6 +105,21 @@ def fmt_dur(mins):
 
 DIAGNOSTICS = []   # pasos cuyo horario no se puede completar: problema del YAML
 
+# duration: flex · flex(30) · flex(-60) · flex(30-60) — paso elástico con
+# cotas opcionales en minutos (min+, ≤max, o rango ~min–max)
+FLEX_RE = re.compile(r"^flex(?:\(\s*(\d+)?\s*(-)?\s*(\d+)?\s*\))?$")
+
+
+def parse_flex(raw):
+    """None si no es flex; si lo es, (min, max) con None en las cotas ausentes."""
+    m = FLEX_RE.match(str(raw or "").strip())
+    if not m:
+        return None
+    lo, dash, hi = m.group(1), m.group(2), m.group(3)
+    if lo and not dash and not hi:
+        return (int(lo), None)         # flex(30) = mínimo
+    return (int(lo) if lo else None, int(hi) if hi else None)
+
 WALK_M_PER_MIN = 4000 / 60          # humano a 4 km/h
 
 
@@ -155,12 +170,16 @@ def derive_schedule(steps, ctx=""):
         beg = hm_min(s.get("time-from"))
         end_exp = hm_min(s.get("time-to"))
         raw_dur = s.get("duration")
-        is_flex = str(raw_dur or "").strip() == "flex"   # se estira a lo que haya
-        has_dur = raw_dur not in (None, 0, "0") and not is_flex
+        flex = parse_flex(raw_dur)                        # se estira a lo que haya
+        has_dur = raw_dur not in (None, 0, "0") and flex is None
         fo = {"begin": beg, "beg_exp": beg is not None, "beg_derived": False,
               "dur": dmin(raw_dur) if has_dur else None, "dur_exp": has_dur,
-              "flex": is_flex, "end_exp": end_exp,
+              "flex": flex is not None,
+              "flex_min": flex[0] if flex else None,
+              "flex_max": flex[1] if flex else None,
+              "end_exp": end_exp,
               "dur_derived": False, "approx": False, "end": None}
+        is_flex = flex is not None
         # los 3 fijados e incompatibles → diagnóstico (⚠️ en la fila)
         if beg is not None and end_exp is not None and has_dur and beg + fo["dur"] != end_exp:
             title = str(s.get("title", ""))[:52]
@@ -200,6 +219,16 @@ def derive_schedule(steps, ctx=""):
             nb = next_begin(i)
             if nb is not None and nb > fo["begin"]:
                 fo["dur"], fo["dur_derived"], fo["approx"] = nb - fo["begin"], True, True
+        if fo["flex"]:
+            # cotas del flex: acotan el relleno; sin relleno, cae al mínimo
+            if fo["dur"] is None:
+                fo["dur"] = fo["flex_min"]
+            if fo["dur"] is not None:
+                if fo["flex_min"]:
+                    fo["dur"] = max(fo["dur"], fo["flex_min"])
+                if fo["flex_max"]:
+                    fo["dur"] = min(fo["dur"], fo["flex_max"])
+                fo["dur_derived"], fo["approx"] = True, True
         if fo["end_exp"] is not None:
             fo["end"] = fo["end_exp"]
         elif fo["begin"] is not None and fo["dur"]:
@@ -243,6 +272,7 @@ def derive_schedule(steps, ctx=""):
             {"start": fo["begin"], "start_derived": fo["beg_derived"],
              "dur": fo["dur"], "dur_derived": fo["dur_derived"],
              "approx": fo.get("approx"), "flex": fo.get("flex"),
+             "flex_min": fo.get("flex_min"), "flex_max": fo.get("flex_max"),
              "end": fo["end"], "end_exp": fo.get("end_exp"),
              "conflict": fo.get("conflict"), "free": fo.get("free")}
             for fo in info]
@@ -305,10 +335,20 @@ def row_text(n, refs, sc=None):
         title = str(n["title"]).replace("*", "")   # defensa; migrate_yaml ya los quita
         parts.append(f'<b class="title">{mode_icon(n)}{md(title, refs)}</b>')
     raw_dur = n.get("duration")
-    if str(raw_dur or "").strip() == "flex":
-        # explícitamente elástica: se muestra lo calculado (si hay) con «+»
+    flex = parse_flex(raw_dur) if raw_dur is not None else None
+    if flex is not None:
+        # elástica: rango ~min–max si tiene cotas; min+ · ≤max · relleno+
         sep = '<span class="sep"> - </span>' if parts else ""
-        val = fmt_dur(sc["dur"]) + "+" if sc.get("dur") else "flex"
+        lo, hi = flex
+        if lo and hi:
+            unit_lo = str(lo) if (lo < 60 and hi < 60) else fmt_dur(lo)
+            val = f"~{unit_lo}–{fmt_dur(hi)}"
+        elif lo:
+            val = f"{fmt_dur(lo)}+"
+        elif hi:
+            val = f"≤{fmt_dur(hi)}"
+        else:
+            val = fmt_dur(sc["dur"]) + "+" if sc.get("dur") else "flex"
         parts.append(f'<span class="duration" data-derived="duration">{sep}{val}</span>')
     elif raw_dur not in (None, 0, "0"):
         sep = '<span class="sep"> - </span>' if parts else ""
@@ -394,8 +434,10 @@ def render_li(n, refs, row_id=None, sc=None, ctx=""):
         attrs += f' data-mode="{html.escape(str(n["mode"]))}"'
     if n.get("select-only"):
         attrs += " data-select-only"
-    if str(n.get("duration") or "").strip() == "flex":
-        attrs += " data-flex"
+    flex_m = FLEX_RE.match(str(n.get("duration") or "").strip())
+    if flex_m and str(n.get("duration") or "").strip().startswith("flex"):
+        inner = re.sub(r"[\s()]", "", str(n["duration"]).strip()[4:])
+        attrs += f' data-flex="{inner}"' if inner else " data-flex"
     if sc and sc.get("free"):
         attrs += f' data-free="{sc["free"]}"'   # hueco libre tras el paso (derivado)
     return f'    <li{attrs}>{time_cell(n, sc)}<div class="body">{body}</div></li>'

@@ -1521,8 +1521,8 @@ days:
       Con 10: ~2 h. Desayuno 🏪: lo del avión + onigiri del 7-Eleven del pasillo.
 
       '}
-  - {transit: haneda-t3-t2, mode: monorail, time-from: '07:00', duration: 10 min (o 15 a pie), title: 'T3 → T2: monorraíl interno gratuito', color: '#8a7fb5', select-only: true, coords: '35.543913,139.768155 35.549000,139.775000 35.554000,139.781000'}
-  - {transit: ana-checkin, mode: tramite, time-from: '07:15', duration: 1 h, title: Documentar con ANA (20 kg incluidos) + seguridad, note: 'Con 10 personas, cuenta 1 h.', color: '#8a7fb5', select-only: true, coords: '35.554000,139.781000 35.554600,139.781600'}
+  - {transit: haneda-t3-t2, mode: monorail, time-from: '07:00', duration: 'flex(10 min, 15 min)', duration-show: 10 min (o 15 a pie), title: 'T3 → T2: monorraíl interno gratuito', color: '#8a7fb5', select-only: true, coords: '35.543913,139.768155 35.549000,139.775000 35.554000,139.781000'}
+  - {transit: ana-checkin, mode: tramite, time-from: '07:15', duration: flex(1h), title: Documentar con ANA (20 kg incluidos) + seguridad + espera, note: 'Con 10 personas, cuenta 1 h.', color: '#8a7fb5', select-only: true, coords: '35.554000,139.781000 35.554600,139.781600'}
   - {transit: flight-haneda-itami, mode: flight, time-from: '09:00', fixed: true, duration: 1 h 05, title: Vuelo ANA NH17 → Osaka Itami, note: 'Aterriza 10:05. Pagado: $1,169 pp (conf. DRWRL6 / DLF2IW).', color: '#7b4fa6', select-only: true, coords: '35.543913,139.768155 34.786161,135.438048'}
   - {location: osaka-itami, time-from: '10:05', fixed: true, duration: 0, title: Llegada a Osaka Itami}
   - {transit: itami-monorail, time-from: '10:30', duration: 15 min, title: 'Osaka Monorail (local Kadomashi): @[Osaka-kūkō → Yamada](itami-monorail)'}
@@ -2359,4 +2359,4 @@ days:
   - {time-from: '09:25', title: 'Check-in AA (2 maletas de 23 kg por persona incluidas), migración, y el último onigiri con lágrima.'}
   - {time-from: '11:55', fixed: true, title: 'HND → LAX — comida y desayuno a bordo; llegan 6:00 AM del mismo domingo → LAX → GDL 14:52 — la cena ya es en casa 🇲🇽. Fin. ⛩️'}
   - {transit: d18-e2, hidden-summary: true, title: Hotel → Busta Shinjuku}
-  - {transit: d18-e3, hidden-summary: true, title: Busta Shinjuku → Haneda T3}
+  - {transit: d18-e3, hidden-summary: true,

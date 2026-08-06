@@ -124,7 +124,8 @@ def parse_step(li):
     if "data-select-only" in li.attrs:
         d["select-only"] = True
     if "data-flex" in li.attrs:
-        d["duration"] = "flex"
+        spec = li.attrs.get("data-flex") or ""
+        d["duration"] = f"flex({spec})" if spec else "flex"
     if "hidden-summary" in li.cls():
         d["hidden-summary"] = True
     t = first(li.children, "time")
@@ -226,7 +227,10 @@ def norm_step(s):
     if s.get("fixed"):
         d["fixed"] = True
     if s.get("duration") not in SKIP_DUR:
-        d["duration"] = str(s["duration"]).strip()   # incluye el literal "flex"
+        dur = str(s["duration"]).strip()
+        if dur.startswith("flex"):
+            dur = re.sub(r"\s+", "", dur)   # flex( 30 - 60 ) ≡ flex(30-60)
+        d["duration"] = dur
     if s.get("title"):
         d["title"] = str(s["title"]).replace("*", "").strip()
     if s.get("note"):
