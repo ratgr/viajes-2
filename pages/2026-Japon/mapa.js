@@ -405,22 +405,29 @@
     }
     return pop;
   }
+  var lastShownKey = null;   // repetir click en lo YA elegido acerca el zoom
   function showOnMap(key, fallbackTitle, activeRowId, zoomOpt) {
     if (!map) return false;
     var content = modalHtml(key) ||
       '<div class="modal"><h3>' + (fallbackTitle || key) + '</h3></div>';
     var loc = GEO.locations[key];
     var tr = GEO.transits[key];
+    var repeat = key === lastShownKey && !zoomOpt;
+    lastShownKey = key;
     clearTemp();
     haloFor([key]);
     if (loc) {
-      map.flyTo(loc, zoomOpt || Math.max(map.getZoom(), 15), { duration: .5 });
+      var z = repeat ? Math.min(19, map.getZoom() + 2)
+                     : (zoomOpt || Math.max(map.getZoom(), 15));
+      map.flyTo(loc, z, { duration: .5 });
       openCardPopup(loc, content + dayPieces(key, activeRowId));
       return true;
     }
     if (tr && tr.coords.length) {
       tempLayer = transitGroup(key, tr, tr.coords).addTo(map);
-      if (zoomOpt) {
+      if (repeat) {
+        map.flyToBounds(tempLayer.getBounds().pad(.02), { duration: .5 });
+      } else if (zoomOpt) {
         map.flyTo(tempLayer.getBounds().getCenter(), zoomOpt, { duration: .5 });
       } else {
         map.flyToBounds(tempLayer.getBounds().pad(.25), { duration: .5 });
@@ -535,6 +542,12 @@
         var content = modalHtml(key) || '<div class="modal"><h3>' + key + '</h3></div>';
         if (loc) content += dayPieces(key, null);
         openCardPopup(loc || tr.coords[Math.floor(tr.coords.length / 2)], content);
+        // segundo click en lo ya elegido = acercar el zoom
+        if (key === lastShownKey && map) {
+          if (loc) map.flyTo(loc, Math.min(19, map.getZoom() + 2), { duration: .4 });
+          else map.flyToBounds(L.latLngBounds(tr.coords).pad(.02), { duration: .4 });
+        }
+        lastShownKey = key;
         selectByKey(key);
       });
     }

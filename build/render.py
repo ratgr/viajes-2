@@ -155,6 +155,69 @@ def step_walk_geometry(s):
     return coords if (mode == "walk" and coords) else None
 
 
+GEO_TELEPORT_M = 100.0   # brinco geométrico que ya cuenta como teletransporte
+
+
+def _place_pt(key):
+    gps = PLACES.get(key, {}).get("gps")
+    if not gps:
+        return None
+    la, lo = str(gps).split(",")
+    return (float(la), float(lo))
+
+
+def _transit_pts(key):
+    coords = TRANSITS.get(key, {}).get("coords")
+    if not coords:
+        return None
+    return [tuple(float(x) for x in p.split(",")) for p in str(coords).split()]
+
+
+def check_teleports(steps, sched, ctx=""):
+    """Continuidad GEOMÉTRICA de la cadena: el fin de un paso debe coincidir
+    (±GEO_TELEPORT_M) con el inicio del siguiente.
+      · location→location sin transit de por medio = teletransporte
+      · transit que arranca/termina lejos del punto vecino = desconectado
+    Un transit declarado SIN coords corta la cadena sin aviso (geometría
+    pendiente: el mapa dibuja su conector automático). El aviso va como 🌀
+    data-derived en la fila y a DIAGNOSTICS."""
+    prev_end = prev_label = prev_kind = None
+    for i, s in enumerate(steps):
+        if not isinstance(s, dict):
+            continue
+        title = str(s.get("title") or s.get("location") or s.get("transit") or "")
+        title = re.sub(r"[*@\[\]]", "", title)[:44]
+        start = end = kind = None
+        if s.get("location"):
+            p = _place_pt(s["location"])
+            if p:
+                start = end = p
+                kind = "location"
+        elif s.get("transit"):
+            pts = _transit_pts(s["transit"])
+            if pts:
+                start, end, kind = pts[0], pts[-1], "transit"
+            else:
+                prev_end = prev_label = prev_kind = None
+                continue
+        if start is None:
+            continue                       # paso sin geometría propia: no mueve
+        if prev_end is not None:
+            d = _crow_m(prev_end, start)
+            if d > GEO_TELEPORT_M:
+                if kind == "transit":
+                    msg = f"transit arranca a {d:.0f} m del punto anterior «{prev_label}»"
+                elif prev_kind == "transit":
+                    msg = f"el transit anterior «{prev_label}» termina a {d:.0f} m de este lugar"
+                else:
+                    msg = f"teletransporte: a {d:.0f} m de «{prev_label}» sin transit de por medio"
+                if i < len(sched) and sched[i] is not None:
+                    sched[i]["teleport"] = msg
+                DIAGNOSTICS.append(f"{ctx} paso {i + 1} «{title}»: {msg}")
+        prev_end, prev_label, prev_kind = end, title, kind
+    return sched
+
+
 def derive_schedule(steps, ctx=""):
     """Horario por paso, completado por SNAP a los vecinos:
       · sin inicio → snap ARRIBA (fin del paso anterior) o ABAJO (inicio del
@@ -404,6 +467,9 @@ def time_cell(n, sc=None):
     if sc.get("conflict"):
         inner += (f'<span class="warn" data-derived="conflict" '
                   f'title="{html.escape(sc["conflict"])}">⚠️</span>')
+    if sc.get("teleport"):
+        inner += (f'<span class="warn" data-derived="teleport" '
+                  f'title="{html.escape(sc["teleport"])}">🌀</span>')
     return f'<time class="{cls}"{dt}>{inner}</time>'
 
 
@@ -445,6 +511,7 @@ def render_options(node, refs, ctx=""):
             plan_title = str(o.get("title", "")).replace("*", "")
             title = md(plan_title, refs)
             sched = derive_schedule(o["steps"], f'{ctx} plan «{plan_title[:24]}»')
+            check_teleports(o["steps"], sched, f'{ctx} plan «{plan_title[:24]}»')
             subs = "\n".join(render_li(s, refs, sc=sched[i], ctx=ctx) for i, s in enumerate(o["steps"]))
             items.append(f'<li><b>{title}</b><ul class="steps">\n{subs}\n</ul></li>')
         else:
@@ -499,6 +566,7 @@ def render_day(day, refs, num):
     # TODOS los pasos van al DOM (hidden-summary incluidos, ocultos por CSS):
     # la fila rNN es EXACTAMENTE el paso N del YAML
     sched = derive_schedule(day.get("steps", []), f"d{num}")
+    check_teleports(day.get("steps", []), sched, f"d{num}")
     lis = "\n".join(render_li(s, refs, f"d{num}-r{i + 1:02d}", sched[i], ctx=f"d{num}")
                     for i, s in enumerate(day.get("steps", [])))
     return (f'  <section class="day" id="d{num}" data-fecha="{fecha}">{head}\n'
