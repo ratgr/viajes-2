@@ -226,6 +226,16 @@
   document.addEventListener('click', function (e) {
     var link = e.target.closest('.modal-link');
     if (!link || !e.target.closest('.panel')) return;
+    if (devMode) {                        // en modo dev la fila se EDITA
+      var liDev = rowOf(link);
+      if (liDev) {
+        e.preventDefault();
+        e.stopPropagation();
+        selectRow(liDev);
+        openDevEditor(liDev);
+      }
+      return;
+    }
     var href = link.getAttribute('href') || '';
     if (href.indexOf('#m-') !== 0) return;
     var key = href.slice(3);
@@ -245,10 +255,83 @@
     var li = rowOf(e.target);
     if (!li) return;
     selectRow(li);
+    if (devMode) { openDevEditor(li); return; }
     var key = li.dataset.location || li.dataset.transit;
     if (key) {
       var title = li.querySelector('.title');
       if (showOnMap(key, title ? title.textContent : key, li.id)) closePanelIfNarrow();
     }
   });
+
+  // ---------- modo dev (solo localhost): click en fila = editar su paso YAML;
+  // guardar hace POST al dev_server, que reescribe src/<viaje>/viaje.yaml y
+  // reconstruye — la fila dN-rMM ES days[N-1].steps[M-1] (proyección 1:1)
+  var TRIP = location.pathname.split('/').slice(-2, -1)[0] || '';
+  var devMode = false;
+  var drawer = null;
+  if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+    var devBtn = document.createElement('button');
+    devBtn.className = 'dev-toggle';
+    devBtn.type = 'button';
+    devBtn.textContent = '🛠';
+    devBtn.title = 'Modo dev: click en una fila = editar su YAML';
+    document.body.appendChild(devBtn);
+    devMode = localStorage.getItem('mapa-dev') === '1';
+    devBtn.classList.toggle('on', devMode);
+    devBtn.addEventListener('click', function () {
+      devMode = !devMode;
+      localStorage.setItem('mapa-dev', devMode ? '1' : '0');
+      devBtn.classList.toggle('on', devMode);
+      if (!devMode) closeDrawer();
+    });
+  }
+  function closeDrawer() {
+    if (drawer) { drawer.remove(); drawer = null; }
+  }
+  function openDevEditor(li) {
+    var m = /^d(\d+)-r(\d+)$/.exec(li.id || '');
+    if (!m) return;   // sub-pasos de planes: sin id de fila (edítalos en el YAML)
+    closeDrawer();
+    // «todo» de la fila: identidad, claves, horario visible y conflicto
+    var facts = ['fila ' + li.id + '  (days[' + (m[1] - 1) + '].steps[' + (m[2] - 1) + '])'];
+    ['location', 'transit', 'mode'].forEach(function (k) {
+      if (li.dataset[k]) facts.push(k + ': ' + li.dataset[k]);
+    });
+    var t = li.querySelector('time');
+    if (t) facts.push('horario: ' + t.textContent.replace(/\s+/g, ' ').trim());
+    var w = li.querySelector('.warn');
+    if (w) facts.push('⚠️ ' + (w.getAttribute('title') || ''));
+    drawer = document.createElement('div');
+    drawer.className = 'dev-drawer';
+    drawer.innerHTML = '<div class="dev-info"></div>' +
+      '<textarea spellcheck="false">cargando…</textarea>' +
+      '<div class="dev-btns"><button class="dev-save" type="button">Guardar → rebuild</button>' +
+      '<button class="dev-close" type="button">Cancelar</button><span class="dev-msg"></span></div>';
+    drawer.querySelector('.dev-info').textContent = facts.join('\n');
+    document.body.appendChild(drawer);
+    var ta = drawer.querySelector('textarea');
+    var msg = drawer.querySelector('.dev-msg');
+    fetch('/api/step?trip=' + encodeURIComponent(TRIP) + '&day=' + m[1] + '&step=' + m[2])
+      .then(function (r) { return r.json(); })
+      .then(function (d) { ta.value = d.ok ? d.yaml : 'error: ' + d.error; })
+      .catch(function (e) { ta.value = 'error: ' + e; });
+    drawer.querySelector('.dev-close').addEventListener('click', closeDrawer);
+    drawer.querySelector('.dev-save').addEventListener('click', function () {
+      msg.textContent = 'guardando…';
+      fetch('/api/step', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ trip: TRIP, day: +m[1], step: +m[2], yaml: ta.value })
+      }).then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (d.ok) {
+            msg.textContent = 'rebuild ok — recargando…';
+            setTimeout(function () { location.reload(); }, 500);
+          } else {
+            msg.textContent = 'error: ' + d.error;
+          }
+        })
+        .catch(function (e) { msg.textContent = 'error: ' + e; });
+    });
+  }
 })();

@@ -84,3 +84,14 @@ body { display: flex; padding: 0; overflow: hidden; }
   .panel-toggle { display: block; }
   body.panel-open .panel { display: block; position: absolute; top: 0; left: 0; bottom: 0; width: min(85vw, 380px) !important; max-width: none; z-index: 1050; box-shadow: 4px 0 18px rgba(0,0,0,.3); }
 }
+
+/* ---------- modo dev (solo localhost): editor de pasos YAML ---------- */
+.dev-toggle { display: block; position: absolute; top: 58px; right: 10px; z-index: 1100; width: 40px; height: 40px; border: none; border-radius: 10px; background: var(--card); color: var(--ink); box-shadow: 0 2px 8px rgba(0,0,0,.28); font-size: 17px; cursor: pointer; }
+.dev-toggle.on { background: var(--shu); }
+.dev-drawer { position: absolute; right: 10px; bottom: 10px; z-index: 1300; width: min(520px, 92vw); background: var(--card); color: var(--ink); border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,.35); padding: 12px; }
+.dev-drawer .dev-info { font: 11px ui-monospace, Consolas, monospace; color: var(--ink-soft); white-space: pre-wrap; margin-bottom: 8px; }
+.dev-drawer textarea { width: 100%; min-height: 200px; box-sizing: border-box; font: 12px ui-monospace, Consolas, monospace; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); color: var(--ink); padding: 8px; resize: vertical; }
+.dev-drawer .dev-btns { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+.dev-drawer .dev-btns button { border: 1px solid var(--line); background: var(--paper-2); color: var(--ink); border-radius: 6px; padding: 6px 12px; font: 600 12px "Segoe UI", system-ui, sans-serif; cursor: pointer; }
+.dev-drawer .dev-save { background: var(--shu); color: #fff; border-color: var(--shu); }
+.dev-drawer .dev-msg { font: 11px ui-monospace, Consolas, monospace; color: var(--ink-soft); }
