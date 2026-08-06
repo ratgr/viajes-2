@@ -67,7 +67,7 @@
   var nav = document.querySelector('.day-nav');
   if (nav && 'IntersectionObserver' in window) {
     var links = {};
-    nav.querySelectorAll('a[href^="#d-"]').forEach(function (a) {
+    nav.querySelectorAll('a[href^="#d"]').forEach(function (a) {
       links[a.getAttribute('href').slice(1)] = a;
     });
     var days = Array.prototype.slice.call(document.querySelectorAll('section.day'));
