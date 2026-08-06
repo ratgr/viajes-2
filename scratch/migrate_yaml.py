@@ -6,6 +6,9 @@ declarado en su config.yaml (`fuente:`), aplicando la limpieza de datos aprobada
      eran ruido del pipeline viejo (y en el app familiar producían basura)
   2. pasos de transporte sin emoji inicial — el icono se deriva de `mode` al
      renderizar (build_itinerario.MODE_ICON), no vive en el texto
+  3. claves del schema en INGLÉS (el upstream las tiene en español) y
+     time → time-from (el schema local también acepta time-to, y
+     duration: flex para pasos que explícitamente se estiran)
 
 Los @[refs](clave) y el markdown de las notas se conservan tal cual.
 Rerun cada vez que cambie el upstream.
@@ -21,14 +24,36 @@ from common import ROOT, resolve_trip, trip_paths
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 TRIP = resolve_trip(sys.argv)
 SRC_DIR, _PAGES, CFG = trip_paths(TRIP)
-if not CFG.get("fuente"):
-    sys.exit(f"src/{TRIP}/config.yaml no declara `fuente:`")
-SRC = os.path.normpath(os.path.join(ROOT, CFG["fuente"]))
+if not CFG.get("source"):
+    sys.exit(f"src/{TRIP}/config.yaml no declara `source:`")
+SRC = os.path.normpath(os.path.join(ROOT, CFG["source"]))
 DST = os.path.join(SRC_DIR, "viaje.yaml")
 
 # emojis de transporte que pueden encabezar un título de transit (con o sin
 # selector de variación); cualquier otro emoji (🏪 👋 👘 …) se queda
 TRANSPORT = ("🚇", "🚶", "🚝", "🚌", "🧳", "✈️", "✈", "⛴️", "⛴", "🛳️", "🛳", "🚋", "🚊")
+
+# claves del upstream (español) → schema local (inglés); time → time-from
+KEY_RENAMES = {
+    "titulo": "title", "ancla": "anchor", "time": "time-from",
+    "precio": "price", "solo_seleccion": "select-only",
+    "lineas": "lines", "linea": "line",
+    "nombre": "name", "nombre_jp": "name_jp",
+    "descripcion": "description", "informacion": "info",
+    "imagen": "image", "horario": "hours", "horario_fuente": "hours_source",
+    "frecuencia": "frequency", "frecuencia_fuente": "frequency_source",
+    "primer_tren": "first_train", "ultimo_tren": "last_train",
+    "reconoce": "recognize", "anden": "platform", "reverso": "reverse",
+    "estaciones": "stations", "vehiculo": "vehicle", "guia": "guide",
+}
+
+
+def rename_keys(node):
+    if isinstance(node, dict):
+        return {KEY_RENAMES.get(k, k): rename_keys(v) for k, v in node.items()}
+    if isinstance(node, list):
+        return [rename_keys(v) for v in node]
+    return node
 
 stats = {"ast": 0, "emoji": 0}
 modes = set()
@@ -71,6 +96,7 @@ for tr in (Y.get("transits") or {}).values():
         modes.add(tr["mode"])
 for day in Y.get("days", []):
     walk_steps(day.get("steps", []))
+Y = rename_keys(Y)   # claves ES → EN (después de las limpiezas, que leen 'time')
 
 yaml.dump(Y, open(DST, "w", encoding="utf-8"), allow_unicode=True,
           sort_keys=False, default_flow_style=None, width=100000)

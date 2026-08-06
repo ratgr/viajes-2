@@ -19,7 +19,7 @@ import yaml
 from common import ASSETS, trip_paths
 
 # estado del viaje activo (lo fija init)
-PLACES = LINEAS = TRANSITS = None
+PLACES = LINES = TRANSITS = None
 DAYS = []
 FOTO_BASE = ""
 _LINE_BY_NAME = _LINE_BY_CHIP = None
@@ -28,16 +28,16 @@ TRANSIT_STEP = {}
 
 def init(data, foto_base=""):
     """carga los catálogos del viaje en el módulo (los renderers los leen)."""
-    global PLACES, LINEAS, TRANSITS, DAYS, FOTO_BASE
+    global PLACES, LINES, TRANSITS, DAYS, FOTO_BASE
     global _LINE_BY_NAME, _LINE_BY_CHIP, TRANSIT_STEP
     PLACES = data.get("places", {})
-    LINEAS = data.get("lineas", {})
+    LINES = data.get("lines", {})
     TRANSITS = data.get("transits", {})
     DAYS = data.get("days", [])
     FOTO_BASE = foto_base
     # identidad de línea (frecuencia/horarios) por nombre o por chip
-    _LINE_BY_NAME = {v.get("nombre"): v for v in LINEAS.values() if v.get("frecuencia")}
-    _LINE_BY_CHIP = {v.get("chip"): v for v in LINEAS.values() if v.get("frecuencia") and v.get("chip")}
+    _LINE_BY_NAME = {v.get("name"): v for v in LINES.values() if v.get("frequency")}
+    _LINE_BY_CHIP = {v.get("chip"): v for v in LINES.values() if v.get("frequency") and v.get("chip")}
     # primer step que usa cada transit (da el renglón Sale/Llega de su modal)
     DIAGNOSTICS.clear()
     TRANSIT_STEP = {}
@@ -59,8 +59,8 @@ REF_RE = re.compile(r"@\[(.+?)\]\((.+?)\)")
 
 # ---------------------------------------------------------------- utilidades
 def line_meta(tr):
-    l = _LINE_BY_NAME.get(tr.get("linea")) or _LINE_BY_CHIP.get(tr.get("chip")) or {}
-    return {k: l[k] for k in ("frecuencia", "primer_tren", "ultimo_tren", "frecuencia_fuente") if l.get(k)}
+    l = _LINE_BY_NAME.get(tr.get("line")) or _LINE_BY_CHIP.get(tr.get("chip")) or {}
+    return {k: l[k] for k in ("frequency", "first_train", "last_train", "frequency_source") if l.get(k)}
 
 
 def dmin(s):
@@ -152,19 +152,31 @@ def derive_schedule(steps, ctx=""):
         if not isinstance(s, dict) or s.get("hidden-summary"):
             info.append(None)
             continue
-        beg = hm_min(s.get("time"))
-        has_dur = s.get("duration") not in (None, 0, "0")
+        beg = hm_min(s.get("time-from"))
+        end_exp = hm_min(s.get("time-to"))
+        raw_dur = s.get("duration")
+        is_flex = str(raw_dur or "").strip() == "flex"   # se estira a lo que haya
+        has_dur = raw_dur not in (None, 0, "0") and not is_flex
         fo = {"begin": beg, "beg_exp": beg is not None, "beg_derived": False,
-              "dur": dmin(s.get("duration")) if has_dur else None,
-              "dur_derived": False, "end": None}
+              "dur": dmin(raw_dur) if has_dur else None, "dur_exp": has_dur,
+              "flex": is_flex, "end_exp": end_exp,
+              "dur_derived": False, "approx": False, "end": None}
+        # los 3 fijados e incompatibles → diagnóstico (⚠️ en la fila)
+        if beg is not None and end_exp is not None and has_dur and beg + fo["dur"] != end_exp:
+            title = str(s.get("title", ""))[:52]
+            fo["conflict"] = (f"time-from {fmt_hm(beg)} + {fo['dur']} min no cuadra "
+                              f"con time-to {fmt_hm(end_exp)}")
+            DIAGNOSTICS.append(f"{ctx} paso {i + 1} «{title}»: {fo['conflict']}")
+        if fo["dur"] is None and beg is not None and end_exp is not None and end_exp > beg:
+            fo["dur"], fo["dur_derived"] = end_exp - beg, True   # exacta (sin ~)
         # caminatas: la geometría dicta la duración (4 km/h + redondeo);
         # si el YAML trae otra cosa, es un diagnóstico
         coords = step_walk_geometry(s)
-        if coords:
+        if coords and not is_flex:
             dist, esperado = walk_calc(coords)
             if fo["dur"] is None:
-                fo["dur"], fo["dur_derived"] = esperado, True
-            elif fo["dur"] != esperado:
+                fo["dur"], fo["dur_derived"], fo["approx"] = esperado, True, True
+            elif fo["dur_exp"] and fo["dur"] != esperado:
                 title = str(s.get("title", ""))[:52]
                 DIAGNOSTICS.append(f"{ctx} paso {i + 1} «{title}»: caminata dice "
                                    f"{fo['dur']} min pero el camino mide {dist:.0f} m "
@@ -187,8 +199,10 @@ def derive_schedule(steps, ctx=""):
         if fo["dur"] is None and fo["begin"] is not None:
             nb = next_begin(i)
             if nb is not None and nb > fo["begin"]:
-                fo["dur"], fo["dur_derived"] = nb - fo["begin"], True
-        if fo["begin"] is not None and fo["dur"]:
+                fo["dur"], fo["dur_derived"], fo["approx"] = nb - fo["begin"], True, True
+        if fo["end_exp"] is not None:
+            fo["end"] = fo["end_exp"]
+        elif fo["begin"] is not None and fo["dur"]:
             fo["end"] = fo["begin"] + fo["dur"]
         cursor = fo["end"] if fo["end"] is not None else fo["begin"]
     # pasada atrás: con duración pero sin inicio → fin = inicio del siguiente
@@ -207,9 +221,9 @@ def derive_schedule(steps, ctx=""):
         title = str(s.get("title", ""))[:52]
         if fo["begin"] is None:
             DIAGNOSTICS.append(f"{ctx} paso {i + 1} «{title}»: sin inicio anclable (ni arriba ni abajo)")
-        elif not fo["dur"] and "location" not in s:
+        elif not fo["dur"] and "location" not in s and not fo["flex"]:
             DIAGNOSTICS.append(f"{ctx} paso {i + 1} «{title}»: solo inicio — falta duración o fin")
-        elif fo["beg_exp"] and fo["dur"] and not fo["dur_derived"]:
+        elif fo["beg_exp"] and fo["dur"] and not fo["dur_derived"] and not fo["flex"] and fo.get("conflict") is None:
             # los 3 valores fijados (inicio + duración explícitos y el inicio
             # del siguiente como fin): si se enciman, no son compatibles
             nb = next_begin(i)
@@ -227,7 +241,9 @@ def derive_schedule(steps, ctx=""):
             fo["free"] = nb - fo["end"]
     return [{} if fo is None else
             {"start": fo["begin"], "start_derived": fo["beg_derived"],
-             "dur": fo["dur"], "dur_derived": fo["dur_derived"], "end": fo["end"],
+             "dur": fo["dur"], "dur_derived": fo["dur_derived"],
+             "approx": fo.get("approx"), "flex": fo.get("flex"),
+             "end": fo["end"], "end_exp": fo.get("end_exp"),
              "conflict": fo.get("conflict"), "free": fo.get("free")}
             for fo in info]
 
@@ -288,12 +304,19 @@ def row_text(n, refs, sc=None):
     if n.get("title"):
         title = str(n["title"]).replace("*", "")   # defensa; migrate_yaml ya los quita
         parts.append(f'<b class="title">{mode_icon(n)}{md(title, refs)}</b>')
-    if n.get("duration") not in (None, 0, "0"):
+    raw_dur = n.get("duration")
+    if str(raw_dur or "").strip() == "flex":
+        # explícitamente elástica: se muestra lo calculado (si hay) con «+»
         sep = '<span class="sep"> - </span>' if parts else ""
-        parts.append(f'<span class="duration">{sep}{html.escape(str(n["duration"]))}</span>')
+        val = fmt_dur(sc["dur"]) + "+" if sc.get("dur") else "flex"
+        parts.append(f'<span class="duration" data-derived="duration">{sep}{val}</span>')
+    elif raw_dur not in (None, 0, "0"):
+        sep = '<span class="sep"> - </span>' if parts else ""
+        parts.append(f'<span class="duration">{sep}{html.escape(str(raw_dur))}</span>')
     elif sc.get("dur") and sc.get("dur_derived"):
         sep = '<span class="sep"> - </span>' if parts else ""
-        parts.append(f'<span class="duration" data-derived="duracion">{sep}~{fmt_dur(sc["dur"])}</span>')
+        tilde = "~" if sc.get("approx") else ""
+        parts.append(f'<span class="duration" data-derived="duration">{sep}{tilde}{fmt_dur(sc["dur"])}</span>')
     if n.get("note"):
         sep = '<span class="sep"> - </span>' if parts else ""
         parts.append(f'<span class="note">{sep}{md(str(n["note"]).strip(), refs)}</span>')
@@ -304,16 +327,18 @@ def time_cell(n, sc=None):
     """hora explícita + (derivados: inicio encadenado si falta, y la hora-fin).
     El itinerario esconde lo derivado por CSS; el mapa muestra DESDE–HASTA."""
     sc = sc or {}
-    t = str(n.get("time") or "")
+    t = str(n.get("time-from") or "")
     cls = "time fixed" if n.get("fixed") else "time"
     dt = f' datetime="{t}"' if re.match(r"^\d{1,2}:\d{2}$", t) else ""
     inner = html.escape(t)
     if not t and sc.get("start_derived"):
-        inner = f'<span class="from" data-derived="inicio">{fmt_hm(sc["start"])}</span>'
-    if sc.get("end") is not None and inner:
-        inner += f'<span class="to" data-derived="fin">–{fmt_hm(sc["end"])}</span>'
+        inner = f'<span class="from" data-derived="from">{fmt_hm(sc["start"])}</span>'
+    if sc.get("end_exp") is not None and inner:
+        inner += f'<span class="to">–{fmt_hm(sc["end_exp"])}</span>'   # explícito: verde
+    elif sc.get("end") is not None and inner:
+        inner += f'<span class="to" data-derived="to">–{fmt_hm(sc["end"])}</span>'
     if sc.get("conflict"):
-        inner += (f'<span class="warn" data-derived="conflicto" '
+        inner += (f'<span class="warn" data-derived="conflict" '
                   f'title="{html.escape(sc["conflict"])}">⚠️</span>')
     return f'<time class="{cls}"{dt}>{inner}</time>'
 
@@ -321,12 +346,12 @@ def time_cell(n, sc=None):
 def resto_link(opt, refs):
     """opción hoja { location: acchichi, precio: ¥600 }."""
     key = opt.get("location")
-    nombre = html.escape(PLACES.get(key, {}).get("nombre", key or "?"))
+    nombre = html.escape(PLACES.get(key, {}).get("name", key or "?"))
     if key:
         refs.add(key)
     lk = f'<a class="modal-link" href="#m-{key}">{nombre}</a>' if key else nombre
-    precio = opt.get("precio")
-    return lk + (f' <span class="precio">{html.escape(str(precio))}</span>' if precio else "")
+    precio = opt.get("price")
+    return lk + (f' <span class="price">{html.escape(str(precio))}</span>' if precio else "")
 
 
 def render_options(node, refs, ctx=""):
@@ -367,8 +392,10 @@ def render_li(n, refs, row_id=None, sc=None, ctx=""):
         attrs += f' data-transit="{html.escape(str(n["transit"]))}"'
     if n.get("mode"):
         attrs += f' data-mode="{html.escape(str(n["mode"]))}"'
-    if n.get("solo_seleccion"):
-        attrs += " data-solo-seleccion"
+    if n.get("select-only"):
+        attrs += " data-select-only"
+    if str(n.get("duration") or "").strip() == "flex":
+        attrs += " data-flex"
     if sc and sc.get("free"):
         attrs += f' data-free="{sc["free"]}"'   # hueco libre tras el paso (derivado)
     return f'    <li{attrs}>{time_cell(n, sc)}<div class="body">{body}</div></li>'
@@ -376,14 +403,14 @@ def render_li(n, refs, row_id=None, sc=None, ctx=""):
 
 def render_day(day, refs, num):
     """num = día 1..N → ancla corta #d1 (la fecha queda en data-fecha)."""
-    titulo = html.escape(day.get("titulo", ""))
+    titulo = html.escape(day.get("title", ""))
     note = html.escape(day.get("note", ""))
-    ancla = html.escape(day.get("ancla", ""))
+    ancla = html.escape(day.get("anchor", ""))
     fecha = day.get("date")
     fecha = fecha.isoformat() if hasattr(fecha, "isoformat") else str(fecha)
     head = (f'<header class="day-head"><h3>{titulo}</h3>'
             f'<span class="note">{note}</span>'
-            f'<span class="ancla">Ancla: {ancla}</span></header>')
+            f'<span class="anchor">Ancla: {ancla}</span></header>')
     # TODOS los pasos van al DOM (hidden-summary incluidos, ocultos por CSS):
     # la fila rNN es EXACTAMENTE el paso N del YAML
     sched = derive_schedule(day.get("steps", []), f"d{num}")
@@ -394,25 +421,25 @@ def render_day(day, refs, num):
 
 
 def nav_link(day, num):
-    label = str(day.get("titulo", "")).split("·")[0].strip() or f"día {num}"
+    label = str(day.get("title", "")).split("·")[0].strip() or f"día {num}"
     return f'<a href="#d{num}">{html.escape(label)}</a>'
 
 
 # ---------------------------------------------------------------- modales
 def render_place_modal(key, pl):
-    nombre = html.escape(pl.get("nombre", key))
+    nombre = html.escape(pl.get("name", key))
     out = [f"<h3>{nombre}</h3>"]
-    if pl.get("imagen"):
-        im = pl["imagen"]
+    if pl.get("image"):
+        im = pl["image"]
         src = im if im.startswith("http") else FOTO_BASE + im
         out.append(f'<img src="{html.escape(src)}" alt="{nombre}" loading="lazy">')
-    if pl.get("descripcion"):
-        out.append(f"<p>{md(pl['descripcion'])}</p>")
-    if pl.get("informacion"):
-        out.append(f'<p class="modal-note">{md(pl["informacion"])}</p>')
-    if pl.get("horario"):
-        src = ' <span class="src-tag">· Google Maps</span>' if pl.get("horario_fuente") == "maps" else ""
-        out.append(f'<p class="modal-note">🕒 <b>Horario:</b> {html.escape(str(pl["horario"]))}{src}</p>')
+    if pl.get("description"):
+        out.append(f"<p>{md(pl['description'])}</p>")
+    if pl.get("info"):
+        out.append(f'<p class="modal-note">{md(pl["info"])}</p>')
+    if pl.get("hours"):
+        src = ' <span class="src-tag">· Google Maps</span>' if pl.get("hours_source") == "maps" else ""
+        out.append(f'<p class="modal-note">🕒 <b>Horario:</b> {html.escape(str(pl["hours"]))}{src}</p>')
     if pl.get("maps"):
         out.append(f'<a class="modal-btn" href="{html.escape(pl["maps"])}" target="_blank" rel="noopener">Abrir en Maps ↗</a>')
     inner = "\n  ".join(out)
@@ -422,11 +449,11 @@ def render_place_modal(key, pl):
 def render_line_modal(key, ident, ride=None, guia=None, horario=None):
     color = ident.get("color", "#555")
     chip = ident.get("chip", "")
-    jp = html.escape(ident.get("nombre_jp", ""))
-    nombre = html.escape(ident.get("nombre", key))
+    jp = html.escape(ident.get("name_jp", ""))
+    nombre = html.escape(ident.get("name", key))
     rng = ""
     if horario and horario.get("desde") and horario.get("hasta"):
-        rng = (f' <span class="h3-range" data-derived="horario">· {html.escape(str(horario["desde"]))}'
+        rng = (f' <span class="h3-range" data-derived="schedule">· {html.escape(str(horario["desde"]))}'
                f' – {html.escape(str(horario["hasta"]))}</span>')
     h = [f"<h3>{nombre}{rng}</h3>"]
 
@@ -434,12 +461,12 @@ def render_line_modal(key, ident, ride=None, guia=None, horario=None):
     badge = f'<div class="badge-row"><span class="badge">{html.escape(chip)}</span></div>' if chip else ""
     h.append(f'<div class="line-banner"><div class="jp" lang="ja">{jp}</div>{badge}</div>')
 
-    if ident.get("frecuencia"):
-        row = f'🔄 Pasa <b>{html.escape(str(ident["frecuencia"]))}</b>'
-        if ident.get("primer_tren") or ident.get("ultimo_tren"):
-            row += (f' · 🚉 {html.escape(str(ident.get("primer_tren", "")))}'
-                    f'–{html.escape(str(ident.get("ultimo_tren", "")))}')
-        src = ident.get("frecuencia_fuente")
+    if ident.get("frequency"):
+        row = f'🔄 Pasa <b>{html.escape(str(ident["frequency"]))}</b>'
+        if ident.get("first_train") or ident.get("last_train"):
+            row += (f' · 🚉 {html.escape(str(ident.get("first_train", "")))}'
+                    f'–{html.escape(str(ident.get("last_train", "")))}')
+        src = ident.get("frequency_source")
         h.append(f'<p class="freq{" has-src" if src else ""}">{row}</p>')
         if src:
             h.append(f'<div class="freq-src"><a href="{html.escape(str(src))}" '
@@ -451,22 +478,22 @@ def render_line_modal(key, ident, ride=None, guia=None, horario=None):
         d = html.escape(str(horario.get("destino", "")))
         desde = html.escape(str(horario.get("desde", "")))
         hasta = html.escape(str(horario.get("hasta", "")))
-        h.append(f'<div class="ride" data-derived="horario">'
+        h.append(f'<div class="ride" data-derived="schedule">'
                  f'<span>🟢 <b>Sale {desde}</b><br><span class="stn">{o}</span></span>'
                  f'<span class="arrow">→</span>'
                  f'<span class="arr">🔴 <b>Llega {hasta}</b><br><span class="stn">{d}</span></span></div>')
 
     if ride:
-        anden = ride.get("anden", ["", ""])
-        veh = ride.get("vehiculo", "tren")
+        anden = ride.get("platform", ["", ""])
+        veh = ride.get("vehicle", "tren")
         ic, lab, word = {"barco": ("🛳️", "Embarcadero correcto", "muelle"),
                          "bus": ("🚏", "Parada correcta", "lado")}.get(veh, ("🧭", "Andén correcto", "andén"))
         h.append(f'<p class="platform">{ic} <b>{lab}:</b> letrero '
                  f'<b class="sign" lang="ja">{html.escape(str(anden[0]))}</b> — {html.escape(str(anden[1]))}</p>')
-        if ride.get("reverso"):
+        if ride.get("reverse"):
             h.append(f'<p class="reverse">⚠️ Si la primera parada es '
-                     f'<b>{html.escape(str(ride["reverso"]))}</b>, van al revés: bajarse y cruzar de {word}.</p>')
-        est = ride.get("estaciones", [])
+                     f'<b>{html.escape(str(ride["reverse"]))}</b>, van al revés: bajarse y cruzar de {word}.</p>')
+        est = ride.get("stations", [])
         if est:
             h.append('<div class="stations">')
             for i, st in enumerate(est):
@@ -481,19 +508,19 @@ def render_line_modal(key, ident, ride=None, guia=None, horario=None):
             dest = est[-1]
             djp, drom = html.escape(str(dest[1])), html.escape(str(dest[2]))
             eki = "駅" if (veh == "tren" and "駅" not in str(dest[1]) and "ターミナル" not in str(dest[1])) else ""
-            h.append(f'<div class="phrase" data-derived="frase">'
+            h.append(f'<div class="phrase" data-derived="phrase">'
                      f'<div class="jp" lang="ja">すみません、{djp}{eki}へ行きたいです。この{VEH_JP.get(veh, "電車")}で合っていますか？</div>'
                      f'<div class="romaji">Sumimasen, {drom}{"-eki" if eki else ""} e ikitai desu. '
                      f'Kono {VEH_RO.get(veh, "densha")} de atte imasu ka?</div>'
                      f'<div class="gloss">«Disculpe, quiero ir a {drom}. ¿Voy bien en este {veh}?» — '
                      f'muéstrale el teléfono a cualquier local o uniformado.</div></div>')
 
-    reconoce = html.escape(ident.get("reconoce", ""))
+    reconoce = html.escape(ident.get("recognize", ""))
     tail = f'<b>Se reconoce:</b> {reconoce}{" — letra <b>" + html.escape(chip) + "</b>" if chip else ""}.'
     texto = guia or ident.get("extra", "")
     if texto:
         tail += f"<br><br>{md(texto)}"
-    h.append(f'<p class="reconoce">{tail}</p>')   # en un elemento: el corte del popup lo puede ocultar
+    h.append(f'<p class="recognize">{tail}</p>')   # en un elemento: el corte del popup lo puede ocultar
     inner = "\n  ".join(h)
     return f'<div class="modal" id="m-{key}" style="--lc:{color}">\n  {inner}\n</div>'
 
@@ -501,20 +528,20 @@ def render_line_modal(key, ident, ride=None, guia=None, horario=None):
 def render_modal(key):
     if key in PLACES:
         return render_place_modal(key, PLACES[key])
-    if key in TRANSITS and TRANSITS[key].get("nombre_jp"):
+    if key in TRANSITS and TRANSITS[key].get("name_jp"):
         tr = TRANSITS[key]
-        ident = {"nombre": tr.get("linea", key), "nombre_jp": tr.get("nombre_jp", ""),
+        ident = {"name": tr.get("line", key), "name_jp": tr.get("name_jp", ""),
                  "chip": tr.get("chip", ""), "color": tr.get("color", "#555"),
-                 "reconoce": tr.get("reconoce", ""), **line_meta(tr)}
-        ride = {k: tr[k] for k in ("anden", "reverso", "estaciones", "vehiculo") if k in tr}
+                 "recognize": tr.get("recognize", ""), **line_meta(tr)}
+        ride = {k: tr[k] for k in ("platform", "reverse", "stations", "vehicle") if k in tr}
         st = TRANSIT_STEP.get(key, {})
         horario = None
-        if tr.get("estaciones") and st.get("time"):
-            horario = {"origen": tr["estaciones"][0][2], "destino": tr["estaciones"][-1][2],
-                       "desde": str(st["time"]), "hasta": add_min(st["time"], dmin(st.get("duration")))}
-        return render_line_modal(key, ident, ride, tr.get("guia"), horario)
-    if key in LINEAS:
-        return render_line_modal(key, LINEAS[key])
+        if tr.get("stations") and st.get("time-from"):
+            horario = {"origen": tr["stations"][0][2], "destino": tr["stations"][-1][2],
+                       "desde": str(st["time-from"]), "hasta": add_min(st["time-from"], dmin(st.get("duration")))}
+        return render_line_modal(key, ident, ride, tr.get("guide"), horario)
+    if key in LINES:
+        return render_line_modal(key, LINES[key])
     return f'<div class="modal" id="m-{key}"><h3>{html.escape(key)}</h3></div>'
 
 # ---------------------------------------------------------------- ensamblado

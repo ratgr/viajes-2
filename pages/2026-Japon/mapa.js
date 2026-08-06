@@ -118,7 +118,7 @@
   function dayPieces(key, activeRowId) {
     var rows = document.querySelectorAll('.panel .steps > li[data-location="' + key + '"]');
     if (!rows.length) return '';
-    var out = ['<div class="usos">'];
+    var out = ['<div class="uses">'];
     rows.forEach(function (li) {
       var day = li.closest('section.day');
       var label = day ? (day.querySelector('h3').textContent.split('·')[0].trim()) : '';
@@ -126,11 +126,11 @@
       var title = li.querySelector('.title');
       var note = li.querySelector('.note');
       var open = (day && day.classList.contains('open')) || li.id === activeRowId;
-      out.push('<details class="uso"' + (open ? ' open' : '') + '>' +
-        '<summary><b>' + label + '</b><span class="uso-linea">' +
+      out.push('<details class="use"' + (open ? ' open' : '') + '>' +
+        '<summary><b>' + label + '</b><span class="use-line">' +
         (time ? time.textContent + ' · ' : '') + (title ? title.textContent : '') +
         '</span></summary>' +
-        (note ? '<div class="uso-nota">' + note.innerHTML + '</div>' : '') +
+        (note ? '<div class="use-note">' + note.innerHTML + '</div>' : '') +
         '</details>');
     });
     out.push('</div>');
@@ -170,7 +170,7 @@
     if (card && card.scrollHeight > window.innerHeight * 0.4) {
       el.classList.add('collapsed');
       var btn = document.createElement('button');
-      btn.className = 'ver-mas';
+      btn.className = 'see-more';
       btn.textContent = 'Ver más ↓';
       btn.addEventListener('click', function () {
         var collapsed = el.classList.toggle('collapsed');

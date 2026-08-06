@@ -121,15 +121,21 @@ def parse_step(li):
         d["transit"] = li.attrs["data-transit"]
     if "data-mode" in li.attrs:
         d["mode"] = li.attrs["data-mode"]
-    if "data-solo-seleccion" in li.attrs:
-        d["solo_seleccion"] = True
+    if "data-select-only" in li.attrs:
+        d["select-only"] = True
+    if "data-flex" in li.attrs:
+        d["duration"] = "flex"
     if "hidden-summary" in li.cls():
         d["hidden-summary"] = True
     t = first(li.children, "time")
     if t is not None:
-        tt = text_plain(t).strip()      # sin la hora-fin derivada
+        # texto directo = time-from explícito (los spans from/to no cuentan)
+        tt = "".join(c for c in t.children if isinstance(c, str)).strip()
         if tt:
-            d["time"] = tt
+            d["time-from"] = tt
+        to = first(t.children, "span", "to")
+        if to is not None and "data-derived" not in to.attrs:
+            d["time-to"] = text_of(to).lstrip("–").strip()
         if "fixed" in t.cls():
             d["fixed"] = True
     body = first(li.children, "div", "body")
@@ -143,7 +149,8 @@ def parse_step(li):
         if c.tag == "b" and "title" in c.cls():
             d["title"] = to_md(c.children).strip()
         elif c.tag == "span" and "duration" in c.cls():
-            d["duration"] = text_plain(c).strip()
+            if "data-derived" not in c.attrs:      # las derivadas no son dato
+                d["duration"] = text_plain(c).strip()
         elif c.tag == "span" and "note" in c.cls():
             d["note"] = re.sub(r"^\s*-\s", "", to_md(c.children)).strip()
         elif c.tag == "ul" and "options" in c.cls():
@@ -162,8 +169,8 @@ def parse_opt(li):
         if c.tag == "a" and "modal-link" in c.cls():
             last = {"location": (c.attrs.get("href") or "")[3:]}
             opts.append(last)
-        elif c.tag == "span" and "precio" in c.cls() and last is not None:
-            last["precio"] = text_of(c).strip()
+        elif c.tag == "span" and "price" in c.cls() and last is not None:
+            last["price"] = text_of(c).strip()
     return {"title": title, "options": opts}
 
 
@@ -184,12 +191,12 @@ def parse_days(html_text):
         head = first(s.children, "header")
         h3 = first(head.children, "h3")
         note = first(head.children, "span", "note")
-        ancla = first(head.children, "span", "ancla")
+        ancla = first(head.children, "span", "anchor")
         steps_ul = first(s.children, "ul", "steps")
         days.append({
-            "titulo": text_of(h3).strip() if h3 else "",
+            "title": text_of(h3).strip() if h3 else "",
             "note": text_of(note).strip() if note else "",
-            "ancla": re.sub(r"^Ancla:\s*", "", text_of(ancla).strip()) if ancla else "",
+            "anchor": re.sub(r"^Ancla:\s*", "", text_of(ancla).strip()) if ancla else "",
             "date": s.attrs.get("data-fecha", ""),
             "steps": [parse_step(li) for li in nodes(steps_ul.children, "li")],
         })
@@ -208,16 +215,18 @@ def norm_step(s):
         d["transit"] = str(s["transit"])
     if s.get("mode"):
         d["mode"] = str(s["mode"])
-    if s.get("solo_seleccion"):
-        d["solo_seleccion"] = True
+    if s.get("select-only"):
+        d["select-only"] = True
     if s.get("hidden-summary"):
         d["hidden-summary"] = True
-    if s.get("time") not in (None, ""):
-        d["time"] = str(s["time"])
+    if s.get("time-from") not in (None, ""):
+        d["time-from"] = str(s["time-from"])
+    if s.get("time-to") not in (None, ""):
+        d["time-to"] = str(s["time-to"])
     if s.get("fixed"):
         d["fixed"] = True
     if s.get("duration") not in SKIP_DUR:
-        d["duration"] = str(s["duration"]).strip()
+        d["duration"] = str(s["duration"]).strip()   # incluye el literal "flex"
     if s.get("title"):
         d["title"] = str(s["title"]).replace("*", "").strip()
     if s.get("note"):
@@ -234,8 +243,8 @@ def norm_opt(o):
     opts = []
     for x in o.get("options", []):
         e = {"location": str(x.get("location") or "")}
-        if x.get("precio"):
-            e["precio"] = str(x["precio"]).strip()
+        if x.get("price"):
+            e["price"] = str(x["price"]).strip()
         opts.append(e)
     return {"title": title, "options": opts}
 
@@ -243,9 +252,9 @@ def norm_opt(o):
 def norm_day(day):
     date = day.get("date")
     return {
-        "titulo": str(day.get("titulo", "")).strip(),
+        "title": str(day.get("title", "")).strip(),
         "note": str(day.get("note", "")).strip(),
-        "ancla": str(day.get("ancla", "")).strip(),
+        "anchor": str(day.get("anchor", "")).strip(),
         "date": date.isoformat() if hasattr(date, "isoformat") else str(date),
         "steps": [norm_step(s) for s in day.get("steps", []) if isinstance(s, dict)],
     }

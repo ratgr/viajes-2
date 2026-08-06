@@ -1,3 +1,3 @@
-# Configuración del viaje (lo único específico del viaje fuera de sus datos)
-foto_base: https://ratgr.github.io/viajes-icons/     # base para imágenes relativas
-fuente: ../viajes-icons/viaje.yaml                   # upstream de migrate_yaml (relativo a la raíz del repo)
+# Trip config (the only trip-specific bits outside its data)
+photo_base: https://ratgr.github.io/viajes-icons/    # base for relative images
+source: ../viajes-icons/viaje.yaml                   # migrate_yaml upstream (relative to repo root)
