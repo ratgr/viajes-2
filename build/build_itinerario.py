@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
-"""build_itinerario.py — viaje.yaml (copia local) → itinerario.html.
+"""build_itinerario.py — src/<viaje>/viaje.yaml → pages/<viaje>/itinerario.html.
 
-Pipeline de viajes-2 (todo vive en esta carpeta):
+Estructura del repo (los scripts de build/ sirven para cualquier viaje):
 
-    migrate_yaml.py        resincroniza viaje.yaml desde ../viajes-icons
-    build_itinerario.py    viaje.yaml + plantilla.html → itinerario.html
-    verify_roundtrip.py    comprueba la proyección 1:1 (corre al final del build)
+    build/                 scripts + assets compartidos (css/js se copian al release)
+    src/<viaje>/           viaje.yaml · plantilla.html · config.yaml
+    pages/<viaje>/         release autocontenida (html + css/js copiados)
 
-itinerario.css e itinerario.js son estáticos: se editan a mano, no se generan.
+    python build/migrate_yaml.py [viaje]        resincroniza viaje.yaml del upstream
+    python build/build_itinerario.py [viaje]    genera la página (y verifica 1:1)
 
 El HTML es una proyección 1:1 del YAML: cada paso es un <li> con sus claves
 como data-* (location/transit/mode/solo-seleccion), sus campos como elementos
@@ -18,17 +19,21 @@ horarios Sale/Llega, frase de auxilio, SUBIR/BAJAR) marcado data-derived.
 import html
 import os
 import re
+import shutil
 import subprocess
 import sys
 
 import yaml
 
+from common import ASSETS, resolve_trip, trip_paths
+
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-SD = os.path.dirname(os.path.abspath(__file__))
-SRC = os.path.join(SD, "viaje.yaml")
-TEMPLATE = os.path.join(SD, "plantilla.html")
-OUT = os.path.join(SD, "itinerario.html")
-FOTO_BASE = "https://ratgr.github.io/viajes-icons/"
+TRIP = resolve_trip(sys.argv)
+SRC_DIR, PAGES_DIR, CFG = trip_paths(TRIP)
+SRC = os.path.join(SRC_DIR, "viaje.yaml")
+TEMPLATE = os.path.join(SRC_DIR, "plantilla.html")
+OUT = os.path.join(PAGES_DIR, "itinerario.html")
+FOTO_BASE = CFG.get("foto_base", "")
 
 # icono de un paso de transporte (derivado de mode; no vive en el título)
 MODE_ICON = {"train": "🚇", "walk": "🚶", "monorail": "🚝", "flight": "✈️",
@@ -356,12 +361,17 @@ def main():
     for token, value in (("<!--NAV-->", nav), ("<!--DAYS-->", days), ("<!--MODALS-->", modals)):
         assert token in page, f"plantilla.html sin {token}"
         page = page.replace(token, value, 1)
+    os.makedirs(PAGES_DIR, exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as f:
         f.write(page)
-    print(f"itinerario.html · {len(DAYS)} días · {len(refs.order)} modales · {len(page) // 1024} KB")
+    # el release es autocontenido: css/js compartidos se copian junto a la página
+    for asset in os.listdir(ASSETS):
+        shutil.copyfile(os.path.join(ASSETS, asset), os.path.join(PAGES_DIR, asset))
+    print(f"pages/{TRIP}/itinerario.html · {len(DAYS)} días · {len(refs.order)} modales · {len(page) // 1024} KB")
 
     # el HTML debe ser proyección 1:1 del YAML — comprobarlo en cada build
-    r = subprocess.run([sys.executable, os.path.join(SD, "verify_roundtrip.py")],
+    r = subprocess.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                                     "verify_roundtrip.py"), TRIP],
                        capture_output=True, text=True, encoding="utf-8")
     print(r.stdout.strip() or r.stderr.strip())
     return r.returncode

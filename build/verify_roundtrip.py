@@ -16,8 +16,9 @@ from html.parser import HTMLParser
 
 import yaml
 
+from common import resolve_trip, trip_paths
+
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-SD = os.path.dirname(os.path.abspath(__file__))
 VOID = {"br", "img", "meta", "link", "input", "hr"}
 
 
@@ -250,8 +251,10 @@ def diff(a, b, path, out):
 
 
 def main():
-    Y = yaml.safe_load(open(os.path.join(SD, "viaje.yaml"), encoding="utf-8"))
-    html_days = parse_days(open(os.path.join(SD, "itinerario.html"), encoding="utf-8").read())
+    trip = resolve_trip(sys.argv)
+    src_dir, pages_dir, _ = trip_paths(trip)
+    Y = yaml.safe_load(open(os.path.join(src_dir, "viaje.yaml"), encoding="utf-8"))
+    html_days = parse_days(open(os.path.join(pages_dir, "itinerario.html"), encoding="utf-8").read())
     yaml_days = [norm_day(d) for d in Y.get("days", [])]
     problems = []
     if len(html_days) != len(yaml_days):

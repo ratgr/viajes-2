@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-"""migrate_yaml.py — crea/actualiza el viaje.yaml LOCAL de viajes-2 a partir de
-../viajes-icons/viaje.yaml, aplicando la limpieza de datos aprobada:
+"""migrate_yaml.py — crea/actualiza src/<viaje>/viaje.yaml a partir del upstream
+declarado en su config.yaml (`fuente:`), aplicando la limpieza de datos aprobada:
 
   1. títulos sin ** — el título entero va en bold por diseño, los asteriscos
      eran ruido del pipeline viejo (y en el app familiar producían basura)
@@ -8,17 +8,22 @@
      renderizar (build_itinerario.MODE_ICON), no vive en el texto
 
 Los @[refs](clave) y el markdown de las notas se conservan tal cual.
-Rerun cada vez que cambie viajes-icons/viaje.yaml.
+Rerun cada vez que cambie el upstream.
 """
 import os
 import sys
 
 import yaml
 
+from common import ROOT, resolve_trip, trip_paths
+
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-SD = os.path.dirname(os.path.abspath(__file__))
-SRC = os.path.abspath(os.path.join(SD, "..", "viajes-icons", "viaje.yaml"))
-DST = os.path.join(SD, "viaje.yaml")
+TRIP = resolve_trip(sys.argv)
+SRC_DIR, _PAGES, CFG = trip_paths(TRIP)
+if not CFG.get("fuente"):
+    sys.exit(f"src/{TRIP}/config.yaml no declara `fuente:`")
+SRC = os.path.normpath(os.path.join(ROOT, CFG["fuente"]))
+DST = os.path.join(SRC_DIR, "viaje.yaml")
 
 # emojis de transporte que pueden encabezar un título de transit (con o sin
 # selector de variación); cualquier otro emoji (🏪 👋 👘 …) se queda
