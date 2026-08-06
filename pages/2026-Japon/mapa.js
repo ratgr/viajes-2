@@ -223,6 +223,14 @@
       set.classList.toggle('eye-ghost', !hide);
       eye.textContent = hide ? '🙈' : '👁';
     });
+    // sub-filas de planes: casilla propia, individualmente seleccionables
+    set.querySelectorAll('.steps > li').forEach(function (li) {
+      if (li.querySelector(':scope > .ck')) return;
+      var ck = document.createElement('input');
+      ck.type = 'checkbox';
+      ck.className = 'ck';
+      li.insertBefore(ck, li.firstChild);
+    });
     set.querySelectorAll(':scope > li').forEach(function (g) {
       var label = g.querySelector(':scope > b');
       if (!label) return;

@@ -55,6 +55,9 @@ body.show-free .panel .steps > li[data-free]::after { content: '⏳ ' attr(data-
 .panel .steps > li:hover { border-left-color: var(--ai); background: var(--paper-2); cursor: pointer; }
 .panel .steps > li.sel { background: var(--shu-soft); border-left-color: var(--shu); }
 
+/* opciones de tier: en el mapa una por línea (el itinerario fluye inline) */
+.panel .options > li .option { display: block; padding: 1px 0; }
+
 /* pasos solo-mapa (hidden-summary): el itinerario los oculta, el MAPA no —
    son geometría; van atenuados para distinguirlos */
 .panel .steps li.hidden-summary { display: grid; opacity: .6; }
@@ -78,10 +81,11 @@ body.show-free .panel .steps > li[data-free]::after { content: '⏳ ' attr(data-
 /* options en columna única dentro de la barra */
 .panel .options { grid-template-columns: 1fr; }
 .panel .options > li:has(> .steps) { padding: 4px 8px 6px; }
-.panel .options .steps > li { grid-template-columns: 42px minmax(0, 1fr); }
-.panel .options .steps > li > .time { grid-column: 1; }
-.panel .options .steps > li .title { grid-column: 2; grid-row: 1; }
-.panel .options .steps > li .note { grid-column: 2; grid-row: 2; }
+.panel .options .steps > li { grid-template-columns: 16px 42px minmax(0, 1fr); }
+.panel .options .steps > li > .ck { grid-column: 1; grid-row: 1; }
+.panel .options .steps > li > .time { grid-column: 2; }
+.panel .options .steps > li .title { grid-column: 3; grid-row: 1; }
+.panel .options .steps > li .note { grid-column: 3; grid-row: 2; }
 
 /* ---------- popup = la tarjeta completa (en teléfono es la única vista) ----------
    Si es alta se colapsa tras «Ver más»; expandida scrollea, tope 40% de la pantalla. */

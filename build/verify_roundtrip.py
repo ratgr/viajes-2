@@ -181,12 +181,19 @@ def parse_opt(li):
     if sub is not None:
         return {"title": title, "steps": [parse_step(x) for x in nodes(sub.children, "li")]}
     opts, last = [], None
-    for c in nodes(li.children):
-        if c.tag == "a" and "modal-link" in c.cls():
-            last = {"location": (c.attrs.get("href") or "")[3:]}
-            opts.append(last)
-        elif c.tag == "span" and "price" in c.cls() and last is not None:
-            last["price"] = text_of(c).strip()
+
+    def eat(children):
+        nonlocal last
+        for c in nodes(children):
+            if c.tag == "span" and "option" in c.cls():
+                eat(c.children)
+            elif c.tag == "a" and "modal-link" in c.cls():
+                last = {"location": (c.attrs.get("href") or "")[3:]}
+                opts.append(last)
+            elif c.tag == "span" and "price" in c.cls() and last is not None:
+                last["price"] = text_of(c).strip()
+
+    eat(li.children)
     return {"title": title, "options": opts}
 
 

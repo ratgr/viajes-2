@@ -428,7 +428,10 @@ def render_options(node, refs, ctx=""):
             items.append(f'<li><b>{title}</b><ul class="steps">\n{subs}\n</ul></li>')
         else:
             label = html.escape(str(o.get("title", "")))
-            inner = " · ".join(resto_link(x, refs) for x in o.get("options", []))
+            # cada opción envuelta (span.option) y separador en span.sep: el
+            # itinerario fluye inline; el mapa las apila una por línea
+            inner = '<span class="sep"> · </span>'.join(
+                f'<span class="option">{resto_link(x, refs)}</span>' for x in o.get("options", []))
             items.append(f'<li data-tier="{label}"><b>{label}</b>{inner}</li>')
     return '<ul class="options">' + "".join(items) + "</ul>"
 
