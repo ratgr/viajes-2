@@ -348,6 +348,81 @@
     return li;
   }
 
+  // ---------- capas vivas: el mapa muestra TODO lo visible en la barra ----------
+  // cada fila/sub-fila con clave dibuja su geometría si está a la vista (día
+  // abierto, opción desplegada, ojo…); la casilla la ANCLA aunque se oculte
+  var liveLayers = {};    // clave → capa Leaflet
+
+  function makeLayer(key) {
+    var loc = GEO.locations[key];
+    var tr = GEO.transits[key];
+    var ly = null;
+    if (loc) {
+      ly = L.circleMarker(loc, { radius: 6, color: '#fff', weight: 2, fillColor: '#b23a2a', fillOpacity: 1 });
+    } else if (tr && tr.coords.length) {
+      ly = L.polyline(tr.coords, {
+        color: tr.color, weight: tr.mode === 'walk' ? 3 : 5, opacity: .85,
+        dashArray: tr.mode === 'walk' ? '4 7' : null
+      });
+    }
+    if (ly) {
+      ly.on('click', function () {
+        var content = modalHtml(key) || '<div class="modal"><h3>' + key + '</h3></div>';
+        if (loc) content += dayPieces(key, null);
+        openCardPopup(loc || tr.coords[Math.floor(tr.coords.length / 2)], content);
+      });
+    }
+    return ly;
+  }
+  function syncLayers() {
+    if (!map) return;
+    var want = {};
+    document.querySelectorAll('.panel [data-location], .panel [data-transit]').forEach(function (el) {
+      var key = el.dataset.location || el.dataset.transit;
+      if (!key || want[key]) return;
+      var ck = el.querySelector(':scope > .ck');
+      if (el.offsetParent !== null || (ck && ck.checked)) want[key] = true;
+    });
+    Object.keys(liveLayers).forEach(function (k) {
+      if (!want[k]) {
+        map.removeLayer(liveLayers[k]);
+        delete liveLayers[k];
+      }
+    });
+    Object.keys(want).forEach(function (k) {
+      if (!liveLayers[k]) {
+        var ly = makeLayer(k);
+        if (ly) {
+          liveLayers[k] = ly;
+          ly.addTo(map);
+        }
+      }
+    });
+  }
+  function fitToLayers() {
+    var bounds = null;
+    Object.keys(liveLayers).forEach(function (k) {
+      var l = liveLayers[k];
+      var b = l.getBounds ? l.getBounds() : L.latLngBounds([l.getLatLng()]);
+      bounds = bounds ? bounds.extend(b) : L.latLngBounds(b.getSouthWest(), b.getNorthEast());
+    });
+    if (bounds && bounds.isValid()) map.flyToBounds(bounds.pad(.15), { duration: .5 });
+  }
+  var syncT = null;
+  function schedSync() {
+    clearTimeout(syncT);
+    syncT = setTimeout(syncLayers, 120);
+  }
+  document.querySelector('.panel').addEventListener('click', schedSync);
+  document.querySelector('.panel').addEventListener('change', schedSync);
+  // chips de día: tras el cambio exclusivo, sincronizar y encuadrar el día
+  document.querySelectorAll('.day-nav a[href^="#d"]').forEach(function (a) {
+    a.addEventListener('click', function () {
+      setTimeout(function () { syncLayers(); fitToLayers(); }, 60);
+    });
+  });
+  setTimeout(function () { syncLayers(); fitToLayers(); }, 150);   // arranque
+
   // teléfono: el panel es un sobrepuesto que abre el botón ☰; al elegir algo
   // se cierra solo para dejar ver el popup
   var narrow = window.matchMedia('(max-width: 820px)');
