@@ -37,11 +37,14 @@ body { display: flex; padding: 0; overflow: hidden; }
 .panel .steps li .options { grid-column: 1 / -1; grid-row: 2; }
 .panel .steps li .note, .panel .sep { display: none; }   /* la nota es del itinerario */
 /* columna izquierda: duración ARRIBA (mapa.js la mueve dentro de <time>),
-   luego la hora DESDE y la hora-fin derivada debajo */
-.panel time .duration { display: block; font-size: 10.5px; color: var(--ink-soft); white-space: normal; }
-.panel .steps .time .to { display: block; font-weight: 400; color: var(--ink-soft); }
-.panel .steps .time .from { display: block; color: var(--ink-soft); font-weight: 400; }
-.panel .steps li .duration[data-derived] { display: block; }
+   luego la hora DESDE y la hora-fin derivada debajo.
+   Colores: explícita = azul-casi-gris · explícita y FIJA = rojo · calculada = gris */
+.panel time .duration { display: block; font-size: 10.5px; white-space: normal; }
+.panel .steps .time, .panel time .duration { color: light-dark(#566a82, #93a5bd); }
+.panel .steps .time.fixed { color: var(--shu); }
+.panel .steps .time .to, .panel .steps .time .from { display: block; font-weight: 400; color: var(--ink-soft); }
+.panel .steps li .duration[data-derived] { display: block; color: var(--ink-soft); }
+.panel .steps .time .warn { display: inline-block; cursor: help; font-size: 12px; }
 .panel .ck { margin: 3px 0 0; accent-color: var(--shu); }
 .panel .day-head .ck { margin: 0; align-self: center; }
 

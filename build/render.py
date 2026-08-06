@@ -209,9 +209,19 @@ def derive_schedule(steps, ctx=""):
             DIAGNOSTICS.append(f"{ctx} paso {i + 1} «{title}»: sin inicio anclable (ni arriba ni abajo)")
         elif not fo["dur"] and "location" not in s:
             DIAGNOSTICS.append(f"{ctx} paso {i + 1} «{title}»: solo inicio — falta duración o fin")
+        elif fo["beg_exp"] and fo["dur"] and not fo["dur_derived"]:
+            # los 3 valores fijados (inicio + duración explícitos y el inicio
+            # del siguiente como fin): si se enciman, no son compatibles
+            nb = next_begin(i)
+            if nb is not None and fo["begin"] + fo["dur"] > nb:
+                exceso = fo["begin"] + fo["dur"] - nb
+                fo["conflict"] = (f"termina {fmt_hm(fo['begin'] + fo['dur'])} pero lo "
+                                  f"siguiente empieza {fmt_hm(nb)} (encimados {exceso} min)")
+                DIAGNOSTICS.append(f"{ctx} paso {i + 1} «{title}»: {fo['conflict']}")
     return [{} if fo is None else
             {"start": fo["begin"], "start_derived": fo["beg_derived"],
-             "dur": fo["dur"], "dur_derived": fo["dur_derived"], "end": fo["end"]}
+             "dur": fo["dur"], "dur_derived": fo["dur_derived"], "end": fo["end"],
+             "conflict": fo.get("conflict")}
             for fo in info]
 
 
@@ -295,6 +305,9 @@ def time_cell(n, sc=None):
         inner = f'<span class="from" data-derived="inicio">{fmt_hm(sc["start"])}</span>'
     if sc.get("end") is not None and inner:
         inner += f'<span class="to" data-derived="fin">–{fmt_hm(sc["end"])}</span>'
+    if sc.get("conflict"):
+        inner += (f'<span class="warn" data-derived="conflicto" '
+                  f'title="{html.escape(sc["conflict"])}">⚠️</span>')
     return f'<time class="{cls}"{dt}>{inner}</time>'
 
 
