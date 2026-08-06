@@ -105,9 +105,9 @@ def fmt_dur(mins):
 
 DIAGNOSTICS = []   # pasos cuyo horario no se puede completar: problema del YAML
 
-# duration: flex · flex(30) · flex(-60) · flex(30-60) — paso elástico con
-# cotas opcionales en minutos (min+, ≤max, o rango ~min–max)
-FLEX_RE = re.compile(r"^flex(?:\(\s*(\d+)?\s*(-)?\s*(\d+)?\s*\))?$")
+# duration: flex · flex(30) · flex(-60) · flex(30-60) · flex(1h) · flex(30-1 h 30)
+# — paso elástico con cotas opcionales (cualquier sintaxis de duración)
+FLEX_RE = re.compile(r"^flex(?:\((.*)\))?$")
 
 
 def parse_flex(raw):
@@ -115,10 +115,13 @@ def parse_flex(raw):
     m = FLEX_RE.match(str(raw or "").strip())
     if not m:
         return None
-    lo, dash, hi = m.group(1), m.group(2), m.group(3)
-    if lo and not dash and not hi:
-        return (int(lo), None)         # flex(30) = mínimo
-    return (int(lo) if lo else None, int(hi) if hi else None)
+    inner = (m.group(1) or "").strip()
+    if not inner:
+        return (None, None)
+    parts = inner.split("-", 1)
+    lo = dmin(parts[0]) or None if parts[0].strip() else None
+    hi = dmin(parts[1]) or None if len(parts) > 1 and parts[1].strip() else None
+    return (lo, hi)
 
 WALK_M_PER_MIN = 4000 / 60          # humano a 4 km/h
 

@@ -36,8 +36,9 @@ body { display: flex; padding: 0; overflow: hidden; }
 .panel .steps li .title { grid-column: 3; grid-row: 1; }
 .panel .steps li .duration { position: absolute; top: 4px; right: 0; text-align: right; font-size: 10.5px; max-width: 96px; background: inherit; }
 .panel .steps li .title { padding-right: 74px; }   /* que el título no choque con la duración */
-.panel .steps li .options { grid-column: 1 / -1; grid-row: 2; }
-.panel .steps li .note, .panel .sep { display: none; }   /* la nota es del itinerario */
+.panel .steps li .options { grid-column: 1 / -1; grid-row: 3; }
+.panel .sep { display: none; }
+.panel .steps li .note { grid-column: 3; grid-row: 2; font-size: 11.5px; color: var(--ink-soft); padding-right: 74px; }
 /* Colores: explícita = verde · explícita y FIJA = rojo · calculada = gris */
 .panel .steps .time, .panel .steps li .duration { color: light-dark(#347132, #8fc07e); }
 .panel .steps .time.fixed { color: var(--shu); }
