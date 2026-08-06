@@ -52,26 +52,33 @@ a { color: var(--shu); }
 .steps b { font-weight: 600; }
 .steps .transit { color: var(--ink-soft); }
 
-/* ---------- fork de comida (tiers Take/Ai/Shu + 🏮 barrio) ---------- */
-.fork { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin: 6px 0 0; padding: 0; list-style: none; }
-@media (max-width: 900px) { .fork { grid-template-columns: 1fr; } }
-.fork > li { font-size: 13px; border-radius: 4px; padding: 6px 10px; }
-.fork b { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; display: block; }
-.tier-take { background: var(--matcha-soft); } .tier-take b { color: var(--matcha); }
-.tier-ai { background: var(--ai-soft); } .tier-ai b { color: var(--ai); }
-.tier-shu { background: var(--shu-soft); } .tier-shu b { color: var(--shu); }
-.tier-hood { background: var(--paper-2); border: 1px dashed var(--line); } .tier-hood b { color: var(--ink-soft); }
-
-/* ---------- planes en paralelo ---------- */
-.plan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin: 8px 0 0; padding: 0; list-style: none; }
-@media (max-width: 900px) { .plan-grid { grid-template-columns: 1fr; } }
-.plan { border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px 8px; }
-.plan-head { font-size: 13.5px; border-bottom: 1px solid var(--line); padding-bottom: 4px; margin-bottom: 2px; }
-.plan-head b { font-size: 13.5px; }
-.plan .steps > li { grid-template-columns: 52px minmax(0, 1fr); font-size: 13px; padding: 4px 0; }
-.plan.a1 { background: light-dark(#f4eefa, #2a2233); } .plan.a1 b { color: light-dark(#7b4fa6, #c9a9e6); }
-.plan.a2 { background: light-dark(#fff6df, #2e2712); } .plan.a2 b { color: light-dark(#a1750a, #e0c072); }
-.plan.a3 { background: light-dark(#fdeef3, #301b24); } .plan.a3 b { color: light-dark(#c2537c, #e79bbb); }
+/* ---------- options: tiers de comida Y planes en paralelo ----------
+   Mismo markup (ul.options > li), como en el YAML son la misma clave.
+   Un li CON sub-.steps (:has) es un plan-tarjeta; sin ellos, un tier-cajita. */
+.options { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin: 6px 0 0; padding: 0; list-style: none; }
+@media (max-width: 900px) { .options { grid-template-columns: 1fr; } }
+.options > li { font-size: 13px; border-radius: 4px; padding: 6px 10px; }
+.options > li > b:first-child { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; display: block; }
+/* tiers hoja: color por tier; cualquier otro tier (🏮 barrio) = neutro punteado */
+.options > li[data-tier] { background: var(--paper-2); border: 1px dashed var(--line); }
+.options > li[data-tier] > b:first-child { color: var(--ink-soft); }
+.options > li[data-tier="Take"] { background: var(--matcha-soft); border: none; }
+.options > li[data-tier="Take"] > b:first-child { color: var(--matcha); }
+.options > li[data-tier="Ai"] { background: var(--ai-soft); border: none; }
+.options > li[data-tier="Ai"] > b:first-child { color: var(--ai); }
+.options > li[data-tier="Shu"] { background: var(--shu-soft); border: none; }
+.options > li[data-tier="Shu"] > b:first-child { color: var(--shu); }
+/* planes anidados: tarjetas grandes, acento por posición */
+.options:has(> li > .steps) { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-top: 8px; }
+.options > li:has(> .steps) { font-size: inherit; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px 8px; }
+.options > li:has(> .steps) > b:first-child { font-size: 13.5px; letter-spacing: 0; text-transform: none; border-bottom: 1px solid var(--line); padding-bottom: 4px; margin-bottom: 2px; }
+.options > li:has(> .steps):nth-child(1) { background: light-dark(#f4eefa, #2a2233); }
+.options > li:has(> .steps):nth-child(1) b { color: light-dark(#7b4fa6, #c9a9e6); }
+.options > li:has(> .steps):nth-child(2) { background: light-dark(#fff6df, #2e2712); }
+.options > li:has(> .steps):nth-child(2) b { color: light-dark(#a1750a, #e0c072); }
+.options > li:has(> .steps):nth-child(n+3) { background: light-dark(#fdeef3, #301b24); }
+.options > li:has(> .steps):nth-child(n+3) b { color: light-dark(#c2537c, #e79bbb); }
+.options .steps > li { grid-template-columns: 52px minmax(0, 1fr); font-size: 13px; padding: 4px 0; }
 
 /* ---------- links a modal + chips de línea ---------- */
 .modal-link { color: inherit; text-decoration: underline dotted; text-underline-offset: 2px; cursor: pointer; }

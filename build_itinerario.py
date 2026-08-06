@@ -16,7 +16,7 @@ import yaml
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 SD = os.path.dirname(os.path.abspath(__file__))
-SRC = os.path.abspath(os.path.join(SD, "..", "viajes-icons", "viaje.yaml"))
+SRC = os.path.join(SD, "viaje.yaml")   # copia local limpia (migrate_yaml.py la resincroniza)
 OUT = os.path.join(SD, "itinerario.html")
 OUT_CSS = os.path.join(SD, "itinerario.css")
 OUT_JS = os.path.join(SD, "itinerario.js")
@@ -48,7 +48,9 @@ for _d in DAYS:
 # ---------------------------------------------------------------- utilidades
 VEH_JP = {"tren": "電車", "bus": "バス", "barco": "船"}
 VEH_RO = {"tren": "densha", "bus": "basu", "barco": "fune"}
-TIER_CLASS = {"Take": "take", "Ai": "ai", "Shu": "shu"}  # resto → hood (🏮 barrio)
+# el icono de un paso de transporte se deriva de su mode (ya no vive en el título)
+MODE_ICON = {"train": "🚇", "walk": "🚶", "monorail": "🚝", "flight": "✈️",
+             "tramite": "🧳", "bus": "🚌", "ferry": "⛴️", "tour": "🚌"}
 REF_RE = re.compile(r"@\[(.+?)\]\((.+?)\)")
 
 
@@ -113,18 +115,25 @@ def md(s, refs=None):
 FIXED_TITLES = []   # títulos que traían *asteriscos* (emphasis roto en el viejo)
 
 
+def mode_icon(n):
+    """icono del paso de transporte, derivado de su mode (step o transit)."""
+    if "transit" not in n and not n.get("mode"):
+        return ""
+    mode = n.get("mode") or TRANSITS.get(n.get("transit"), {}).get("mode", "walk")
+    ic = MODE_ICON.get(mode, "")
+    return ic + " " if ic else ""
+
+
 def row_text(n, refs):
-    """<b.title> - <span.dur> - <span.note> — campos separados, no un blob."""
+    """<b.title> - <span.duration> - <span.note> — campos separados, no un blob."""
     parts = []
     if n.get("title"):
         title = str(n["title"])
-        # el título entero va en bold por diseño: los ** internos del YAML
-        # (herencia del pipeline viejo, que los renderizaba INVERTIDOS) no
-        # aportan nada dentro de un título ya-bold → fuera
+        # defensa: el yaml local ya viene sin asteriscos (migrate_yaml.py)
         if "*" in title:
             FIXED_TITLES.append(title)
             title = title.replace("*", "")
-        parts.append(f'<b class="title">{md(title, refs)}</b>')
+        parts.append(f'<b class="title">{mode_icon(n)}{md(title, refs)}</b>')
     dur = n.get("duration")
     if dur not in (None, 0, "0"):
         parts.append(f'<span class="duration">{html.escape(str(dur))}</span>')
@@ -152,36 +161,28 @@ def resto_link(opt, refs):
     return lk + (f' <span class="precio">{html.escape(str(precio))}</span>' if precio else "")
 
 
-def render_fork(node, refs):
-    """fork de comida: una lista con un item por tier Take/Ai/Shu (+🏮 barrio)."""
-    groups = []
-    for tier in node.get("options", []):
-        cls = TIER_CLASS.get(tier.get("title", ""), "hood")
-        label = html.escape(tier.get("title", ""))
-        inner = " · ".join(resto_link(o, refs) for o in tier.get("options", []))
-        groups.append(f'<li class="tier-{cls}" data-tier="{label}"><b>{label}</b>{inner}</li>')
-    return '<ul class="fork">' + "".join(groups) + "</ul>"
-
-
-def render_plans(node, refs):
-    """planes en paralelo: lista de tarjetas, cada una con su sub-itinerario."""
-    out = ['<ul class="plan-grid">']
-    for i, plan in enumerate(node.get("options", [])):
-        acc = f"a{min(i + 1, 3)}"
-        title = md(plan.get("title", ""), refs)
-        subs = "\n".join(render_li(s, refs) for s in plan.get("steps", []) if not s.get("hidden-summary"))
-        out.append(f'<li class="plan {acc}"><div class="plan-head"><b>{title}</b></div>'
-                   f'<ul class="steps">\n{subs}\n</ul></li>')
-    out.append("</ul>")
-    return "".join(out)
+def render_options(node, refs):
+    """options unificadas: MISMO markup para tiers de comida y planes en
+    paralelo (igual que en el YAML son la misma clave). El CSS decide el
+    render por item: con sub-steps (:has) = tarjeta plan, sin = cajita tier."""
+    items = []
+    for o in node.get("options", []):
+        if not isinstance(o, dict):
+            continue
+        if "steps" in o:
+            title = md(str(o.get("title", "")).replace("*", ""), refs)
+            subs = "\n".join(render_li(s, refs) for s in o["steps"] if not s.get("hidden-summary"))
+            items.append(f'<li><b>{title}</b><ul class="steps">\n{subs}\n</ul></li>')
+        else:
+            label = html.escape(str(o.get("title", "")))
+            inner = " · ".join(resto_link(x, refs) for x in o.get("options", []))
+            items.append(f'<li data-tier="{label}"><b>{label}</b>{inner}</li>')
+    return '<ul class="options">' + "".join(items) + "</ul>"
 
 
 def render_li(n, refs, row_id=None):
     if "options" in n:
-        if any("steps" in o for o in n.get("options", [])):
-            body = row_text(n, refs) + render_plans(n, refs)
-        else:
-            body = row_text(n, refs) + render_fork(n, refs)
+        body = row_text(n, refs) + render_options(n, refs)
     else:
         body = row_text(n, refs)
     # los trayectos van en gris para que resalten los lugares
@@ -389,26 +390,33 @@ a { color: var(--shu); }
 .steps b { font-weight: 600; }
 .steps .transit { color: var(--ink-soft); }
 
-/* ---------- fork de comida (tiers Take/Ai/Shu + 🏮 barrio) ---------- */
-.fork { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin: 6px 0 0; padding: 0; list-style: none; }
-@media (max-width: 900px) { .fork { grid-template-columns: 1fr; } }
-.fork > li { font-size: 13px; border-radius: 4px; padding: 6px 10px; }
-.fork b { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; display: block; }
-.tier-take { background: var(--matcha-soft); } .tier-take b { color: var(--matcha); }
-.tier-ai { background: var(--ai-soft); } .tier-ai b { color: var(--ai); }
-.tier-shu { background: var(--shu-soft); } .tier-shu b { color: var(--shu); }
-.tier-hood { background: var(--paper-2); border: 1px dashed var(--line); } .tier-hood b { color: var(--ink-soft); }
-
-/* ---------- planes en paralelo ---------- */
-.plan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin: 8px 0 0; padding: 0; list-style: none; }
-@media (max-width: 900px) { .plan-grid { grid-template-columns: 1fr; } }
-.plan { border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px 8px; }
-.plan-head { font-size: 13.5px; border-bottom: 1px solid var(--line); padding-bottom: 4px; margin-bottom: 2px; }
-.plan-head b { font-size: 13.5px; }
-.plan .steps > li { grid-template-columns: 52px minmax(0, 1fr); font-size: 13px; padding: 4px 0; }
-.plan.a1 { background: light-dark(#f4eefa, #2a2233); } .plan.a1 b { color: light-dark(#7b4fa6, #c9a9e6); }
-.plan.a2 { background: light-dark(#fff6df, #2e2712); } .plan.a2 b { color: light-dark(#a1750a, #e0c072); }
-.plan.a3 { background: light-dark(#fdeef3, #301b24); } .plan.a3 b { color: light-dark(#c2537c, #e79bbb); }
+/* ---------- options: tiers de comida Y planes en paralelo ----------
+   Mismo markup (ul.options > li), como en el YAML son la misma clave.
+   Un li CON sub-.steps (:has) es un plan-tarjeta; sin ellos, un tier-cajita. */
+.options { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin: 6px 0 0; padding: 0; list-style: none; }
+@media (max-width: 900px) { .options { grid-template-columns: 1fr; } }
+.options > li { font-size: 13px; border-radius: 4px; padding: 6px 10px; }
+.options > li > b:first-child { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; display: block; }
+/* tiers hoja: color por tier; cualquier otro tier (🏮 barrio) = neutro punteado */
+.options > li[data-tier] { background: var(--paper-2); border: 1px dashed var(--line); }
+.options > li[data-tier] > b:first-child { color: var(--ink-soft); }
+.options > li[data-tier="Take"] { background: var(--matcha-soft); border: none; }
+.options > li[data-tier="Take"] > b:first-child { color: var(--matcha); }
+.options > li[data-tier="Ai"] { background: var(--ai-soft); border: none; }
+.options > li[data-tier="Ai"] > b:first-child { color: var(--ai); }
+.options > li[data-tier="Shu"] { background: var(--shu-soft); border: none; }
+.options > li[data-tier="Shu"] > b:first-child { color: var(--shu); }
+/* planes anidados: tarjetas grandes, acento por posición */
+.options:has(> li > .steps) { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-top: 8px; }
+.options > li:has(> .steps) { font-size: inherit; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px 8px; }
+.options > li:has(> .steps) > b:first-child { font-size: 13.5px; letter-spacing: 0; text-transform: none; border-bottom: 1px solid var(--line); padding-bottom: 4px; margin-bottom: 2px; }
+.options > li:has(> .steps):nth-child(1) { background: light-dark(#f4eefa, #2a2233); }
+.options > li:has(> .steps):nth-child(1) b { color: light-dark(#7b4fa6, #c9a9e6); }
+.options > li:has(> .steps):nth-child(2) { background: light-dark(#fff6df, #2e2712); }
+.options > li:has(> .steps):nth-child(2) b { color: light-dark(#a1750a, #e0c072); }
+.options > li:has(> .steps):nth-child(n+3) { background: light-dark(#fdeef3, #301b24); }
+.options > li:has(> .steps):nth-child(n+3) b { color: light-dark(#c2537c, #e79bbb); }
+.options .steps > li { grid-template-columns: 52px minmax(0, 1fr); font-size: 13px; padding: 4px 0; }
 
 /* ---------- links a modal + chips de línea ---------- */
 .modal-link { color: inherit; text-decoration: underline dotted; text-underline-offset: 2px; cursor: pointer; }
