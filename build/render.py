@@ -9,6 +9,7 @@ cada página agrega su cromo por CSS/JS estático, no cambiando el HTML.
 Uso: render.build_page(trip, "plantilla-X.html", "salida.html")
 """
 import html
+import math
 import os
 import re
 import shutil
@@ -104,6 +105,37 @@ def fmt_dur(mins):
 
 DIAGNOSTICS = []   # pasos cuyo horario no se puede completar: problema del YAML
 
+WALK_M_PER_MIN = 4000 / 60          # humano a 4 km/h
+
+
+def _crow_m(a, b):
+    """metros aprox entre dos (lat,lng) — equirectangular."""
+    dy = (b[0] - a[0]) * 111000
+    dx = (b[1] - a[1]) * 111000 * math.cos(math.radians(a[0]))
+    return math.hypot(dx, dy)
+
+
+def round_walk(mins):
+    """redondeo de caminatas: al múltiplo de 5 que la encierra hasta 45;
+    de ahí en adelante, al múltiplo de 15."""
+    m5 = max(5, math.ceil(mins / 5) * 5)
+    return m5 if m5 <= 45 else math.ceil(mins / 15) * 15
+
+
+def walk_calc(coords_str):
+    """(metros, minutos redondeados) del camino a pie."""
+    pts = [tuple(float(x) for x in p.split(",")) for p in str(coords_str).split()]
+    dist = sum(_crow_m(pts[i - 1], pts[i]) for i in range(1, len(pts)))
+    return dist, round_walk(dist / WALK_M_PER_MIN)
+
+
+def step_walk_geometry(s):
+    """coords del paso si es una caminata (mode walk propio o de su transit)."""
+    tr = TRANSITS.get(s.get("transit"), {}) if s.get("transit") else {}
+    mode = s.get("mode") or tr.get("mode")
+    coords = tr.get("coords") or s.get("coords")
+    return coords if (mode == "walk" and coords) else None
+
 
 def derive_schedule(steps, ctx=""):
     """Horario por paso, completado por SNAP a los vecinos:
@@ -116,15 +148,28 @@ def derive_schedule(steps, ctx=""):
     Todo lo inferido se marca data-derived al render."""
     n = len(steps)
     info = []
-    for s in steps:
+    for i, s in enumerate(steps):
         if not isinstance(s, dict) or s.get("hidden-summary"):
             info.append(None)
             continue
         beg = hm_min(s.get("time"))
         has_dur = s.get("duration") not in (None, 0, "0")
-        info.append({"begin": beg, "beg_exp": beg is not None, "beg_derived": False,
-                     "dur": dmin(s.get("duration")) if has_dur else None,
-                     "dur_derived": False, "end": None})
+        fo = {"begin": beg, "beg_exp": beg is not None, "beg_derived": False,
+              "dur": dmin(s.get("duration")) if has_dur else None,
+              "dur_derived": False, "end": None}
+        # caminatas: la geometría dicta la duración (4 km/h + redondeo);
+        # si el YAML trae otra cosa, es un diagnóstico
+        coords = step_walk_geometry(s)
+        if coords:
+            dist, esperado = walk_calc(coords)
+            if fo["dur"] is None:
+                fo["dur"], fo["dur_derived"] = esperado, True
+            elif fo["dur"] != esperado:
+                title = str(s.get("title", ""))[:52]
+                DIAGNOSTICS.append(f"{ctx} paso {i + 1} «{title}»: caminata dice "
+                                   f"{fo['dur']} min pero el camino mide {dist:.0f} m "
+                                   f"≈ {esperado} min a 4 km/h")
+        info.append(fo)
 
     def next_begin(i):
         for j in range(i + 1, n):
