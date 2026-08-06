@@ -28,6 +28,11 @@
       ck.type = 'checkbox';
       ck.className = 'ck';
       li.insertBefore(ck, li.firstChild);
+      // duración ARRIBA de la hora: se recoloca dentro de <time> (solo aquí,
+      // en el navegador — el HTML servido no cambia)
+      var dur = li.querySelector('.duration');
+      var t = li.querySelector('time');
+      if (dur && t) t.insertBefore(dur, t.firstChild);
     });
 
     // cabecera: maestro + caret
@@ -112,6 +117,30 @@
     var src = store.getElementById('m-' + key);
     return src ? src.outerHTML : '';
   }
+  // un LUGAR puede aparecer en varios días (las rutas son únicas): la tarjeta
+  // lleva una pieza por día, colapsada a «día + una línea»; la del día
+  // seleccionado (sección abierta) o la fila clickeada llega expandida
+  function dayPieces(key, activeRowId) {
+    var rows = document.querySelectorAll('.panel .steps > li[data-location="' + key + '"]');
+    if (!rows.length) return '';
+    var out = ['<div class="usos">'];
+    rows.forEach(function (li) {
+      var day = li.closest('section.day');
+      var label = day ? (day.querySelector('h3').textContent.split('·')[0].trim()) : '';
+      var time = li.querySelector('time');
+      var title = li.querySelector('.title');
+      var note = li.querySelector('.note');
+      var open = (day && day.classList.contains('open')) || li.id === activeRowId;
+      out.push('<details class="uso"' + (open ? ' open' : '') + '>' +
+        '<summary><b>' + label + '</b><span class="uso-linea">' +
+        (time ? time.textContent + ' · ' : '') + (title ? title.textContent : '') +
+        '</span></summary>' +
+        (note ? '<div class="uso-nota">' + note.innerHTML + '</div>' : '') +
+        '</details>');
+    });
+    out.push('</div>');
+    return out.join('');
+  }
   function selectRow(li) {
     if (selRow) selRow.classList.remove('sel');
     selRow = li;
@@ -120,7 +149,32 @@
   function clearTemp() {
     if (tempLayer && map) { map.removeLayer(tempLayer); tempLayer = null; }
   }
-  function showOnMap(key, fallbackTitle) {
+  // popup con la tarjeta COMPLETA (en teléfono es la única vista); si es alta
+  // se colapsa tras «Ver más» y expandida scrollea con tope de 40% de pantalla
+  function openCardPopup(latlng, content) {
+    var pop = L.popup({ maxWidth: 320 })
+      .setLatLng(latlng)
+      .setContent('<div class="popup-card">' + content + '</div>')
+      .openOn(map);
+    // OJO: nada de pop.update() tras mutar el DOM — re-renderiza el contenido
+    // desde el string original y borra la clase y el botón
+    var root = pop.getElement ? pop.getElement() : null;
+    var el = root && root.querySelector('.popup-card');
+    var card = el && el.querySelector('.modal');
+    if (card && card.scrollHeight > window.innerHeight * 0.4) {
+      el.classList.add('collapsed');
+      var btn = document.createElement('button');
+      btn.className = 'ver-mas';
+      btn.textContent = 'Ver más ↓';
+      btn.addEventListener('click', function () {
+        var collapsed = el.classList.toggle('collapsed');
+        btn.textContent = collapsed ? 'Ver más ↓' : 'Ver menos ↑';
+      });
+      el.appendChild(btn);
+    }
+    return pop;
+  }
+  function showOnMap(key, fallbackTitle, activeRowId) {
     if (!map) return false;
     var content = modalHtml(key) ||
       '<div class="modal"><h3>' + (fallbackTitle || key) + '</h3></div>';
@@ -129,7 +183,7 @@
     clearTemp();
     if (loc) {
       map.flyTo(loc, Math.max(map.getZoom(), 15), { duration: .5 });
-      L.popup({ maxWidth: 320 }).setLatLng(loc).setContent(content).openOn(map);
+      openCardPopup(loc, content + dayPieces(key, activeRowId));
       return true;
     }
     if (tr && tr.coords.length) {
@@ -138,8 +192,7 @@
         dashArray: tr.mode === 'walk' ? '4 7' : null
       }).addTo(map);
       map.flyToBounds(tempLayer.getBounds().pad(.25), { duration: .5 });
-      var mid = tr.coords[Math.floor(tr.coords.length / 2)];
-      L.popup({ maxWidth: 320 }).setLatLng(mid).setContent(content).openOn(map);
+      openCardPopup(tr.coords[Math.floor(tr.coords.length / 2)], content);
       return true;
     }
     return false;
@@ -152,6 +205,22 @@
     return li;
   }
 
+  // teléfono: el panel es un sobrepuesto que abre el botón ☰; al elegir algo
+  // se cierra solo para dejar ver el popup
+  var narrow = window.matchMedia('(max-width: 820px)');
+  var toggle = document.createElement('button');
+  toggle.className = 'panel-toggle';
+  toggle.type = 'button';
+  toggle.textContent = '☰';
+  toggle.title = 'Días';
+  document.body.appendChild(toggle);
+  toggle.addEventListener('click', function () {
+    document.body.classList.toggle('panel-open');
+  });
+  function closePanelIfNarrow() {
+    if (narrow.matches) document.body.classList.remove('panel-open');
+  }
+
   // links a modal: si la clave tiene geometría, la tarjeta va al popup del
   // mapa (captura, para ganarle al dialog de itinerario.js); si no, dialog
   document.addEventListener('click', function (e) {
@@ -160,10 +229,12 @@
     var href = link.getAttribute('href') || '';
     if (href.indexOf('#m-') !== 0) return;
     var key = href.slice(3);
-    if (showOnMap(key, link.textContent)) {
+    var linkRow = rowOf(link);
+    if (showOnMap(key, link.textContent, linkRow && linkRow.id)) {
       e.preventDefault();
       e.stopPropagation();
-      selectRow(rowOf(link));
+      selectRow(linkRow);
+      closePanelIfNarrow();
     }
   }, true);
 
@@ -177,7 +248,7 @@
     var key = li.dataset.location || li.dataset.transit;
     if (key) {
       var title = li.querySelector('.title');
-      showOnMap(key, title ? title.textContent : key);
+      if (showOnMap(key, title ? title.textContent : key, li.id)) closePanelIfNarrow();
     }
   });
 })();

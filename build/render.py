@@ -330,7 +330,7 @@ def render_line_modal(key, ident, ride=None, guia=None, horario=None):
     texto = guia or ident.get("extra", "")
     if texto:
         tail += f"<br><br>{md(texto)}"
-    h.append(tail)
+    h.append(f'<p class="reconoce">{tail}</p>')   # en un elemento: el corte del popup lo puede ocultar
     inner = "\n  ".join(h)
     return f'<div class="modal" id="m-{key}" style="--lc:{color}">\n  {inner}\n</div>'
 
