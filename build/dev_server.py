@@ -39,8 +39,66 @@ from common import ROOT, dump_yaml
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 SERVE_DIR = os.path.dirname(ROOT)
-PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8791
+PORT = int(sys.argv[1]) if len(sys.argv) > 1 and sys.argv[1].isdigit() else 8791
 CATALOGS = ("places", "transits", "lines")
+
+# ---------- compartir las dev-tools: OAuth device flow de GitHub ----------
+# `--share` escucha en 0.0.0.0 (túnel/LAN). Desde localhost no se pide login;
+# desde fuera, TODO /api/ exige sesión de un usuario del allowlist (device
+# flow: el server habla con GitHub, el navegador solo enseña el código).
+SHARE = "--share" in sys.argv
+BIND = "0.0.0.0" if SHARE else "127.0.0.1"
+ALLOW_USERS = set((os.environ.get("TF_DEV_ALLOW") or "ratgr").split(","))
+# client_id público del GitHub CLI (device flow habilitado); cámbialo con
+# TF_DEV_OAUTH_CLIENT si prefieres tu propia OAuth App
+OAUTH_CLIENT = os.environ.get("TF_DEV_OAUTH_CLIENT", "178c6fc778ccc68e1d6a")
+_SESSIONS = {}      # sid → login de GitHub
+_LOGINS = {}        # handle → device_code en curso
+# cada cambio guardado se COMMITEA solo; deploy = copiar pages/ al repo de
+# Pages y push (rebuild con {"deploy": true} o el botón Deploy del cajón)
+AUTO_COMMIT = True
+PAGES_REPO = os.path.join(os.path.dirname(ROOT), "viajes-icons")
+PAGES_SUBDIR = "viajes2"
+
+
+def _github(url, data=None, token=None):
+    import urllib.request
+    hdrs = {"Accept": "application/json", "User-Agent": "viajes-2 dev"}
+    if token:
+        hdrs["Authorization"] = "Bearer " + token
+    body = urllib.parse.urlencode(data).encode() if data else None
+    req = urllib.request.Request(url, body, hdrs)
+    with urllib.request.urlopen(req, timeout=20) as r:
+        return json.loads(r.read().decode("utf-8"))
+
+
+def git_commit(repo, paths, message):
+    """commit silencioso (no falla el request si no hay nada que commitear)."""
+    if not AUTO_COMMIT:
+        return
+    try:
+        subprocess.run(["git", "-C", repo, "add"] + paths, check=True,
+                       capture_output=True, timeout=30)
+        subprocess.run(["git", "-C", repo, "commit", "-q", "-m", message],
+                       capture_output=True, timeout=30)
+    except Exception as e:
+        print("aviso git:", e)
+
+
+def deploy_pages(trip):
+    """pages/<trip>/ → viajes-icons/viajes2/ + commit + push (Pages publica)."""
+    src = os.path.join(ROOT, "pages", trip)
+    dst = os.path.join(PAGES_REPO, PAGES_SUBDIR)
+    if not os.path.isdir(src) or not os.path.isdir(PAGES_REPO):
+        raise ValueError("no encuentro pages/ o el repo de Pages")
+    import shutil
+    shutil.copytree(src, dst, dirs_exist_ok=True)
+    git_commit(PAGES_REPO, [PAGES_SUBDIR], f"viajes2: deploy desde dev ({trip})")
+    r = subprocess.run(["git", "-C", PAGES_REPO, "push", "-q"],
+                       capture_output=True, text=True, timeout=120)
+    if r.returncode != 0:
+        raise ValueError("push falló: " + (r.stderr or "").strip()[-200:])
+    return "desplegado"
 
 
 def yaml_path(trip):
@@ -343,11 +401,32 @@ class Handler(SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    # --- sesión: localhost pasa directo; remoto exige login del allowlist ---
+    def _is_local(self):
+        return self.client_address[0] in ("127.0.0.1", "::1")
+
+    def _session_user(self):
+        c = self.headers.get("Cookie") or ""
+        for part in c.split(";"):
+            k, _, v = part.strip().partition("=")
+            if k == "devsid" and v in _SESSIONS:
+                return _SESSIONS[v]
+        return None
+
+    def _authed(self):
+        return self._is_local() or self._session_user() is not None
+
     def do_GET(self):
         if not self.path.startswith("/api/"):
             return super().do_GET()
         u = urllib.parse.urlparse(self.path)
         q = dict(urllib.parse.parse_qsl(u.query))
+        if u.path == "/api/ping":
+            # sonda del cliente: ¿hay dev server, y hace falta login?
+            return self._json(200, {"ok": True, "auth": "ok" if self._authed() else "required",
+                                    "user": self._session_user()})
+        if not self._authed():
+            return self._json(401, {"error": "inicia sesión (GitHub)"})
         try:
             if u.path == "/api/step":
                 # TEXTO CRUDO del archivo (comentarios/formato del usuario
@@ -367,26 +446,76 @@ class Handler(SimpleHTTPRequestHandler):
         u = urllib.parse.urlparse(self.path)
         try:
             n = int(self.headers.get("Content-Length", 0))
-            req = json.loads(self.rfile.read(n).decode("utf-8"))
+            req = json.loads(self.rfile.read(n).decode("utf-8")) if n else {}
+            # login por device flow: lo ÚNICO abierto sin sesión
+            if u.path == "/api/login/start":
+                d = _github("https://github.com/login/device/code",
+                            {"client_id": OAUTH_CLIENT, "scope": ""})
+                handle = os.urandom(12).hex()
+                _LOGINS[handle] = d["device_code"]
+                return self._json(200, {"ok": True, "handle": handle,
+                                        "user_code": d["user_code"],
+                                        "verification_uri": d["verification_uri"],
+                                        "interval": d.get("interval", 5)})
+            if u.path == "/api/login/poll":
+                dc = _LOGINS.get(req.get("handle"))
+                if not dc:
+                    return self._json(400, {"error": "login no iniciado"})
+                t = _github("https://github.com/login/oauth/access_token",
+                            {"client_id": OAUTH_CLIENT, "device_code": dc,
+                             "grant_type": "urn:ietf:params:oauth:grant-type:device_code"})
+                if t.get("error") == "authorization_pending":
+                    return self._json(200, {"ok": True, "pending": True})
+                if "access_token" not in t:
+                    return self._json(400, {"error": t.get("error", "login falló")})
+                user = _github("https://api.github.com/user", token=t["access_token"])
+                login = user.get("login", "")
+                del _LOGINS[req["handle"]]
+                if login not in ALLOW_USERS:
+                    return self._json(403, {"error": f"'{login}' no está en el allowlist"})
+                sid = os.urandom(16).hex()
+                _SESSIONS[sid] = login
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Set-Cookie",
+                                 f"devsid={sid}; HttpOnly; SameSite=Lax; Path=/; Max-Age=2592000")
+                body = json.dumps({"ok": True, "user": login}).encode()
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+                return
+            if not self._authed():
+                return self._json(401, {"error": "inicia sesión (GitHub)"})
+            who = self._session_user() or "local"
+            yml = os.path.relpath(yaml_path(req["trip"]), ROOT) if req.get("trip") else ""
             if u.path == "/api/step":
                 save_step_raw(req["trip"], req["day"], req["step"], req["yaml"],
                               req.get("sub", ""))
+                git_commit(ROOT, [yml], f"dev: paso d{req['day']}-r{req['step']}{req.get('sub','')} ({who})")
                 self._json(200, {"ok": True})
             elif u.path == "/api/entity":
                 if req.get("kind") not in CATALOGS:
                     return self._json(400, {"error": f"kind debe ser uno de {CATALOGS}"})
                 save_entity_raw(req["trip"], req["kind"], req["key"], req["yaml"])
+                git_commit(ROOT, [yml], f"dev: {req['kind']}.{req['key']} ({who})")
                 self._json(200, {"ok": True})
             elif u.path == "/api/step-insert":
                 pos = insert_step_raw(req["trip"], req["day"], req["step"],
                                       req.get("where"), req.get("sub", ""))
+                git_commit(ROOT, [yml], f"dev: inserta paso en d{req['day']} ({who})")
                 self._json(200, {"ok": True, "step": pos})
             elif u.path == "/api/step-move":
                 pos = move_step_raw(req["trip"], req["day"], req["step"],
                                     req.get("dir", 0), req.get("sub", ""))
+                git_commit(ROOT, [yml], f"dev: mueve paso en d{req['day']} ({who})")
                 self._json(200, {"ok": True, "step": pos})
             elif u.path == "/api/rebuild":
-                self._json(200, {"ok": True, "build": rebuild(req["trip"])})
+                out = rebuild(req["trip"])
+                extra = ""
+                if req.get("deploy"):
+                    git_commit(ROOT, ["pages"], f"dev: rebuild ({who})")
+                    extra = " · " + deploy_pages(req["trip"])
+                self._json(200, {"ok": True, "build": out + extra})
             else:
                 self._json(404, {"error": "endpoint desconocido"})
         except Exception as e:
@@ -395,5 +524,6 @@ class Handler(SimpleHTTPRequestHandler):
 
 if __name__ == "__main__":
     os.chdir(SERVE_DIR)
-    print(f"dev server → http://127.0.0.1:{PORT}/viajes-2/pages/  (API /api/step)")
-    ThreadingHTTPServer(("127.0.0.1", PORT), Handler).serve_forever()
+    modo = "COMPARTIDO (0.0.0.0 — túnel/LAN, login GitHub p/ remotos)" if SHARE else "local"
+    print(f"dev server [{modo}] → http://127.0.0.1:{PORT}/viajes-2/pages/  · allowlist: {sorted(ALLOW_USERS)}")
+    ThreadingHTTPServer((BIND, PORT), Handler).serve_forever()
