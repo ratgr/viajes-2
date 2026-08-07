@@ -99,6 +99,209 @@ def step_at(Y, day, step):
     return steps, s - 1
 
 
+# ---------- edición de YAML por TEXTO CRUDO ----------
+# El editor manda/recibe el texto TAL CUAL está en el archivo (desindentado
+# al nivel superior): los comentarios y el formato del usuario sobreviven.
+# yaml.compose() da los marks de línea para ubicar el span de cada paso.
+
+def _seq_item_span(seq, idx, n_lines):
+    """(línea_inicio, línea_fin_exclusiva, columna_del_guion) del item idx."""
+    item = seq.value[idx]
+    start = item.start_mark.line
+    if idx + 1 < len(seq.value):
+        end = seq.value[idx + 1].start_mark.line
+    else:
+        # último item: el end_mark del ITEM (el de la secuencia se pasa de
+        # largo hacia la estructura de AFUERA en listas anidadas)
+        em = item.end_mark
+        end = em.line + (1 if em.column > 0 else 0)
+    return start, min(end, n_lines), item.start_mark.column - 2
+
+
+def _map_get(node, key):
+    for k, v in node.value:
+        if k.value == key:
+            return v
+    raise ValueError(f"clave '{key}' no encontrada")
+
+
+def _resolve_step_seq(root, day, step, sub=""):
+    """navega hasta la SECUENCIA que contiene el paso y su índice; sub es un
+    sufijo de id tipo '-g1-s2' (plan) o '-g1-o2-s3' (opción de tier)."""
+    days = _map_get(root, "days")
+    d = int(day)
+    if not 1 <= d <= len(days.value):
+        raise ValueError(f"día fuera de rango: {day}")
+    seq = _map_get(days.value[d - 1], "steps")
+    s = int(step)
+    if not 1 <= s <= len(seq.value):
+        raise ValueError(f"paso fuera de rango: {step}")
+    idx = s - 1
+    for part in [p for p in (sub or "").split("-") if p]:
+        kind, n = part[0], int(part[1:]) - 1
+        node = seq.value[idx]
+        if kind == "g":
+            seq = _map_get(node, "options")
+        elif kind == "o":
+            seq = _map_get(node, "options")
+        elif kind == "s":
+            seq = _map_get(node, "steps")
+        else:
+            raise ValueError(f"sub-ruta inválida: {sub}")
+        if not 0 <= n < len(seq.value):
+            raise ValueError(f"sub-índice fuera de rango: {part}")
+        idx = n
+    return seq, idx
+
+
+def _dedent_line(ln, col):
+    """quita col espacios preservando las líneas EN BLANCO (antes se comían
+    su salto de línea y desaparecían del texto)."""
+    if not ln.strip():
+        return "\n" if ln.endswith("\n") else ln
+    return ln[col:] if ln[:col].strip() == "" else ln.lstrip()
+
+
+def raw_step(trip, day, step, sub=""):
+    """texto CRUDO del paso, desindentado (sin el '- ' del item)."""
+    with _YAML_LOCK:
+        text = open(yaml_path(trip), encoding="utf-8").read()
+    lines = text.splitlines(keepends=True)
+    seq, idx = _resolve_step_seq(yaml.compose(text), day, step, sub)
+    start, end, col = _seq_item_span(seq, idx, len(lines))
+    out = []
+    for i, ln in enumerate(lines[start:end]):
+        if i == 0:
+            out.append(ln[col + 2:] if ln[:col + 2].strip() in ("-",) else ln.lstrip())
+        else:
+            out.append(_dedent_line(ln, col + 2))
+    return "".join(out)
+
+
+def _reindent(raw, col):
+    """texto del editor → bloque de item de lista con guion en la columna col
+    (las líneas en blanco — incluidas las del final — se preservan)."""
+    pad = " " * (col + 2)
+    out = []
+    for i, ln in enumerate(raw.splitlines(keepends=True)):
+        body = ln.rstrip("\n")
+        if i == 0:
+            out.append(" " * col + "- " + body + "\n")
+        elif body.strip():
+            out.append(pad + body + "\n")
+        else:
+            out.append("\n")
+    return "".join(out)
+
+
+def _splice(trip, start, end, block):
+    """reemplaza lines[start:end] por block (texto) — atómico, bajo el lock."""
+    path = yaml_path(trip)
+    with _YAML_LOCK:
+        lines = open(path, encoding="utf-8").read().splitlines(keepends=True)
+        new = "".join(lines[:start]) + block + "".join(lines[end:])
+        yaml.safe_load(new)          # el archivo COMPLETO debe seguir siendo válido
+        tmp = path + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
+            f.write(new)
+        os.replace(tmp, path)
+
+
+def save_step_raw(trip, day, step, raw, sub=""):
+    obj = yaml.safe_load(raw)
+    if not isinstance(obj, dict):
+        raise ValueError("el YAML debe ser un mapeo (un paso)")
+    with _YAML_LOCK:
+        text = open(yaml_path(trip), encoding="utf-8").read()
+        lines = text.splitlines(keepends=True)
+        seq, idx = _resolve_step_seq(yaml.compose(text), day, step, sub)
+        start, end, col = _seq_item_span(seq, idx, len(lines))
+        _splice(trip, start, end, _reindent(raw, col))
+
+
+def insert_step_raw(trip, day, step, where, sub=""):
+    with _YAML_LOCK:
+        text = open(yaml_path(trip), encoding="utf-8").read()
+        lines = text.splitlines(keepends=True)
+        seq, idx = _resolve_step_seq(yaml.compose(text), day, step, sub)
+        start, end, col = _seq_item_span(seq, idx, len(lines))
+        at = start if where == "before" else end
+        _splice(trip, at, at, " " * col + "- title: (nuevo paso)\n")
+        return idx + 1 if where == "before" else idx + 2
+
+
+def move_step_raw(trip, day, step, direction, sub=""):
+    with _YAML_LOCK:
+        text = open(yaml_path(trip), encoding="utf-8").read()
+        lines = text.splitlines(keepends=True)
+        seq, idx = _resolve_step_seq(yaml.compose(text), day, step, sub)
+        j = idx + int(direction)
+        if not (0 <= j < len(seq.value) and j != idx):
+            raise ValueError("movimiento fuera de rango")
+        a0, a1, _ = _seq_item_span(seq, idx, len(lines))
+        b0, b1, _ = _seq_item_span(seq, j, len(lines))
+        blk_a = "".join(lines[a0:a1])
+        blk_b = "".join(lines[b0:b1])
+        if idx < j:
+            new = "".join(lines[:a0]) + blk_b + blk_a + "".join(lines[b1:])
+        else:
+            new = "".join(lines[:b0]) + blk_a + blk_b + "".join(lines[a1:])
+        yaml.safe_load(new)
+        path = yaml_path(trip)
+        tmp = path + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
+            f.write(new)
+        os.replace(tmp, path)
+        return j + 1
+
+
+def _entity_span(root, kinds, key, n_lines):
+    """span de líneas del PAR completo 'clave: valor' en su catálogo (incluye
+    la línea de la clave: el editor lo ve con encabezado, dedentado 2)."""
+    for kind in kinds:
+        try:
+            cat = _map_get(root, kind)
+        except ValueError:
+            continue
+        for i, (k, v) in enumerate(cat.value):
+            if k.value != key:
+                continue
+            start = k.start_mark.line
+            if i + 1 < len(cat.value):
+                end = cat.value[i + 1][0].start_mark.line
+            else:
+                em = cat.end_mark
+                end = em.line + (1 if em.column > 0 else 0)
+            return kind, start, min(end, n_lines), k.start_mark.column
+    raise ValueError(f"'{key}' no está en {'/'.join(kinds)}")
+
+
+def raw_entity(trip, key, kind=None):
+    kinds = [kind] if kind in CATALOGS else CATALOGS
+    with _YAML_LOCK:
+        text = open(yaml_path(trip), encoding="utf-8").read()
+    lines = text.splitlines(keepends=True)
+    k, start, end, col = _entity_span(yaml.compose(text), kinds, key, len(lines))
+    out = [_dedent_line(ln, col) for ln in lines[start:end]]
+    return k, "".join(out)
+
+
+def save_entity_raw(trip, kind, key, raw):
+    obj = yaml.safe_load(raw)
+    if not isinstance(obj, dict) or list(obj.keys()) != [key]:
+        raise ValueError(f"el YAML debe ser el bloque completo '{key}: …'")
+    with _YAML_LOCK:
+        text = open(yaml_path(trip), encoding="utf-8").read()
+        lines = text.splitlines(keepends=True)
+        _k, start, end, col = _entity_span(yaml.compose(text), [kind], key, len(lines))
+        pad = " " * col
+        block = "".join((pad + ln if ln.strip() else ("\n" if ln.endswith("\n") else ln))
+                        for ln in raw.splitlines(True))
+        if not block.endswith("\n"):
+            block += "\n"
+        _splice(trip, start, end, block)
+
+
 def rebuild(trip):
     # bajo el candado: un Guardar aterrizando entre los dos scripts producía
     # itinerario y mapa construidos de VERSIONES DISTINTAS del YAML
@@ -136,20 +339,14 @@ class Handler(SimpleHTTPRequestHandler):
         q = dict(urllib.parse.parse_qsl(u.query))
         try:
             if u.path == "/api/step":
-                steps, i = step_at(load(q["trip"]), q["day"], q["step"])
-                self._json(200, {"ok": True, "yaml": dump_yaml(steps[i], flow=False)})
+                # TEXTO CRUDO del archivo (comentarios/formato del usuario
+                # intactos), no un re-dump serializado
+                self._json(200, {"ok": True,
+                                 "yaml": raw_step(q["trip"], q["day"], q["step"],
+                                                  q.get("sub", ""))})
             elif u.path == "/api/entity":
-                Y = load(q["trip"])
-                key = q["key"]
-                kinds = [q["kind"]] if q.get("kind") in CATALOGS else CATALOGS
-                for kind in kinds:
-                    if key in (Y.get(kind) or {}):
-                        # width enorme (en DUMP): coords debe quedar en UNA línea (el
-                        # editor de geometría del mapa la reescribe línea por línea)
-                        self._json(200, {"ok": True, "kind": kind,
-                                         "yaml": dump_yaml(Y[kind][key], flow=False)})
-                        return
-                self._json(404, {"error": f"'{key}' no está en {'/'.join(kinds)}"})
+                kind, raw = raw_entity(q["trip"], q["key"], q.get("kind"))
+                self._json(200, {"ok": True, "kind": kind, "yaml": raw})
             else:
                 self._json(404, {"error": "endpoint desconocido"})
         except Exception as e:
@@ -161,39 +358,22 @@ class Handler(SimpleHTTPRequestHandler):
             n = int(self.headers.get("Content-Length", 0))
             req = json.loads(self.rfile.read(n).decode("utf-8"))
             if u.path == "/api/step":
-                step = yaml.safe_load(req["yaml"])
-                if not isinstance(step, dict):
-                    return self._json(400, {"error": "el YAML debe ser un mapeo (un paso)"})
-                with edit(req["trip"]) as Y:
-                    steps, i = step_at(Y, req["day"], req["step"])
-                    steps[i] = step
+                save_step_raw(req["trip"], req["day"], req["step"], req["yaml"],
+                              req.get("sub", ""))
                 self._json(200, {"ok": True})
             elif u.path == "/api/entity":
-                obj = yaml.safe_load(req["yaml"])
-                if not isinstance(obj, dict):
-                    return self._json(400, {"error": "el YAML debe ser un mapeo (una entidad)"})
                 if req.get("kind") not in CATALOGS:
                     return self._json(400, {"error": f"kind debe ser uno de {CATALOGS}"})
-                with edit(req["trip"]) as Y:
-                    Y.setdefault(req["kind"], {})[req["key"]] = obj
+                save_entity_raw(req["trip"], req["kind"], req["key"], req["yaml"])
                 self._json(200, {"ok": True})
             elif u.path == "/api/step-insert":
-                # inserta {title: (nuevo paso)} antes/después de la fila dada;
-                # responde el número (1-based) del paso nuevo
-                with edit(req["trip"]) as Y:
-                    steps, i = step_at(Y, req["day"], req["step"])
-                    pos = i if req.get("where") == "before" else i + 1
-                    steps.insert(pos, {"title": "(nuevo paso)"})
-                self._json(200, {"ok": True, "step": pos + 1})
+                pos = insert_step_raw(req["trip"], req["day"], req["step"],
+                                      req.get("where"), req.get("sub", ""))
+                self._json(200, {"ok": True, "step": pos})
             elif u.path == "/api/step-move":
-                # mueve la fila una posición (dir=-1 sube, dir=1 baja)
-                with edit(req["trip"]) as Y:
-                    steps, i = step_at(Y, req["day"], req["step"])
-                    j = i + int(req.get("dir", 0))
-                    if not (0 <= j < len(steps) and i != j):
-                        raise ValueError("movimiento fuera de rango")
-                    steps.insert(j, steps.pop(i))
-                self._json(200, {"ok": True, "step": j + 1})
+                pos = move_step_raw(req["trip"], req["day"], req["step"],
+                                    req.get("dir", 0), req.get("sub", ""))
+                self._json(200, {"ok": True, "step": pos})
             elif u.path == "/api/rebuild":
                 self._json(200, {"ok": True, "build": rebuild(req["trip"])})
             else:

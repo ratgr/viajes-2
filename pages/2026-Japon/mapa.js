@@ -1381,11 +1381,15 @@
     });
   }
   function openDevEditor(li) {
-    var m = /^d(\d+)-r(\d+)$/.exec(li.id || '');
-    if (!m) return;   // sub-pasos de planes: sin id de fila (edítalos en el YAML)
+    // id extendido: dN-rMM[-gG[-oO]-sS] — los sub-pasos de options también
+    // se editan; el sufijo viaja como `sub` y el server navega el YAML
+    var m = /^d(\d+)-r(\d+)((?:-[gos]\d+)*)$/.exec(li.id || '');
+    if (!m) return;
+    var sub = m[3] || '';
     closeDrawer();
     // «todo» de la fila: identidad, claves, horario visible y conflicto
-    var facts = ['fila ' + li.id + '  (days[' + (m[1] - 1) + '].steps[' + (m[2] - 1) + '])'];
+    var facts = ['fila ' + li.id + '  (days[' + (m[1] - 1) + '].steps[' + (m[2] - 1) + ']' +
+                 (sub ? ' ' + sub : '') + ')'];
     ['location', 'transit', 'mode'].forEach(function (k) {
       if (li.dataset[k]) facts.push(k + ': ' + li.dataset[k]);
     });
@@ -1498,7 +1502,8 @@
         })
         .catch(function (e) { msg.textContent = 'error: ' + e; });
     });
-    api('/api/step?trip=' + encodeURIComponent(TRIP) + '&day=' + m[1] + '&step=' + m[2])
+    api('/api/step?trip=' + encodeURIComponent(TRIP) + '&day=' + m[1] + '&step=' + m[2] +
+        '&sub=' + encodeURIComponent(sub))
       .then(function (d) { ta.value = d.ok ? d.yaml : 'error: ' + d.error; })
       .catch(function (e) { ta.value = 'error: ' + e; });
     drawer.querySelector('.dev-close').addEventListener('click', closeDrawer);
@@ -1506,7 +1511,7 @@
     // reconstruye una vez y recarga — el hash #@fila nos regresa aquí mismo
     drawer.querySelector('.dev-save').addEventListener('click', function () {
       msg.textContent = 'guardando…';
-      api('/api/step', { day: +m[1], step: +m[2], yaml: ta.value })
+      api('/api/step', { day: +m[1], step: +m[2], sub: sub, yaml: ta.value })
         .then(function (d) {
           msg.textContent = d.ok ? 'guardado ✓ (pendiente rebuild)' : 'error: ' + d.error;
         })
@@ -1523,30 +1528,40 @@
     // se pregunta si recalcular (rebuild + recarga posicionada en el paso)
     function stepOp(path, body) {
       msg.textContent = '…';
-      api(path, Object.assign({ day: +m[1], step: +m[2] }, body))
+      api(path, Object.assign({ day: +m[1], step: +m[2], sub: sub }, body))
         .then(function (d) {
           if (!d.ok) { msg.textContent = 'error: ' + d.error; return; }
           // el paso EDITADO cambió de número: re-apuntar el cajón YA — si no,
-          // el siguiente Guardar/mover escribiría sobre la fila equivocada
-          var mine = +m[2];
+          // el siguiente Guardar/mover escribiría sobre la fila equivocada.
+          // El índice que cambia es el ÚLTIMO segmento (sN del sub, o el rMM)
+          var mine = sub ? +(/(\d+)$/.exec(sub) || [0, 0])[1] : +m[2];
           if (path === '/api/step-insert') {
             if (body.where === 'before') mine += 1;      // me recorrí un lugar
           } else {
             mine = d.step;                               // move: soy el movido
           }
-          m[2] = String(mine);
+          var newId;
+          if (sub) {
+            sub = sub.replace(/\d+$/, String(mine));
+            newId = 'd' + m[1] + '-r' + String(+m[2]).padStart(2, '0') + sub;
+          } else {
+            m[2] = String(mine);
+            newId = 'd' + m[1] + '-r' + String(mine).padStart(2, '0');
+          }
           drawer.querySelector('.dev-info').textContent =
-            'fila d' + m[1] + '-r' + String(mine).padStart(2, '0') +
-            '  (days[' + (m[1] - 1) + '].steps[' + (mine - 1) + '])  — tras ' + path.slice(5);
-          var target = 'd' + m[1] + '-r' + String(d.step).padStart(2, '0');
+            'fila ' + newId + '  — tras ' + path.slice(5);
+          var targetN = sub ? sub.replace(/\d+$/, String(d.step)) : null;
+          var target = sub
+            ? 'd' + m[1] + '-r' + String(+m[2]).padStart(2, '0') + targetN
+            : 'd' + m[1] + '-r' + String(d.step).padStart(2, '0');
           if (window.confirm('Guardado. ¿Recalcular (rebuild) ahora?')) {
             doRebuild(function () {
               location.hash = '#@' + target;
               location.reload();
             });
           } else {
-            msg.textContent = 'guardado ✓ (pendiente rebuild; este cajón ya apunta a r' +
-              String(mine).padStart(2, '0') + ')';
+            msg.textContent = 'guardado ✓ (pendiente rebuild; este cajón ya apunta a ' +
+              newId + ')';
           }
         })
         .catch(function (e) { msg.textContent = 'error: ' + e; });

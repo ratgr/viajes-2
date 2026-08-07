@@ -503,16 +503,18 @@ def time_cell(n, sc=None):
     return f'<time class="{cls}"{dt}>{inner}</time>'
 
 
-def render_option(opt, refs):
+def render_option(opt, refs, base=None):
     """opción de tier — plana {location, price} o ENRIQUECIDA {title, price,
     steps}: la ida/lugar/regreso viven como sub-pasos propios (el itinerario
-    no los muestra; el mapa sí, seleccionables)."""
+    no los muestra; el mapa sí, seleccionables). base = id extendido
+    dN-rMM-gG-oO para que sus sub-pasos sean editables en modo dev."""
     if "steps" in opt or "title" in opt:
         out = md(str(opt.get("title", "")), refs)
         if opt.get("price"):
             out += f' <span class="price">{html.escape(str(opt["price"]))}</span>'
         if opt.get("steps"):
-            subs = "\n".join(render_li(s, refs) for s in opt["steps"])
+            subs = "\n".join(render_li(s, refs, f"{base}-s{si + 1}" if base else None)
+                             for si, s in enumerate(opt["steps"]))
             out += f'<ul class="steps">\n{subs}\n</ul>'
         return out
     return resto_link(opt, refs)
@@ -529,12 +531,14 @@ def resto_link(opt, refs):
     return lk + (f' <span class="price">{html.escape(str(precio))}</span>' if precio else "")
 
 
-def render_options(node, refs, ctx=""):
+def render_options(node, refs, ctx="", row_id=None):
     """options unificadas: MISMO markup para tiers de comida y planes en
     paralelo (en el YAML son la misma clave). El CSS decide el render por
-    item: con sub-steps (:has) = tarjeta plan, sin ellos = cajita tier."""
+    item: con sub-steps (:has) = tarjeta plan, sin ellos = cajita tier.
+    row_id = id de la fila padre: los sub-pasos reciben ids extendidos
+    dN-rMM-gG-sS (plan) / dN-rMM-gG-oO-sS (tier) para el editor dev."""
     items = []
-    for o in node.get("options", []):
+    for gi, o in enumerate(node.get("options", []), 1):
         if not isinstance(o, dict):
             continue
         if "steps" in o:
@@ -542,15 +546,21 @@ def render_options(node, refs, ctx=""):
             title = md(plan_title, refs)
             sched = derive_schedule(o["steps"], f'{ctx} plan «{plan_title[:24]}»')
             check_teleports(o["steps"], sched, f'{ctx} plan «{plan_title[:24]}»')
-            subs = "\n".join(render_li(s, refs, sc=sched[i], ctx=ctx) for i, s in enumerate(o["steps"]))
-            items.append(f'<li><b>{title}</b><ul class="steps">\n{subs}\n</ul></li>')
+            subs = "\n".join(
+                render_li(s, refs, f"{row_id}-g{gi}-s{i + 1}" if row_id else None,
+                          sc=sched[i], ctx=ctx)
+                for i, s in enumerate(o["steps"]))
+            items.append(f'<li data-kind="plan"><b>{title}</b><ul class="steps">\n{subs}\n</ul></li>')
         else:
             label = html.escape(str(o.get("title", "")))
             extra = f' class="{html.escape(str(o["class"]))}"' if o.get("class") else ""
             # cada opción envuelta (span.option) y separador en span.sep: el
             # itinerario fluye inline; el mapa las apila una por línea
             inner = '<span class="sep"> · </span>'.join(
-                f'<span class="option">{render_option(x, refs)}</span>' for x in o.get("options", []))
+                f'<span class="option">'
+                f'{render_option(x, refs, f"{row_id}-g{gi}-o{oi + 1}" if row_id else None)}'
+                f'</span>'
+                for oi, x in enumerate(o.get("options", [])))
             items.append(f'<li data-kind="tier" data-tier="{label}"{extra}><b>{label}</b>{inner}</li>')
     return '<ul class="options">' + "".join(items) + "</ul>"
 
@@ -558,7 +568,7 @@ def render_options(node, refs, ctx=""):
 def render_li(n, refs, row_id=None, sc=None, ctx=""):
     body = row_text(n, refs, sc)
     if "options" in n:
-        body += render_options(n, refs, ctx or row_id or "")
+        body += render_options(n, refs, ctx or row_id or "", row_id)
     elif "transit" in n:
         # los trayectos van en gris para que resalten los lugares
         body = f'<span class="transit">{body}</span>'
