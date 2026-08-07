@@ -2,6 +2,7 @@
    disposición barra-lateral + mapa, filas compactas con casilla, días colapsables. */
 
 /* ---------- disposición: barra lateral + divisor arrastrable + mapa ---------- */
+[hidden] { display: none !important; }  /* que ningún display: de clase le gane al atributo */
 html, body { height: 100%; }
 body { padding: 0; overflow: hidden; position: relative; }
 /* teléfono: el mapa va de lado a lado y el panel FLOTA encima (☰);
@@ -236,7 +237,6 @@ body > .app-tabs a { pointer-events: auto; background: var(--card); box-shadow: 
 /* ⚙️ configuración (cfg.js) */
 .cfg-toggle { position: absolute; right: 10px; top: 228px; z-index: 1100; width: 40px; height: 40px; border: none; border-radius: 10px; background: var(--card); color: var(--ink); box-shadow: 0 2px 8px rgba(0,0,0,.28); font-size: 17px; cursor: pointer; }
 .cfg-menu { position: absolute; right: 58px; top: 228px; z-index: 1200; background: var(--card); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,.3); padding: 6px; display: flex; flex-direction: column; gap: 4px; }
-.cfg-menu[hidden] { display: none; }  /* display:flex le gana al atributo hidden */
 .cfg-menu button { border: none; background: none; color: var(--ink); font-size: 13px; padding: 6px 10px; text-align: left; cursor: pointer; border-radius: 6px; }
 .cfg-menu button:hover { background: var(--paper-2); }
 
