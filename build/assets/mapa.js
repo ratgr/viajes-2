@@ -628,6 +628,22 @@
       });
       el.appendChild(btn);
     }
+    // des-recorte: autoPan pelea con el vuelo en curso, así que se corrige
+    // DESPUÉS de la animación — si el popup quedó bajo el chip/toolbar o
+    // pegado al borde, panear lo mínimo para destaparlo
+    setTimeout(function () {
+      if (!map || !pop.isOpen || !pop.isOpen()) return;
+      var box = pop.getElement && pop.getElement();
+      if (!box) return;
+      var r = box.getBoundingClientRect();
+      var mr = document.getElementById('map').getBoundingClientRect();
+      var dx = 0, dy = 0;
+      if (r.left < mr.left + 10) dx = r.left - (mr.left + 10);
+      else if (r.right > mr.right - 54) dx = r.right - (mr.right - 54);
+      if (r.top < mr.top + 96) dy = r.top - (mr.top + 96);
+      else if (r.bottom > mr.bottom - 44) dy = r.bottom - (mr.bottom - 44);
+      if (dx || dy) map.panBy([dx, dy], { duration: .25 });
+    }, 620);
     return pop;
   }
   var lastShownKey = null;   // repetir click en lo YA elegido acerca el zoom
@@ -980,17 +996,26 @@
     li.scrollIntoView({ block: 'center' });
     var key = el.dataset.location || el.dataset.transit;
     if (!showOnMap(key, stTitle(el), li.id, true)) {
-      // sin geometría (conector automático): encuadrar sus puntos vecinos
-      // COMPLETOS (con el mismo tope de acercamiento) y abrir su tarjeta
       var na = anchorsFor(el, stEls, i, false);
-      var pts = [];
-      if (na.prev) pts.push(na.prev);
-      if (na.next) pts.push(na.next);
-      if (pts.length && map) {
-        var b = L.latLngBounds(pts);
-        map.flyToBounds(b.pad(.25), { duration: .5, maxZoom: ST_MAX_ZOOM });
-        openCardPopup(b.getCenter(), modalHtml(key) ||
-          '<div class="modal"><h3>' + stTitle(el) + '</h3></div>');
+      var html = modalHtml(key) ||
+        '<div class="modal"><h3>' + stTitle(el) + '</h3></div>';
+      var at = na.prev || na.next;
+      if (!key && at && map) {
+        // paso NOTA (ni lugar ni transporte): estás EN el ancla previa —
+        // encuadrar los dos vecinos podía dejar un vacío de 50 km
+        map.flyTo(at, Math.min(Math.max(map.getZoom(), 15), ST_MAX_ZOOM), { duration: .5 });
+        openCardPopup(at, html);
+      } else {
+        // conector automático: encuadrar sus puntos vecinos COMPLETOS
+        // (con el mismo tope de acercamiento) y abrir su tarjeta
+        var pts = [];
+        if (na.prev) pts.push(na.prev);
+        if (na.next) pts.push(na.next);
+        if (pts.length && map) {
+          var b = L.latLngBounds(pts);
+          map.flyToBounds(b.pad(.25), { duration: .5, maxZoom: ST_MAX_ZOOM });
+          openCardPopup(b.getCenter(), html);
+        }
       }
     }
     stRender();
@@ -1092,7 +1117,9 @@
     if (nx < 0) return;
     var curSet = stEls[stCur] ? stEls[stCur].closest('.options') : null;
     var nxSet = stEls[nx].closest('.options');
-    if (nxSet && nxSet !== curSet) { stMode = nxSet; stRender(); return; }
+    // al abrir el selector de opciones, cerrar el popup: quedaba DEBAJO
+    // de los botones de opción y se veía amontonado
+    if (nxSet && nxSet !== curSet) { if (map) map.closePopup(); stMode = nxSet; stRender(); return; }
     stGoTo(nx);
   });
   stBar.querySelector('.st-jump-toggle').addEventListener('click', function () {
@@ -1197,7 +1224,16 @@
     chip.hidden = true;
     document.body.appendChild(chip);
     var reloadable = false;
-    chip.addEventListener('click', function () { if (reloadable) location.reload(); });
+    chip.addEventListener('click', function () {
+      if (!reloadable) return;
+      // pedir el sw nuevo ANTES de recargar: recargar a secas re-servía la
+      // versión vieja desde el caché y el chip parecía no hacer nada
+      chip.textContent = '⏳ actualizando…';
+      var j = ('serviceWorker' in navigator)
+        ? navigator.serviceWorker.getRegistration().then(function (r) { return r && r.update(); })
+        : Promise.resolve();
+      j.catch(function () {}).then(function () { location.reload(); });
+    });
     function check() {
       if (document.hidden) return;
       fetch('https://api.github.com/repos/' + repo + '/actions/runs?per_page=1')
