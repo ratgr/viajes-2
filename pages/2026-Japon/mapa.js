@@ -1285,6 +1285,29 @@
       geomEd = null;
     }
   }
+  // largo del camino y tiempo A PIE — espejo EXACTO de walk_calc/round_walk
+  // del build (4 km/h; techo a múltiplo de 5 hasta 45, luego de 15)
+  function pathMeters(coords) {
+    var m = 0;
+    for (var i = 1; i < coords.length; i++) {
+      var dy = (coords[i][0] - coords[i - 1][0]) * 111000;
+      var dx = (coords[i][1] - coords[i - 1][1]) * 111000 *
+               Math.cos(coords[i - 1][0] * Math.PI / 180);
+      m += Math.sqrt(dx * dx + dy * dy);
+    }
+    return m;
+  }
+  function walkMins(coords) {
+    var mins = pathMeters(coords) / (4000 / 60);
+    var m5 = Math.max(5, Math.ceil(mins / 5) * 5);
+    return m5 <= 45 ? m5 : Math.ceil(mins / 15) * 15;
+  }
+  // '· 750 m ≈ ~15 min a pie' para los mensajes del editor (solo caminatas)
+  function walkNote(coords, isWalk) {
+    if (!isWalk || coords.length < 2) return '';
+    return ' · ' + Math.round(pathMeters(coords)) + ' m ≈ ~' + walkMins(coords) + ' min a pie';
+  }
+
   // reescribe la línea coords: del textarea de entidad y refleja en GEO —
   // lo usan el editor de geometría, el snap y el trazado Geo auto
   function setCoordsIn(ta, key, coords) {
@@ -1395,7 +1418,9 @@
       });
       geomToYaml();                                        // persistir en GEO + textarea
       startGeomEdit(geomEd.key, geomEd.ta, geomEd.msg);    // redibujar con lo ajustado
-      geomEd.msg.textContent = 'snap ✓ (' + moved + '/' + snapped.length + ' puntos)';
+      var trSnap = GEO.transits[geomEd.key];
+      geomEd.msg.textContent = 'snap ✓ (' + moved + '/' + snapped.length + ' puntos' +
+        walkNote(geomEd.coords, trSnap && trSnap.mode === 'walk') + ')';
     });
   }
   function openDevEditor(li) {
@@ -1480,10 +1505,13 @@
     var entCur = null;    // {kind, key} de la entidad cargada
     geomBtn.addEventListener('click', function () {
       if (geomEd) {
+        var doneCoords = geomEd.coords;
+        var doneTr = GEO.transits[geomEd.key];
         stopGeomEdit();
         geomBtn.textContent = 'Geometría';
         snapBtn.hidden = true;
-        msg.textContent = 'edición de geometría terminada';
+        msg.textContent = 'edición de geometría terminada' +
+          walkNote(doneCoords, doneTr && doneTr.mode === 'walk');
         return;
       }
       if (!entCur) { msg.textContent = 'carga primero una referencia'; return; }
@@ -1589,7 +1617,8 @@
           var pts = cs.map(function (c) { return [c[1], c[0]]; });
           setCoordsIn(entTa, entCur.key, pts);
           if (geomEd && geomEd.key === entCur.key) startGeomEdit(entCur.key, entTa, msg);
-          msg.textContent = 'geo auto ✓ (' + pts.length + ' pts) — Guardar referencia para persistir';
+          msg.textContent = 'geo auto ✓ (' + pts.length + ' pts' + walkNote(pts, walk) +
+            ') — Guardar referencia para persistir';
         })
         .catch(function (e) { msg.textContent = 'error: ' + e; });
     });
