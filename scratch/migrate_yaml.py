@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-"""migrate_yaml.py — crea/actualiza src/<viaje>/viaje.yaml a partir del upstream
+"""HISTÓRICO — NO RERUN: este repo ya es el canónico; correr esto PISARÍA viaje.yaml con el upstream viejo.
+
+migrate_yaml.py — crea/actualiza src/<viaje>/viaje.yaml a partir del upstream
 declarado en su config.yaml (`fuente:`), aplicando la limpieza de datos aprobada:
 
   1. títulos sin ** — el título entero va en bold por diseño, los asteriscos

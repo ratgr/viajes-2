@@ -1,3 +1,2 @@
 # Trip config (the only trip-specific bits outside its data)
 'photo_base': ""    # imagenes RELATIVAS (static/fotos y static/fachadas del repo)
-source: ../viajes-icons/viaje.yaml                   # migrate_yaml upstream (relative to repo root)

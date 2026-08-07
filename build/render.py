@@ -769,9 +769,7 @@ def build_page(trip, template_name, out_name, extra=None):
     `extra`: callable (corre tras init) que devuelve tokens adicionales."""
     src_dir, pages_dir, cfg = trip_paths(trip)
     data = yaml.safe_load(open(os.path.join(src_dir, "viaje.yaml"), encoding="utf-8"))
-    # la llave del config es photo_base (esquema en inglés); se leía foto_base
-    # y la base quedaba SIEMPRE vacía — rutas relativas de imagen rotas
-    init(data, cfg.get("photo_base", cfg.get("foto_base", "")))
+    init(data, cfg.get("photo_base", ""))
 
     refs = RefLog()
     days = "\n\n".join(render_day(d, refs, i + 1) for i, d in enumerate(DAYS))

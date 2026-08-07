@@ -1484,7 +1484,7 @@
       '<div class="dev-btns"><button class="dev-save" type="button">Guardar</button>' +
       '<button class="dev-rebuild" type="button">Rebuild</button>' +
       '<button class="dev-deploy" type="button" ' +
-      'title="Rebuild + copiar a viajes-icons/viajes2 + push (Pages publica)">Deploy 🚀</button>' +
+      'title="Rebuild + push (la Action publica el sitio)">Deploy 🚀</button>' +
       '<button class="dev-close" type="button">Cancelar</button><span class="dev-msg"></span></div>' +
       '<div class="dev-btns dev-step-ops">' +
       '<button class="dev-add-before" type="button" title="Insertar un paso nuevo ANTES de esta fila">+ antes</button>' +

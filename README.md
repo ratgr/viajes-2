@@ -15,6 +15,7 @@ invierte el render en cada build y compara contra la fuente; todo lo calculado
 
 ```
 src/2026-Japon/       viaje.yaml (fuente) · plantillas · config.yaml
+                      static/ (app.html + fotos/ + fachadas/ + manifest — va tal cual al sitio)
 build/                pipeline: render.py + build_*.py + verify_roundtrip.py
                       contract.py (vocabulario renderer↔verificador)
                       dev_server.py (edición local opcional)
@@ -51,7 +52,7 @@ YAML **tal cual está en el archivo** (los comentarios sobreviven: la edición e
 por empalme de texto). Desde el cajón:
 
 - **Guardar / Rebuild / Deploy 🚀** — guardar escribe (y auto-commitea);
-  rebuild reconstruye local; deploy además copia a `/viajes2` y hace push.
+  rebuild reconstruye local; deploy hace push y la Action publica.
 - **+ antes / + después / ▲ / ▼** — insertar y mover pasos.
 - **Referencias** — cada clave referenciada se edita ahí mismo; una clave que
   no existe (o el input **➕ ref**) abre modo CREAR con plantillas

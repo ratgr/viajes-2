@@ -1421,7 +1421,7 @@ var rt;window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeou
     if (!r) return;
     document.getElementById('pop-t').textContent = r[0];
     document.getElementById('pop-e').innerHTML =
-      '<img class="lgimg" src="https://raw.githubusercontent.com/ratgr/viajes-icons/main/fachadas/' + a.dataset.k + '.jpg" onerror="this.style.display=&quot;none&quot;">' +
+      '<img class="lgimg" src="fachadas/' + a.dataset.k + '.jpg" onerror="this.style.display=&quot;none&quot;">' +
       '<b>' + r[1] + '</b> · ' + r[2] + '<br><br>Recomendado por: <b>' + (QUIEN[r[3]] || r[3]) + '</b>' +
       '<br><br><a href="https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(r[4]) + '" target="_blank" rel="noopener" style="color:var(--shu);font-weight:700">📷 Fachada, fotos y mapa ↗</a>';
     document.getElementById('pop-v').innerHTML = '';
@@ -1526,7 +1526,7 @@ var rt;window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeou
 <!--SOLO-ARTIFACT-END-->
 <script>(function(){
 var pop=document.getElementById('pop'),pt=document.getElementById('pop-t'),pe=document.getElementById('pop-e'),pv=document.getElementById('pop-v');if(!pop)return;
-var FB='https://raw.githubusercontent.com/ratgr/viajes-icons/main/fotos/';
+var FB='fotos/';
 var FOTOS_ON=localStorage.getItem('fotosNet')!=='0',precLoop=0;
 function marcaAhorro(){if('caches' in window){caches.open('viajes-cfg').then(function(c){c.put('cfg-ahorro',new Response(FOTOS_ON?'0':'1'));});}}
 marcaAhorro();
@@ -1599,3 +1599,4 @@ function arrancaPrecarga(){
 }
 arrancaPrecarga();
 })();</script>
+<script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');</script>

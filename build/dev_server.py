@@ -34,7 +34,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 import yaml
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from common import ROOT, dump_yaml
+from common import ROOT, dump_yaml  # dump_yaml: lo usan raw GET (flow=False)
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
@@ -54,11 +54,8 @@ ALLOW_USERS = set((os.environ.get("TF_DEV_ALLOW") or "ratgr").split(","))
 OAUTH_CLIENT = os.environ.get("TF_DEV_OAUTH_CLIENT", "178c6fc778ccc68e1d6a")
 _SESSIONS = {}      # sid → login de GitHub
 _LOGINS = {}        # handle → device_code en curso
-# cada cambio guardado se COMMITEA solo; deploy = copiar pages/ al repo de
-# Pages y push (rebuild con {"deploy": true} o el botón Deploy del cajón)
+# cada cambio guardado se COMMITEA solo; Deploy = push (la Action publica)
 AUTO_COMMIT = True
-PAGES_REPO = os.path.join(os.path.dirname(ROOT), "viajes-icons")
-PAGES_SUBDIR = "viajes2"
 
 
 def _github(url, data=None, token=None):
@@ -85,7 +82,7 @@ def git_commit(repo, paths, message):
         print("aviso git:", e)
 
 
-def deploy_pages(trip):
+def deploy_pages():
     """el repo es auto-sostenible: deploy = push de los commits (la Action
     build & deploy reconstruye y publica el sitio por Pages)."""
     r = subprocess.run(["git", "-C", ROOT, "push", "-q"],
@@ -109,46 +106,6 @@ def yaml_path(trip):
 # también se usan solos.
 _YAML_LOCK = threading.RLock()
 
-
-def load(trip):
-    with _YAML_LOCK:
-        return yaml.safe_load(open(yaml_path(trip), encoding="utf-8"))
-
-
-def save(trip, data):
-    """escritura atómica: tmp + replace, bajo el lock."""
-    path = yaml_path(trip)
-    tmp = path + ".tmp"
-    with _YAML_LOCK:
-        with open(tmp, "w", encoding="utf-8") as f:
-            f.write(dump_yaml(data))
-        os.replace(tmp, path)
-
-
-@contextlib.contextmanager
-def edit(trip):
-    """leer-modificar-guardar ATÓMICO: candado sostenido todo el trayecto."""
-    with _YAML_LOCK:
-        Y = load(trip)
-        yield Y
-        save(trip, Y)
-
-
-def steps_of(Y, day):
-    """lista de pasos del día 1-based — con validación de rango (el indexado
-    negativo de Python convertía day=0 en 'el último día' sin error)."""
-    d = int(day)
-    if not 1 <= d <= len(Y.get("days", [])):
-        raise ValueError(f"día fuera de rango: {day}")
-    return Y["days"][d - 1]["steps"]
-
-
-def step_at(Y, day, step):
-    steps = steps_of(Y, day)
-    s = int(step)
-    if not 1 <= s <= len(steps):
-        raise ValueError(f"paso fuera de rango: {step}")
-    return steps, s - 1
 
 
 # ---------- edición de YAML por TEXTO CRUDO ----------
@@ -507,8 +464,7 @@ class Handler(SimpleHTTPRequestHandler):
                 out = rebuild(req["trip"])
                 extra = ""
                 if req.get("deploy"):
-                    git_commit(ROOT, ["pages"], f"dev: rebuild ({who})")
-                    extra = " · " + deploy_pages(req["trip"])
+                    extra = " · " + deploy_pages()
                 self._json(200, {"ok": True, "build": out + extra})
             else:
                 self._json(404, {"error": "endpoint desconocido"})
