@@ -226,21 +226,32 @@
   }
   // línea de transporte: polilínea + flechas + (si las estaciones calzan con
   // los vértices, como en los rieles) un punto con nombre por estación
-  function transitGroup(key, tr, coords) {
+  function transitGroup(key, tr, coords, inert) {
+    // inert = capa de EXHIBICIÓN (la temporal del popup): sin interacción,
+    // para que los clicks caigan a la capa viva de abajo — la temporal
+    // encima de lo ya elegido se tragaba el click y el popup no reabría
     var g = L.featureGroup();
     var s = lineStyle(tr);
     var line = L.polyline(coords, {
-      color: s.color, weight: s.weight, opacity: .85, dashArray: s.dashArray
+      color: s.color, weight: s.weight, opacity: .85, dashArray: s.dashArray,
+      interactive: !inert
     });
     // línea de IMPACTO invisible y gorda: las punteadas casi no se atinan
-    g.addLayer(L.polyline(coords, { weight: 16, opacity: 0.001, interactive: true }));
+    if (!inert) {
+      g.addLayer(L.polyline(coords, { weight: 16, opacity: 0.001, interactive: true }));
+    }
     g.addLayer(line);
     g._line = line;
     g._decos = chevronMarkers(coords, tr.color);
     g._dots = [];
-    if (tr.stations && tr.stations.length === coords.length) {
-      coords.forEach(function (c, i) {
-        var dot = L.circleMarker(c, { radius: 3.5, color: tr.color, weight: 2, fillColor: '#fff', fillOpacity: 1 });
+    // puntos de estación: de tr.stops (trazo denso OSM) o, si no hay, de los
+    // vértices cuando calzan 1 a 1 con la lista de estaciones
+    var stopPts = (tr.stops && tr.stations && tr.stops.length === tr.stations.length)
+      ? tr.stops
+      : (tr.stations && tr.stations.length === coords.length ? coords : null);
+    if (stopPts) {
+      stopPts.forEach(function (c, i) {
+        var dot = L.circleMarker(c, { radius: 3.5, color: tr.color, weight: 2, fillColor: '#fff', fillOpacity: 1, interactive: !inert });
         if (tr.stations[i]) dot.bindTooltip(tr.stations[i], { direction: 'top', offset: [0, -4] });
         g._dots.push(dot);
       });
@@ -612,7 +623,7 @@
       return true;
     }
     if (tr) {
-      tempLayer = transitGroup(key, tr, tr.coords).addTo(map);
+      tempLayer = transitGroup(key, tr, tr.coords, true).addTo(map);
       if (repeat) {
         map.flyToBounds(tempLayer.getBounds().pad(.02), { duration: .5 });
       } else {

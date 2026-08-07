@@ -46,6 +46,13 @@ def geo_tokens():
                     (s[2] or s[1]) if isinstance(s, list) and len(s) >= 3 else str(s)
                     for s in stations
                 ]
+            # stops: posiciones de estación cuando coords ya es el trazo DENSO
+            # (geometría OSM) y perdió la alineación 1 vértice = 1 estación
+            stops = tr.get("stops")
+            if stops:
+                sp = render.parse_pts(stops, f"transits[{key}].stops")
+                if sp:
+                    entry["stops"] = [[a, b] for a, b in sp]
             transits[key] = entry
     # caja del viaje (vista inicial del mapa) + nombre del viaje (identidad
     # para el modo dev, en vez de olfatear la URL)
