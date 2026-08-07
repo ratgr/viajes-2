@@ -1928,7 +1928,7 @@ days:
   - {transit: d7-1, time-from: '05:20', title: '@[Sakaisuji Line](d7-1) → Nippombashi — 6 min.'}
   - {transit: nippombashi-namba, hidden-summary: true, title: Nippombashi → Osaka-Namba}
   - {transit: d7-2, time-from: '05:30', title: 'Al andén @[Kintetsu](d7-2) (Osaka-Namba, mismo complejo) — 8 min.'}
-  - {transit: d7-3, time-from: '05:45', fixed: true, title: '@[Kintetsu Nara Line express](d7-3) → Kintetsu-Nara ~06:25 (a 5 min del parque; NO usar JR hoy).'}
+  - {transit: d7-3, time-from: '05:45', fixed: true, title: 'Kintetsu Nara Line express → Kintetsu-Nara ~06:25 (a 5 min del parque; NO usar JR hoy).'}
   - {location: parque-de-nara, time-from: '06:30', title: '@[Parque de Nara al alba](parque-de-nara) ★ — 1 h: los venados con neblina y sin nadie, galletas ¥200 y las reverencias.'}
   - {transit: d7-6, time-from: '07:30', title: 'Parque → @[Tōdai-ji](todai-ji) — 10 min entre venados, sin salir del parque.'}
   - {location: todai-ji, time-from: '07:40', fixed: true, title: '@[Tōdai-ji](todai-ji) ★ — 1 h 15: los primeros al abrir (7:30), el Gran Buda de 15 m casi vacío (¥600; de 2 en 2).'}
