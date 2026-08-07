@@ -220,6 +220,13 @@ places:
   teppan-de-kobe: {name: Teppan de Kobe, gps: '', maps: '', description: Res Kobe certificada en plancha de barra, info: 'Recomendado por: Sugerencia del plan (Claude)', image: fachadas/teppan_kobe_t.jpg}
   barra-con-estrella: {name: Barra con estrella, gps: '', maps: '', description: Sushi estrellado si quieren el techo del viaje, info: 'Recomendado por: Michelin / Bib Gourmand', image: fachadas/barra_estrella.jpg}
 transits:
+  itami-a-monorail: {mode: walk, color: '#7a6f63'}
+  dotonbori-a-namba: {mode: walk, color: '#7a6f63'}
+  hondori-a-parque: {mode: walk, color: '#7a6f63'}
+  miyajimaguchi-jr: {mode: walk, color: '#7a6f63'}
+  shinsekai-a-tennoji: {mode: walk, color: '#7a6f63'}
+  harukas-a-tennoji: {mode: walk, color: '#7a6f63'}
+  hotel-a-pontocho: {mode: walk, color: '#7a6f63'}
   itami-monorail:
     mode: train
     line: Osaka Monorail
@@ -1531,9 +1538,10 @@ days:
   - {transit: ana-checkin, mode: tramite, time-from: '07:15', duration: flex(1h), title: Documentar con ANA (20 kg incluidos) + seguridad + espera, note: 'Con 10 personas, cuenta 1 h.', color: '#8a7fb5', select-only: true, coords: '35.554000,139.781000 35.554600,139.781600'}
   - {transit: flight-haneda-itami, mode: flight, time-from: '09:00', fixed: true, duration: 1 h 05, title: Vuelo ANA NH17 → Osaka Itami, note: 'Aterriza 10:05. Pagado: $1,169 pp (conf. DRWRL6 / DLF2IW).', color: '#7b4fa6', select-only: true, coords: '35.543913,139.768155 34.786161,135.438048'}
   - {location: osaka-itami, time-from: '10:05', fixed: true, duration: 0, title: Llegada a Osaka Itami}
+  - {transit: itami-a-monorail, time-from: '10:15', duration: 10 min, title: A pie a la estación del monorraíl — 10 min con maletas}
   - {transit: itami-monorail, time-from: '10:30', duration: 15 min, title: 'Osaka Monorail (local Kadomashi): @[Osaka-kūkō → Yamada](itami-monorail)'}
   - {transit: yamada-hankyu, time-from: '10:50', duration: 25 min, title: 'Hankyu Senri Line (transbordo en Yamada): @[Yamada → Kitahama](yamada-hankyu)', note: 'Entra directo a la @[línea Sakaisuji](sakaisuji) — reagrupe en el andén: el que se pierda, baja en Yamada y espera.'}
-  - {transit: kitahama-hotel, duration: 2 min, title: Kitahama → hotel}
+  - {transit: kitahama-hotel, duration: 5 min, title: Kitahama → hotel}
   - {location: royal-park, time-from: '12:00', fixed: true, duration: 1 h 20, title: 'Check-in en el @[Royal Park Canvas](royal-park)', note: '**Check-in** — dejamos maletas y una **siesta de ~1 h**; luego salimos ligeros al Castillo.'}
   - {transit: hotel-temmabashi, time-to: '13:35', title: Hotel → Temmabashi por la ribera, note: '5 min a **Temmabashi** por la ribera (o @[Tanimachi Line](tanimachi), 1 estación a Tanimachi 4-chōme).'}
   - {transit: temmabashi-castillo, duration: 25 min, title: Temmabashi → Castillo (entra por el NORTE), note: ~20 min de parque hasta la torre; entramos por el norte para salir por el sur.}
@@ -1627,6 +1635,7 @@ days:
         - {transit: to-mgyu-do, title: To Matsusakagyu M Dotonbori}
         - {location: mgyu-do}
         - {transit: from-mgyu-do, title: From Matsusakagyu M Dotonbori}
+  - {transit: dotonbori-a-namba, time-from: '21:35', duration: 10 min, title: Del letrero de Glico a la estación Namba — 10 min a pie}
   - {transit: metro-midosuji, time-from: '21:45', duration: 10 min, title: 'Midosuji Line: @[Namba → Yodoyabashi](metro-midosuji)'}
   - {transit: yodoyabashi-hotel, time-from: '22:00', duration: 10 min, title: Yodoyabashi → hotel por la ribera, note: '🏪 Aviso mañana: el buffet abre 6:30 y SÍ alcanza — konbini solo de respaldo. El tren NO espera.'}
 - title: lun 5 · Hiroshima + Miyajima
@@ -1643,22 +1652,25 @@ days:
     title: 3 min a pie al ferry JR
   - {transit: d5-5, time-from: '10:10', title: 'Tomar el @[ferry JR](d5-5) — sale cada 15 min, cruce de 10 (el de :10/:25 pasa junto al torii).'}
   - {transit: d5-e13, hidden-summary: true, title: Isla de Miyajima → Santuario Itsukushima}
-  - {location: isla-de-miyajima, time-from: '10:15', fixed: true, title: '@[Isla de Miyajima](isla-de-miyajima) ★ — 2 h 15 (ventana de Juan): @[Itsukushima](santuario-itsukushima) (¥300) y el torii flotante, venados isleños, calle Omotesando con momiji manju y ostras a la parrilla. Del muelle al santuario: 12 min a pie por la costanera — cuenta como paseo, no traslado.'}
+  - {location: santuario-itsukushima, time-from: '10:15', fixed: true, title: '@[Isla de Miyajima](isla-de-miyajima) ★ — 2 h 15 (ventana de Juan), sin circuito: nos quedamos en la zona del santuario y la costanera. @[Itsukushima](santuario-itsukushima) (¥300) y el torii flotante, venados isleños, calle Omotesando con momiji manju y ostras a la parrilla. Del muelle al santuario: 12 min a pie por la costanera — cuenta como paseo, no traslado.'}
   - {transit: d5-e14, hidden-summary: true, title: Santuario Itsukushima → Miyajima}
   - {transit: d5-6, time-from: '12:30', title: '@[Ferry](d5-6) de las :30 de regreso — 10 min.'}
+  - {transit: miyajimaguchi-jr, duration: 3 min, title: Del muelle a la estación JR — 3 min a pie}
   - {transit: d5-7, time-from: '12:45', title: '@[JR San-yo](d5-7) (local Hiroshima) — 28 min a Hiroshima Station.'}
   - {transit: d5-8, time-from: '13:15', title: '@[Tranvía Hiroden](d5-8) nº 2/6 → Genbaku Dome-mae — 15 min.'}
   - {transit: d5-e15, hidden-summary: true, title: Gembaku Dome-mae → Parque Memorial de la Paz}
   - {transit: d5-e16, hidden-summary: true, title: Parque Memorial de la Paz → Domo de la Bomba Atómica}
   - {transit: d5-e17, hidden-summary: true, title: Domo de la Bomba Atómica → Hondōri}
-  - {time-from: '13:35', title: 'Comer okonomiyaki estilo Hiroshima 🍴 — 1 h 15: Nagataya (junto al Domo) u Okonomimura (25 planchas — cada subgrupo la suya). Nagataya está a 3 min de la parada del tranvía — sin conmutación real.'}
+  - {time-from: '13:35', duration: 1 h 15, title: 'Comer okonomiyaki estilo Hiroshima 🍴 — 1 h 15: Nagataya (junto al Domo) u Okonomimura (25 planchas — cada subgrupo la suya). Nagataya está a 3 min de la parada del tranvía — sin conmutación real.'}
+  - {transit: hondori-a-parque, duration: 5 min, title: Del okonomiyaki al Parque — 5 min a pie}
   - {location: parque-memorial-de-la-paz, time-from: '14:50', title: '@[Parque Memorial de la Paz](parque-memorial-de-la-paz) ★ — 2 h 30 (a 3 min a pie del okonomiyaki — sin conmutación): el @[Domo](domo-de-la-bomba-atomica), el museo (¥200, entrar escalonados de 2 en 2), las grullas de Sadako, la llama.'}
   - {transit: d5-9, time-from: '17:20', title: Hondori a pie de pasada — 15 min de arcada comercial.}
   - {transit: d5-10, time-from: '17:40', title: '@[Tranvía nº 1](d5-10) a la estación — 15 min · comprar el ekiben de anago para el tren.'}
   - {transit: d5-11, time-from: '18:53', fixed: true, title: '@[Shinkansen](d5-11) de regreso — también pagado: llega a Shin-Osaka 20:21.'}
-  - {transit: d5-12, time-from: '20:25', title: '@[Midosuji](d5-12) a Yodoyabashi + 6 a pie — 35 min puerta a puerta. Cena ligera. 🏪 AVISO PARA MAÑANA: USJ con fila a las 6:45 — comprar el desayuno de konbini ESTA NOCHE (Lawson de la esquina).'}
-  - time-from: '20:25'
-    title: Cena
+  - time-from: '20:30'
+    duration: 1 h
+    title: Cena ligera en Shin-Osaka — 1 h
+    note: 'Cenamos aquí mismo en la estación antes del último tramo — llegamos al hotel ya listos para dormir.'
     options:
     - title: Take
       options:
@@ -1720,6 +1732,7 @@ days:
         - {transit: to-yakiniku-nocturno, title: To Yakiniku nocturno}
         - {location: yakiniku-nocturno}
         - {transit: from-yakiniku-nocturno, title: From Yakiniku nocturno}
+  - {transit: d5-12, time-from: '21:35', duration: 35 min, title: '@[Midosuji](d5-12) a Yodoyabashi + 6 a pie — 35 min puerta a puerta. 🏪 AVISO PARA MAÑANA: USJ con fila a las 6:45 — comprar el desayuno de konbini ESTA NOCHE (Lawson de la esquina).'}
 - title: mar 6 · Universal + Nintendo World
   note: el día de parque — fila 6:45, regla de Juan
   anchor: Super Nintendo World
@@ -1728,17 +1741,19 @@ days:
   - {time-from: '05:45', title: Arriba — 🏪 desayuno de konbini en mano (comprado anoche); café del Lawson.}
   - {transit: d6-1, time-from: '06:10', fixed: true, title: '@[Sakaisuji Line](d6-1), 1 estación → Sakaisuji-Hommachi — 3 min.'}
   - {transit: d6-2, time-from: '06:15', title: '@[Chuo Line](d6-2) → Bentencho — 8 min.'}
-  - {transit: d6-3, time-from: '06:25', title: '@[JR Loop Line](d6-3) (dir. Nishikujo) → transbordo en Nishikujo → @[Yumesaki Line](d6-4) → Universal-City — 15 min. Alternativa sin transbordos: taxis ×3 (~¥3,000 c/u, 20 min).'}
-  - {location: universal-studios-japan, time-from: '06:45', fixed: true, title: '@[Formarse en la reja](universal-studios-japan) (★ de Juan) — la fila temprana ES el boleto a Nintendo sin ticket cronometrado. Desayuno de fila.'}
+  - {transit: d6-3, time-from: '06:25', duration: 7 min, title: '@[JR Loop Line](d6-3) (dir. Nishikujo) → transbordo en Nishikujo — 7 min.'}
+  - {transit: d6-4, time-from: '06:33', duration: 8 min, title: '@[Yumesaki Line](d6-4) → Universal-City — 8 min. Alternativa sin transbordos: taxis ×3 (~¥3,000 c/u, 20 min).'}
   - {transit: d6-e9, hidden-summary: true, title: Universal City → Universal Studios Japan}
+  - {location: universal-studios-japan, time-from: '06:45', fixed: true, title: '@[Formarse en la reja](universal-studios-japan) (★ de Juan) — la fila temprana ES el boleto a Nintendo sin ticket cronometrado. Desayuno de fila.'}
   - {transit: d6-e10, hidden-summary: true, title: Universal Studios Japan → Super Nintendo World}
-  - {transit: d6-e11, hidden-summary: true, title: Super Nintendo World → Universal City}
   - {location: super-nintendo-world, time-from: '08:30', fixed: true, title: 'Apertura (a veces 15–30 min antes) — rope drop a @[Super Nintendo World](super-nintendo-world): Mario Kart primero, Yoshi, Power-Up Bands ¥4,500. Nivel Shu: Express Pass ~¥10–15,000.'}
   - {time-from: '12:30', title: 'Comida en el parque — 1 h: Kinopio''s Café ~¥2,500 (turno en la app DESDE LA MAÑANA) o food carts. Dentro del parque — sin conmutación.'}
   - {time-from: '13:30', title: 'Resto del parque — Hollywood Dream, Jaws, Harry Potter, ambiente Halloween. Subgrupos; punto de reunión: la esfera a las 18:45.'}
+  - {transit: d6-e11, hidden-summary: true, title: Super Nintendo World → Universal City}
   - {transit: d6-5, time-from: '19:00', title: 'Universal-City → @[Yumesaki Line](d6-5) → Nishikujo — 8 min.'}
   - {transit: d6-6, time-from: '19:10', title: '@[Loop](d6-6) → Bentencho → @[Chuo](d6-7) → Sakaisuji-Hommachi → Kitahama — 30 min (o quedarse en el vagón de la @[Loop](d6-8) hasta Temma y caminar 10).'}
   - time-from: '19:50'
+    duration: 1 h 15
     title: 'Cena — 1 h 15, donde caiga el subgrupo: hotel, Dotonbori o mixto. 🏪 AVISO PARA MAÑANA: Nara sale 5:10 — konbini esta noche.'
     options:
     - title: Take
@@ -1812,26 +1827,26 @@ days:
   - {transit: d7-2, time-from: '05:30', title: 'Al andén @[Kintetsu](d7-2) (Osaka-Namba, mismo complejo) — 8 min.'}
   - {transit: d7-3, time-from: '05:45', fixed: true, title: '@[Kintetsu Nara Line express](d7-3) → Kintetsu-Nara ~06:25 (a 5 min del parque; NO usar JR hoy).'}
   - {location: parque-de-nara, time-from: '06:30', title: '@[Parque de Nara al alba](parque-de-nara) ★ — 1 h: los venados con neblina y sin nadie, galletas ¥200 y las reverencias.'}
-  - {transit: d7-4, time-from: '07:30', title: 'Parque → @[Tōdai-ji](todai-ji) — 10 min entre venados, sin salir del parque.'}
+  - {transit: d7-6, time-from: '07:30', title: 'Parque → @[Tōdai-ji](todai-ji) — 10 min entre venados, sin salir del parque.'}
   - {location: todai-ji, time-from: '07:40', fixed: true, title: '@[Tōdai-ji](todai-ji) ★ — 1 h 15: los primeros al abrir (7:30), el Gran Buda de 15 m casi vacío (¥600; de 2 en 2).'}
-  - {transit: d7-5, time-from: '08:55', title: Subir a Nigatsu-dō — 10 min por el sendero de piedra.}
+  - {transit: d7-4, time-from: '08:55', title: Subir a Nigatsu-dō — 10 min por el sendero de piedra.}
   - {time-from: '09:05', title: 'Nigatsu-dō ★ — 30 min: el balcón de madera con vista a todo Nara en la luz de la mañana (gratis, siempre abierto).'}
-  - {transit: d7-6, time-from: '09:35', title: 'Sendero del bosque a @[Kasuga Taisha](kasuga-taisha) — 15 min (el camino YA es la atracción).'}
+  - {transit: d7-7, time-from: '09:35', title: 'Sendero del bosque a @[Kasuga Taisha](kasuga-taisha) — 15 min (el camino YA es la atracción).'}
   - {location: kasuga-taisha, time-from: '09:50', title: '@[Kasuga Taisha](kasuga-taisha) ★ — 1 h: el sendero de las 2,000 linternas de piedra.'}
-  - {transit: d7-7, time-from: '10:50', title: 'Bajar a @[Kōfuku-ji](kofuku-ji) y el estanque Sarusawa — 15 min.'}
+  - {transit: d7-8, time-from: '10:50', title: 'Bajar a @[Kōfuku-ji](kofuku-ji) y el estanque Sarusawa — 15 min.'}
   - {location: kofuku-ji, time-from: '11:05', title: '@[Kōfuku-ji](kofuku-ji) + estanque Sarusawa ★ — 45 min: la pagoda de 5 pisos y su reflejo en el agua.'}
+  - {transit: d7-e11, hidden-summary: true, title: Kōfuku-ji → Naramachi}
   - {location: naramachi, time-from: '11:50', title: '@[Naramachi](naramachi) — 40 min: las casas de celosía; Nakatanidou 🍴 (mochis del pounding viral) está en el camino.'}
   - {time-from: '12:30', title: Comida — Tonkatsu Ganko 🍴 — 1 h 15; con 10 se divide en 2 mesas sin drama.}
-  - {transit: d7-8, time-from: '13:45', title: 'A @[Yoshikien](jardin-yoshikien) / Isuien — 10 min.'}
-  - {transit: d7-e11, hidden-summary: true, title: Kōfuku-ji → Naramachi}
-  - {transit: d7-e12, hidden-summary: true, title: Naramachi → Jardín Yoshikien}
+  - {transit: d7-e12, time-from: '13:45', title: 'A @[Yoshikien](jardin-yoshikien) / Isuien — 10 min.'}
+  - {location: jardin-yoshikien, time-from: '14:05', title: '@[Jardín Yoshikien](jardin-yoshikien) ★ — 45 min: musgo, té y arce (gratis para extranjeros); Isuien al lado si quieren más (¥900).'}
+  - {time-from: '14:50', title: 'Arcadas Higashimuki / Mochiidono — 35 min de compras, matcha y souvenirs, de camino a la estación.'}
   - {transit: d7-e13, hidden-summary: true, title: Jardín Yoshikien → Kintetsu-Nara}
-  - {location: jardin-yoshikien, time-from: '13:55', title: '@[Jardín Yoshikien](jardin-yoshikien) ★ — 45 min: musgo, té y arce (gratis para extranjeros); Isuien al lado si quieren más (¥900).'}
-  - {time-from: '14:40', title: 'Arcadas Higashimuki / Mochiidono — 45 min de compras, matcha y souvenirs, de camino a la estación.'}
   - {transit: d7-9, time-from: '15:30', fixed: true, title: 'Kintetsu-Nara → @[express](d7-9) → Osaka-Namba — 40 min (llega ~16:15).'}
   - {transit: d7-e14, hidden-summary: true, title: Osaka-Namba → Nippombashi}
   - {transit: d7-10, time-from: '16:25', title: 'Nippombashi → @[Sakaisuji](d7-10) → Kitahama — 10 min. Siesta corta.'}
   - time-from: '19:30'
+    duration: 2 h
     title: 'Cena juntos — la noche grande de Osaka (última noche): reservar desde la mañana.'
     options:
     - title: Take
@@ -1909,8 +1924,9 @@ days:
   steps:
   - {time-from: '08:00', title: 'Desayuno en el hotel 🏨 + empacar; check-out, maletas en recepción — o takkyubin al Keio Prelia (~¥2,500/maleta) y viajar con mochila: decidirlo en el desayuno.'}
   - {transit: d8-1, time-from: '09:15', title: '@[Sakaisuji Line](d8-1) (local Tengachaya) directo → Ebisucho, salida 3 — 12 min, cero transbordos.'}
+  - {transit: d8-2, time-from: '09:27', title: 'De la salida 3 a @[Shinsekai](shinsekai) — 5 min, pasando bajo la @[Tsūtenkaku](tsutenkaku).'}
   - {location: shinsekai, time-from: '09:30', title: '@[Shinsekai](shinsekai) 🏴 — 1 h 30: el barrio retro, la torre @[Tsūtenkaku](tsutenkaku) ★ (¥900 opcional) y Hondori.'}
-  - {transit: d8-2, time-from: '11:00', title: A pie al parque Tennōji — 10 min.}
+  - {transit: shinsekai-a-tennoji, time-from: '11:00', duration: 10 min, title: A pie al parque Tennōji — 10 min.}
   - {location: parque-tennoji-keitakuen, time-from: '11:10', title: '@[Parque Tennōji + jardín Keitakuen](parque-tennoji-keitakuen) (¥150, el tradicional chiquito del Keep) — 50 min.'}
   - time-from: '12:15'
     title: Comida por Tennōji/Abeno — 1 h 15. Todo en la misma zona — 5 min a pie máximo.
@@ -1985,14 +2001,17 @@ days:
         - {transit: from-janjan-yokocho, title: From Janjan Yokocho}
   - {transit: d8-e8, hidden-summary: true, title: Parque Tennōji + Keitakuen → Abeno Harukas}
   - {location: abeno-harukas, time-from: '14:00', fixed: true, title: '@[Mirador Abeno Harukas](abeno-harukas) 🔘 — reservado por Juan: 300 m sobre Osaka — 1 h 30 (encima de la estación: cero traslado).'}
+  - {transit: harukas-a-tennoji, time-from: '15:40', duration: 5 min, title: Bajar del mirador al andén de Tennōji — mismo edificio.}
   - {transit: d8-3, time-from: '15:45', title: 'Tennōji → @[Midosuji Line](d8-3) → Yodoyabashi — 15 min.'}
   - {transit: d8-4, time-from: '16:05', title: 'Por las maletas al hotel — 15 min (los de takkyubin: directo a Umeda y café con calma).'}
   - {transit: d8-5, time-from: '16:35', title: 'Yodoyabashi → @[Midosuji](d8-5) → Umeda / Osaka Station — 8 min + encontrar el andén JR con maletas: 20 min.'}
   - {transit: d8-6, time-from: '17:07', fixed: true, title: '@[HARUKA 38 Limited Express](d8-6) a Kioto (el del Keep) — 27 min, asientos reservados y espacio real de maletas; llegada 17:34.'}
   - {transit: d8-7, time-from: '17:40', title: '@[Karasuma Line](d8-7) (local Kokusaikaikan), 1 estación → Gojō, salida 1 — el Keio Prelia a 4 min a pie.'}
   - {time-from: '18:00', title: Check-in Keio Prelia (el hotel que el Keep de Juan ya asume) + respiro — 1 h 15.}
+  - {transit: hotel-a-pontocho, time-from: '19:15', duration: 15 min, title: 'Del hotel a @[Pontocho](pontocho) — 15 min a pie.'}
   - {location: pontocho, time-from: '19:30', title: 'Cena de bienvenida a Kioto — 1 h 30; @[Pontocho](pontocho) a 15 min a pie. 🏪 AVISO PARA MAÑANA: desayuno normal en el buffet (6:30) — konbini solo para el subgrupo madrugador opcional de las 5:40.'}
   - time-from: '19:30'
+    duration: 1 h 30
     title: Cena
     options:
     - title: Take
