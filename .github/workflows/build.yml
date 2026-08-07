@@ -1,0 +1,53 @@
+# En cada edición del src (web, API o push) se reconstruyen las páginas, se
+# verifica el round-trip YAML≡HTML y se publican por GitHub Pages. El sitio
+# se sirve del ARTEFACTO del build: pages/ no vive en git.
+name: build & deploy
+
+on:
+  push:
+    branches: [main]
+    paths: ['src/**', 'build/**', '.github/workflows/build.yml']
+  workflow_dispatch:
+
+concurrency:
+  group: build-deploy
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install pyyaml
+      - name: build + verify (round-trip)
+        run: |
+          python build/build_itinerario.py 2026-Japon
+          python build/build_mapa.py 2026-Japon
+      - name: índice del sitio
+        run: |
+          cat > pages/index.html <<'HTML'
+          <!doctype html><meta charset="utf-8">
+          <meta http-equiv="refresh" content="0; url=2026-Japon/mapa.html">
+          <title>viajes</title><a href="2026-Japon/mapa.html">Japón 2026 · mapa</a>
+          HTML
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: pages
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

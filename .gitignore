@@ -1,2 +1,4 @@
+# generado por el build (la Action lo construye y publica; local es preview)
+pages/
 __pycache__/
 *.pyc

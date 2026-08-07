@@ -8,31 +8,29 @@ invierte el render en cada build y compara contra la fuente; todo lo calculado
 (horarios encadenados, duraciones de caminata, avisos) va marcado
 `data-derived` y queda fuera de la comparación.
 
-**En vivo:** <https://ratgr.github.io/viajes-icons/viajes2/mapa.html> ·
-<https://ratgr.github.io/viajes-icons/viajes2/itinerario.html>
+**En vivo:** <https://ratgr.github.io/viajes-2/2026-Japon/mapa.html> ·
+<https://ratgr.github.io/viajes-2/2026-Japon/itinerario.html>
 
 ## Estructura
 
 ```
-viajes-2/
-  src/2026-Japon/       viaje.yaml (fuente) · plantillas · config.yaml
-  build/                pipeline: render.py + build_*.py + verify_roundtrip.py
-                        contract.py (vocabulario renderer↔verificador)
-                        dev_server.py (edición local opcional)
-                        assets/ (css/js/vendor copiados al release)
-  pages/2026-Japon/     release generado (NO editar a mano)
-  scratch/              herramientas fuera del pipeline (migraciones, OSM…)
-../viajes2/             copia publicada por la Action (lo que sirve Pages)
+src/2026-Japon/       viaje.yaml (fuente) · plantillas · config.yaml
+build/                pipeline: render.py + build_*.py + verify_roundtrip.py
+                      contract.py (vocabulario renderer↔verificador)
+                      dev_server.py (edición local opcional)
+                      assets/ (css/js/vendor copiados al release)
+pages/<viaje>/        release generado (fuera de git: la Action lo publica)
+scratch/              herramientas fuera del pipeline (migraciones, OSM…)
 ```
 
 ## Flujo de edición EN LÍNEA (sin server)
 
-1. Edita `viajes-2/src/2026-Japon/viaje.yaml` — desde el editor web de GitHub,
+1. Edita `src/2026-Japon/viaje.yaml` — desde el editor web de GitHub,
    el móvil, o por API (contents). Necesitas ser colaborador del repo; para la
    API basta un **PAT fine-grained** con `contents: read/write` SOLO de este
    repo (uno por persona).
-2. Al hacer commit, la Action **`build viajes2`** corre sola: construye ambas
-   páginas, verifica el round-trip y publica `/viajes2`. Ediciones rápidas se
+2. Al hacer commit, la Action **`build & deploy`** corre sola: construye ambas
+   páginas, verifica el round-trip y publica el sitio por Pages (artefacto del build). Ediciones rápidas se
    cancelan entre sí (solo se construye el último estado).
 3. GitHub Pages sirve el resultado ~90 s después del commit.
 
