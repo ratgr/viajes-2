@@ -797,6 +797,11 @@ def build_page(trip, template_name, out_name, extra=None):
             shutil.copytree(src, os.path.join(pages_dir, asset), dirs_exist_ok=True)
         else:
             shutil.copyfile(src, os.path.join(pages_dir, asset))
+    # páginas estáticas del viaje (p.ej. app.html con los demás tabs migrados):
+    # van tal cual al release — nada del sitio referencia fuera del repo
+    static_dir = os.path.join(src_dir, "static")
+    if os.path.isdir(static_dir):
+        shutil.copytree(static_dir, pages_dir, dirs_exist_ok=True)
     print(f"pages/{trip}/{out_name} · {len(DAYS)} días · {len(refs.order)} modales · {len(page) // 1024} KB")
     if DIAGNOSTICS:
         print(f"⚠️ horario incompleto en el YAML ({len(DIAGNOSTICS)} pasos):")
