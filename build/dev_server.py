@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """dev_server.py — servidor local de desarrollo (solo 127.0.0.1).
 
-Sirve el directorio PADRE del repo (para ver pages/ y el app viejo) con
-Cache-Control: no-store, y expone la API del modo dev del mapa — editar
+Sirve el directorio PADRE del repo con Cache-Control: no-store (preview
+local instantáneo; el sitio público lo publica la Action), y expone la API del modo dev del mapa — editar
 pasos del YAML directamente desde la página:
 
     GET  /api/step?trip=X&day=N&step=M     YAML del paso (para el editor)
