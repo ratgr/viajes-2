@@ -143,7 +143,7 @@
           '<ol>' +
           '<li><a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Abrir GitHub → nuevo token ↗</a></li>' +
           '<li><b>Repository access</b>: <i>Only select repositories</i> → <b>' + ED.repo + '</b></li>' +
-          '<li><b>Permissions → Contents</b>: <i>Read and write</i> (lo demás en No access)</li>' +
+          '<li><b>Permissions</b> → <b>Contents</b>, <b>Pages</b> y <b>Pull requests</b>: <i>Read and write</i> (lo demás en No access)</li>' +
           '<li><b>Generate token</b> y cópialo (empieza con <code>github_pat_</code>)</li>' +
           '</ol>' +
           '<input type="password" placeholder="github_pat_…" spellcheck="false">' +
