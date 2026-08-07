@@ -229,6 +229,12 @@ transits:
   hotel-a-pontocho: {mode: walk, color: '#7a6f63'}
   hotel-a-gojo: {mode: walk, color: '#7a6f63'}
   inari-jr-regreso: {mode: train, color: '#0072bc', line: JR Nara Line}
+  hotel-a-shinjuku: {mode: walk, color: '#7a6f63'}
+  skytree-a-oshiage: {mode: walk, color: '#7a6f63'}
+  ueno-a-parque: {mode: walk, color: '#7a6f63'}
+  tour-fuji-a-hakone: {mode: bus, color: '#8fc31f', line: Bus del tour}
+  togendai-muelle: {mode: walk, color: '#7a6f63'}
+  tour-regreso-tokyo: {mode: bus, color: '#8fc31f', line: Bus del tour}
   itami-monorail:
     mode: train
     line: Osaka Monorail
@@ -2476,8 +2482,6 @@ days:
   - {transit: d12-2, time-from: '10:30', fixed: true, title: '@[Shinkansen Nozomi](d12-2) a Tokio — 2 h 15 (~¥14,200 pp): asientos lado E (filas D-E), el Fuji aparece ~40 min después de salir. El ekiben a bordo ES la comida.'}
   - {transit: d12-e5, hidden-summary: true, title: Tokyo → Tokyo}
   - {transit: d12-3, time-from: '12:45', title: 'Tokyo Station → @[JR Chuo Line rápida](d12-3) (andenes 1-2) → Shinjuku — 15 min.'}
-  - {transit: d12-e6, hidden-summary: true, title: Shinjuku → Mirador del Gobierno Metropolitano}
-  - {transit: d12-e7, hidden-summary: true, title: Mirador del Gobierno Metropolitano → Omoide Yokocho}
   - {transit: d12-4, time-from: '13:05', title: Salida oeste + 8 min a pie por Nishi-Shinjuku al Rose Garden.}
   - time-from: '13:30'
     title: Ramen de bienvenida — 1 h.
@@ -2543,9 +2547,12 @@ days:
         - {location: tempura-de-barra}
         - {transit: from-tempura-de-barra, title: From Tempura de barra}
   - {time-from: '15:00', fixed: true, title: Check-in Rose Garden + descanso — 1 h 30.}
+  - {transit: d12-e6, hidden-summary: true, title: Shinjuku → Mirador del Gobierno Metropolitano}
   - {location: mirador-del-gobierno-metropolitano, time-from: '17:00', title: 'Shinjuku a pie — 2 h: Kabukichō, Godzilla, y el @[mirador GRATIS del Gobierno Metropolitano](mirador-del-gobierno-metropolitano) (piso 45, hasta 22:00) — todo caminando.'}
+  - {transit: d12-e7, hidden-summary: true, title: Mirador del Gobierno Metropolitano → Omoide Yokocho}
   - {location: omoide-yokocho, time-from: '19:30', title: '@[Omoide Yokocho](omoide-yokocho) — 1 h 30 de yakitori (a 12 min a pie del mirador, cruzando la estación) bajo las vías; barras de 4–6: dividirse ES el plan; reunión en el arco a las 21:00.'}
   - time-from: '19:30'
+    duration: 1 h 30
     title: Cena
     options:
     - title: Take
@@ -2613,7 +2620,8 @@ days:
   anchor: Sensō-ji
   date: '2026-10-13'
   steps:
-  - {location: senso-ji, time-from: '05:30', fixed: true, title: '🏪 Konbini ligero (precomprado) — hoy @[Sensō-ji](senso-ji) al alba; los pancakes de Benitsuru son el desayuno grande (10:15).'}
+  - {location: rose-garden, time-from: '05:30', fixed: true, title: '🏪 Konbini ligero (precomprado) — hoy @[Sensō-ji](senso-ji) al alba; los pancakes de Benitsuru son el desayuno grande (10:15).'}
+  - {transit: hotel-a-shinjuku, time-from: '05:35', duration: 10 min, title: A la estación Shinjuku — 10 min a pie.}
   - {transit: d13-1, time-from: '05:45', title: '@[JR Chuo rápida](d13-1) → Kanda — 12 min.'}
   - {transit: d13-2, time-from: '06:00', title: '@[Ginza Line](d13-2) (mismo complejo) → Asakusa, terminal — 18 min. Un solo transbordo.'}
   - {time-from: '06:30', title: 'Kaminarimon ★ — 15 min: la puerta del trueno al alba, con la linterna encendida y sin nadie.'}
@@ -2624,21 +2632,22 @@ days:
   - {time-from: '09:05', title: 'Denbōin-dōri + Nakamise abriendo — 35 min: el callejón de tiendas viejas mientras despiertan los puestos.'}
   - {time-from: '10:15', fixed: true, title: 'Benitsuru 🍧 — avanzada (a 6 min a pie del final de Nakamise) de 2 formada desde 9:40; soufflé pancakes ¥2,200 en tandas de 4.'}
   - {transit: d13-6, time-from: '11:30', title: 'A @[Skytree](tokyo-skytree): 20 min a pie cruzando el Sumida (las fotos valen la caminata) — o @[Tobu Line](d13-6), 1 estación.'}
-  - {time-from: '12:00', fixed: true, title: 'Subgrupos en Sumida — 1 h 30 (reservas hechas):>'}
-  - time-from: '12:00'
-    title: Elige tu plan del día
+  - {time-from: '12:00', fixed: true, duration: 1 h 30, title: 'Subgrupos en Sumida — 1 h 30 (reservas hechas):>'}
+  - title: Elige tu plan del día
     options:
     - title: Altura
       steps:
-      - {title: 'Skytree 🏴 — ¥3,100, reservar slot 12:00 — 1 h 30'}
+      - {time-from: '12:00', duration: 1 h 30, title: 'Skytree 🏴 — ¥3,100, reservar slot 12:00 — 1 h 30'}
     - title: Capibaras ☕
       steps:
-      - {title: 'CAPPINESS Oshiage — ¥3,500, reservado, turnos de 2–4 — 1 h'}
+      - {time-from: '12:00', duration: 1 h, title: 'CAPPINESS Oshiage — ¥3,500, reservado, turnos de 2–4 — 1 h'}
     - title: Calle
       steps:
-      - {title: Solamachi (la base del Skytree) de tiendas sin boleto}
+      - {time-from: '12:00', duration: 1 h 30, title: Solamachi (la base del Skytree) de tiendas sin boleto}
+  - {transit: skytree-a-oshiage, time-from: '13:50', duration: 5 min, title: A la estación Oshiage, bajo el Skytree — 5 min.}
   - {transit: d13-7, time-from: '14:00', title: 'Oshiage → @[Asakusa Line](d13-7) → Asakusa — 5 min.'}
   - {transit: d13-8, time-from: '14:10', title: '@[Ginza Line](d13-8) → Ueno — 15 min.'}
+  - {transit: ueno-a-parque, time-from: '14:25', duration: 5 min, title: De la estación Ueno a la entrada del parque — 5 min.}
   - {location: parque-ueno, time-from: '14:30', title: '@[Parque Ueno](parque-ueno) ★ — 20 min: entrar por la fuente y el paseo entre los árboles.'}
   - {transit: d13-9, time-from: '14:50', title: 'Ueno Tōshō-gū (5 min a pie dentro del parque) — 30 min: el santuario dorado de 1651 y su callejón de linternas (¥500 el interior).'}
   - {transit: d13-10, time-from: '15:20', title: 'Estanque Shinobazu + Bentendo (8 min bajando) — 30 min: el templo en la isla entre lotos; botes de cisne opcionales.'}
@@ -2716,7 +2725,7 @@ days:
         - {transit: to-ameyoko, title: To Ameyoko}
         - {location: ameyoko}
         - {transit: from-ameyoko, title: From Ameyoko}
-  - {transit: d13-12, time-from: '19:45', title: '@[JR Yamanote](d13-12): Ueno → Shinjuku directo — 25 min, mismo vagón todos. 🏪 AVISO PARA MAÑANA: el tour de Hakone sale antes del buffet — konbini esta noche.'}
+  - {transit: d13-12, time-from: '19:45', duration: 25 min, title: '@[JR Yamanote](d13-12): Ueno → Shinjuku directo — 25 min, mismo vagón todos. 🏪 AVISO PARA MAÑANA: el tour de Hakone sale antes del buffet — konbini esta noche.'}
 - title: mié 14 · Hakone / Fuji
   note: el tour contratado — horario militar
   anchor: teleférico + lago Ashi
@@ -2726,12 +2735,16 @@ days:
   - {transit: d14-1, time-from: '07:00', fixed: true, title: '@[JR Chuo rápida](d14-1) → Tokyo Station — 15 min.'}
   - {transit: d14-2, time-from: '07:20', title: 'Encontrar el punto del tour (suele ser salida Marunouchi South) — 25 min de colchón; con 10 NO se llega 7:55.'}
   - {location: monte-fuji, time-from: '08:00', fixed: true, title: 'SALE EL TOUR (~$1,099 pp, no espera): @[monte Fuji](monte-fuji) (5ª estación si el clima deja), @[teleférico de Hakone](teleferico-de-hakone), @[Owakudani](owakudani) y sus huevos negros, @[lago Ashi](lago-ashi) en barco pirata, @[santuario Motomiya](santuario-de-hakone-motomiya). Hoy el camión hace TODAS las conmutaciones — día de descanso logístico.'}
+  - {transit: tour-fuji-a-hakone, duration: 1 h 30, title: '🚌 El camión del tour: 5ª estación → base del @[teleférico de Hakone](teleferico-de-hakone) — ~1 h 30.'}
   - {transit: d14-e4, hidden-summary: true, title: Teleférico de Hakone → Ōwakudani}
   - {transit: d14-e5, hidden-summary: true, title: 🚡 Ōwakudani → Lago Ashi}
+  - {transit: togendai-muelle, hidden-summary: true, title: 'Tōgendai: del teleférico al muelle del barco pirata'}
   - {transit: d14-e6, hidden-summary: true, title: Lago Ashi → Santuario de Hakone (Motomiya)}
   - {time-from: '13:00', title: 'Comida del día: incluida o libre según el tour — CONFIRMAR EN EL VOUCHER esta semana; si es libre, en Owakudani hay poco: los snacks del konbini son el plan B.'}
+  - {transit: tour-regreso-tokyo, time-from: '16:00', duration: 2 h 30, title: '🚌 Regreso del tour a Tokyo Station — ~2 h 30 según tráfico.'}
   - {transit: d14-3, time-from: '18:30', title: 'Regreso a Tokyo Station → @[Chuo](d14-3) a Shinjuku — 15 min; en hora pico, dejar pasar el tren lleno: 10 no caben al primer intento.'}
   - time-from: '19:30'
+    duration: 1 h 30
     title: Cena cerca de la estación o Ginza — 1 h 30, o rendirse dignamente cerca del hotel.
     options:
     - title: Take
