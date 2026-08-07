@@ -86,19 +86,13 @@ def git_commit(repo, paths, message):
 
 
 def deploy_pages(trip):
-    """pages/<trip>/ → viajes-icons/viajes2/ + commit + push (Pages publica)."""
-    src = os.path.join(ROOT, "pages", trip)
-    dst = os.path.join(PAGES_REPO, PAGES_SUBDIR)
-    if not os.path.isdir(src) or not os.path.isdir(PAGES_REPO):
-        raise ValueError("no encuentro pages/ o el repo de Pages")
-    import shutil
-    shutil.copytree(src, dst, dirs_exist_ok=True)
-    git_commit(PAGES_REPO, [PAGES_SUBDIR], f"viajes2: deploy desde dev ({trip})")
-    r = subprocess.run(["git", "-C", PAGES_REPO, "push", "-q"],
+    """el repo es auto-sostenible: deploy = push de los commits (la Action
+    build & deploy reconstruye y publica el sitio por Pages)."""
+    r = subprocess.run(["git", "-C", ROOT, "push", "-q"],
                        capture_output=True, text=True, timeout=120)
     if r.returncode != 0:
         raise ValueError("push falló: " + (r.stderr or "").strip()[-200:])
-    return "desplegado"
+    return "push hecho — la Action publica en ~90 s"
 
 
 def yaml_path(trip):
