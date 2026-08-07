@@ -133,11 +133,47 @@
     available: function () { return !!(ED && ED.steps); },
     hasToken: function () { return !!localStorage.getItem(TK); },
     promptToken: function () {
-      var t = window.prompt('Pega tu PAT fine-grained de GitHub\n(contents: read/write SOLO de ' + (ED && ED.repo) + '):');
-      if (!t) return Promise.reject(new Error('sin token'));
-      localStorage.setItem(TK, t.trim());
-      return gh('/user').then(function (u) { return u.login; })
-        .catch(function (e) { localStorage.removeItem(TK); throw e; });
+      // diálogo con INSTRUCCIONES completas: cualquiera puede seguirlo
+      return new Promise(function (res, rej) {
+        var d = document.createElement('div');
+        d.className = 'gh-login';
+        d.innerHTML =
+          '<h3>🛠 Editar en línea</h3>' +
+          '<p>Necesitas un token de GitHub (una sola vez):</p>' +
+          '<ol>' +
+          '<li><a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Abrir GitHub → nuevo token ↗</a></li>' +
+          '<li><b>Repository access</b>: <i>Only select repositories</i> → <b>' + ED.repo + '</b></li>' +
+          '<li><b>Permissions → Contents</b>: <i>Read and write</i> (lo demás en No access)</li>' +
+          '<li><b>Generate token</b> y cópialo (empieza con <code>github_pat_</code>)</li>' +
+          '</ol>' +
+          '<input type="password" placeholder="github_pat_…" spellcheck="false">' +
+          '<div class="gh-login-btns"><button type="button" class="gh-ok">Entrar</button>' +
+          '<button type="button" class="gh-no">Cancelar</button><span class="gh-msg"></span></div>' +
+          '<p class="gh-note">El token se guarda solo en ESTE navegador. Para editar también necesitas ser colaborador del repo.</p>';
+        document.body.appendChild(d);
+        var inp = d.querySelector('input');
+        var msg = d.querySelector('.gh-msg');
+        inp.focus();
+        function go() {
+          var t = inp.value.trim();
+          if (!t) { msg.textContent = 'pega el token'; return; }
+          msg.textContent = 'validando…';
+          localStorage.setItem(TK, t);
+          gh('/user').then(function (u) {
+            d.remove();
+            res(u.login);
+          }).catch(function (e) {
+            localStorage.removeItem(TK);
+            msg.textContent = '✗ ' + (e.message || 'token inválido');
+          });
+        }
+        d.querySelector('.gh-ok').addEventListener('click', go);
+        inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') go(); });
+        d.querySelector('.gh-no').addEventListener('click', function () {
+          d.remove();
+          rej(new Error('cancelado'));
+        });
+      });
     },
     api: function (path, body) {
       var p = path.split('?')[0];
