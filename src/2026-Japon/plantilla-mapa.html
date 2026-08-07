@@ -42,6 +42,6 @@
 <script src="dev-github.js"></script>
 <script src="mapa.js"></script>
 <script src="cfg.js"></script>
-<script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');</script>
+<script>if('serviceWorker' in navigator){(function(){var had=!!navigator.serviceWorker.controller;navigator.serviceWorker.register('sw.js').then(function(reg){reg.addEventListener('updatefound',function(){var w=reg.installing;w&&w.addEventListener('statechange',function(){if(w.state==='activated'&&had)location.reload();});});});})();}</script>
 </body>
 </html>
