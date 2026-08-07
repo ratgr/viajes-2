@@ -227,6 +227,8 @@ transits:
   shinsekai-a-tennoji: {mode: walk, color: '#7a6f63'}
   harukas-a-tennoji: {mode: walk, color: '#7a6f63'}
   hotel-a-pontocho: {mode: walk, color: '#7a6f63'}
+  hotel-a-gojo: {mode: walk, color: '#7a6f63'}
+  inari-jr-regreso: {mode: train, color: '#0072bc', line: JR Nara Line}
   itami-monorail:
     mode: train
     line: Osaka Monorail
@@ -2087,34 +2089,31 @@ days:
   anchor: Kiyomizu-dera
   date: '2026-10-09'
   steps:
-  - {location: kiyomizu-dera, time-from: '05:00', fixed: true, title: '🏪 Desayuno konbini (precomprado anoche) — hoy se madruga: el @[Kiyomizu](kiyomizu-dera) vacío es para TODOS, no solo un subgrupo.'}
+  - {location: keio-prelia, time-from: '05:00', fixed: true, title: '🏪 Desayuno konbini (precomprado anoche) — hoy se madruga: el @[Kiyomizu](kiyomizu-dera) vacío es para TODOS, no solo un subgrupo.'}
   - {transit: d9-1, time-from: '05:40', title: 'Bus 207 (primer bus ~5:45 desde Shijo) → Kiyomizu-michi — 25 min, llega justo a la apertura. Preferimos el bus por los 10; si no lo alcanzan, taxis ×3–4 (¥1,300 c/u), 12 min.'}
   - {location: kiyomizu-dera, time-from: '06:15', fixed: true, title: '@[Kiyomizu-dera](kiyomizu-dera) ★ — 1 h (abre 6:00, ¥500): EL sueño — el templo casi para ustedes antes de que caiga la ola (~9:30).'}
   - {transit: d9-2, time-from: '07:15', title: '@[Sannenzaka y Ninenzaka](sannenzaka-y-ninenzaka) bajando (sin conmutación) — 45 min: las calles de piedra vacías + @[pagoda Yasaka (Hōkan-ji)](pagoda-yasaka-hokan-ji) ★ para LA foto.'}
   - {transit: d9-e6, hidden-summary: true, title: Sannenzaka y Ninenzaka → Pagoda Yasaka (Hōkan-ji)}
   - {transit: d9-e7, hidden-summary: true, title: Pagoda Yasaka (Hōkan-ji) → Santuario Yasaka}
-  - {transit: d9-e8, hidden-summary: true, title: Santuario Yasaka → Ryōzen Kannon}
-  - {transit: d9-e9, hidden-summary: true, title: Ryōzen Kannon → Gion}
-  - {transit: d9-e12, hidden-summary: true, title: Gion → Sanjūsangen-dō}
-  - {transit: d9-e13, hidden-summary: true, title: Sanjūsangen-dō → Hakubutsukan-Sanjūsangendō-mae}
-  - {transit: d9-e10, hidden-summary: true, title: Gion → Hakubutsukan-Sanjūsangendō-mae}
-  - {transit: d9-e14, hidden-summary: true, title: Hakubutsukan-Sanjūsangendō-mae → Kyoto-eki-mae}
-  - {transit: d9-e11, hidden-summary: true, title: Hakubutsukan-Sanjūsangendō-mae → Gion}
   - {location: santuario-yasaka, time-from: '08:00', title: '@[Santuario Yasaka](santuario-yasaka) + Maruyama — 35 min (siempre abiertos).'}
+  - {transit: d9-e8, hidden-summary: true, title: Santuario Yasaka → Ryōzen Kannon}
   - {location: ryozen-kannon, time-from: '08:40', title: '@[Ryōzen Kannon](ryozen-kannon) ★ — 25 min (abre 8:40, ¥300): la gran Kannon blanca, a 5 min de la pagoda.'}
+  - {transit: d9-e9, hidden-summary: true, title: Ryōzen Kannon → Gion}
   - {transit: d9-3, time-from: '09:10', title: '@[Bus 206](d9-3) desde @[Gion](gion) → Sanjusangendo-mae — 15 min (o taxis ×3 ¥900).'}
   - {location: sanjusangen-do, time-from: '09:30', title: '@[Sanjusangendo](sanjusangen-do) ★ — 1 h (abre 8:30, ¥600): las 1,001 Kannon en el salón de 120 m.'}
   - {transit: d9-4, time-from: '10:30', title: 'A Kyoto Station por Shichijo-dori — 15 min (o @[bus 206](d9-4)/208, 8 min).'}
-  - {time-from: '10:50', title: Comida temprana — 1 h 15 en Porta / The Cube (hileras de restaurantes para grupos).}
-  - time-from: '10:50'
+  - {transit: d9-e13, hidden-summary: true, title: Sanjūsangen-dō → Hakubutsukan-Sanjūsangendō-mae}
+  - {transit: d9-e14, hidden-summary: true, title: Hakubutsukan-Sanjūsangendō-mae → Kyoto-eki-mae}
+  - {time-from: '10:50', duration: 1 h 15, title: Comida temprana — 1 h 15 en Porta / The Cube (hileras de restaurantes para grupos).}
+  - time-from: '12:05'
     title: Elige tu plan del día
     options:
     - title: Opción templo
       steps:
-      - {title: Heian Jingū 🏴 con su torii gigante}
+      - {time-from: '13:30', duration: 2 h 30, title: Heian Jingū 🏴 con su torii gigante}
     - title: Opción río
       steps:
-      - {title: 'El Kamo con cerveza de konbini, viendo pasar Kioto'}
+      - {time-from: '13:30', duration: 2 h 30, title: 'El Kamo con cerveza de konbini, viendo pasar Kioto'}
   - {transit: d9-5, time-from: '12:15', title: 'Kyoto Station → @[Karasuma Line](d9-5), 1 estación → Gojō — 8 min puerta a puerta.'}
   - {time-from: '12:30', title: Descanso — 1 h (siesta o baño de aguas termales; hoy se madrugó).}
   - {time-from: '13:30', title: "Libre — 2 h 30. \U0001F449 Desliza para ver la opción kimono con su horario.\U0001F458 Kimono en Gion\n 13:30\U0001F6B6 Gojō → Higashiyama — 20 min a pie (o \U0001F68C camión 207/206 a Kiyomizu-michi, 15 min)"}
@@ -2125,6 +2124,7 @@ days:
   - {time-from: '15:50', fixed: true, title: 'Devolver el kimono antes del cierre (~18:00)'}
   - {time-from: '16:00', title: 🚶 A Shijo — 12 min a pie desde Gion; libre hasta la cena}
   - time-from: '17:00'
+    duration: 1 h 30
     title: 'Cena temprana — 1 h 30. 🏪 AVISO PARA MAÑANA: salimos temprano a Arashiyama (ese madrugón SÍ se paga solo) — konbini esta noche.'
     options:
     - title: Take
@@ -2200,26 +2200,24 @@ days:
   anchor: bosque de bambú
   date: '2026-10-10'
   steps:
-  - {location: bosque-de-bambu, time-from: '05:00', fixed: true, title: '🏪 Desayuno konbini (precomprado anoche) — hoy el @[bambú](bosque-de-bambu) al alba, con neblina y sin nadie.'}
+  - {location: keio-prelia, time-from: '05:00', fixed: true, title: '🏪 Desayuno konbini (precomprado anoche) — hoy el @[bambú](bosque-de-bambu) al alba, con neblina y sin nadie.'}
+  - {transit: hotel-a-gojo, time-from: '05:40', duration: 4 min, title: Del hotel a la estación Gojō — 4 min.}
   - {transit: d10-1, time-from: '05:45', title: 'Gojō → @[Karasuma Line](d10-1) → Shijo — 3 min.'}
   - {transit: d10-2, time-from: '05:52', title: 'Al andén Hankyu (Karasuma) — 5 min → @[Hankyu Kyoto Line](d10-2).'}
   - {transit: d10-3, time-from: '06:00', title: 'Transbordo en Katsura → @[Hankyu Arashiyama Line](d10-3) → Arashiyama — 25 min.'}
   - {transit: d10-4, time-from: '06:25', title: Cruzar el puente hacia el bosque — 12 min a pie.}
   - {location: bosque-de-bambu, time-from: '06:35', title: '@[Bosque de bambú al alba](bosque-de-bambu) ★ — 45 min: antes de las 8 es un templo; a las 10, un andén del metro.'}
+  - {transit: d10-e9, hidden-summary: true, title: Bosque de bambú → Puente Togetsukyō}
   - {location: puente-togetsukyo, time-from: '07:20', title: '@[Puente Togetsukyō y el río](puente-togetsukyo) — 30 min de niebla y fotos.'}
   - {time-from: '07:50', title: 'Nonomiya-jinja + paseo por Sagano — 40 min: el santuario del bambú (siempre abierto), mientras abre Tenryu-ji.'}
-  - {location: tenryu-ji, time-from: '08:30', fixed: true, title: '@[Tenryu-ji](tenryu-ji) ★ — abre 8:30 (¥500): el templo de 1339 con el jardín Sōgenchi, UNESCO — 1 h; su salida norte da al bambú.'}
-  - {transit: d10-e14, hidden-summary: true, title: Arashiyama Tenryūji-mae → Otagidera-mae}
-  - {transit: d10-e15, hidden-summary: true, title: Otagi Nenbutsu-ji → Bosque Kimono}
-  - {time-from: '09:35', title: Desayuno/café en Arashiyama ☕ — 40 min (% Arabica con vista ¥650 + panadería).}
-  - {transit: d10-5, time-from: '10:15', title: 'Cruzar el @[puente Togetsukyō](puente-togetsukyo) al lado sur — 12 min: la entrada de los monos está del OTRO lado del río.'}
-  - {transit: d10-e9, hidden-summary: true, title: Bosque de bambú → Puente Togetsukyō}
-  - {transit: d10-e12, hidden-summary: true, title: Puente Togetsukyō → Monte de los monos (Iwatayama)}
-  - {transit: d10-e13, hidden-summary: true, title: Monte de los monos (Iwatayama) → Arashiyama Tenryūji-mae}
   - {transit: d10-e10, hidden-summary: true, title: Puente Togetsukyō → Tenryū-ji}
+  - {location: tenryu-ji, time-from: '08:30', fixed: true, title: '@[Tenryu-ji](tenryu-ji) ★ — abre 8:30 (¥500): el templo de 1339 con el jardín Sōgenchi, UNESCO — 1 h; su salida norte da al bambú.'}
+  - {time-from: '09:35', title: Desayuno/café en Arashiyama ☕ — 40 min (% Arabica con vista ¥650 + panadería).}
   - {transit: d10-e11, hidden-summary: true, title: Tenryū-ji → Puente Togetsukyō}
+  - {transit: d10-e12, time-from: '10:15', title: 'Cruzar el @[puente Togetsukyō](puente-togetsukyo) al lado sur — 12 min: la entrada de los monos está del OTRO lado del río.'}
   - {location: monte-de-los-monos-iwatayama, time-from: '10:30', title: '@[Iwatayama Monkey Park](monte-de-los-monos-iwatayama) ★ — 1 h 15 (¥800): 20 min de subida, monos libres, la vista de Kioto.'}
-  - {transit: d10-6, time-from: '11:50', title: 'Taxis ×3 a Otagi (¥1,100, 15 min) o @[bus 92/94](d10-6).'}
+  - {transit: d10-e13, hidden-summary: true, title: Monte de los monos (Iwatayama) → Arashiyama Tenryūji-mae}
+  - {transit: d10-e14, time-from: '11:50', title: 'Taxis ×3 a Otagi (¥1,100, 15 min) o @[bus 92/94](d10-e14) desde Arashiyama Tenryūji-mae.'}
   - {location: otagi-nenbutsu-ji, time-from: '12:10', title: '@[Otagi Nenbutsu-ji](otagi-nenbutsu-ji) ★ — 45 min con las 1,200 estatuas con caras (¥500); es chico: dos tandas de 5.'}
   - time-from: '13:00'
     title: 'Comida — 1 h 15: el yudōfu ES de aquí.'
@@ -2284,10 +2282,10 @@ days:
         - {transit: to-kitcho-arashiyama, title: To Kitchō Arashiyama}
         - {location: kitcho-arashiyama}
         - {transit: from-kitcho-arashiyama, title: From Kitchō Arashiyama}
-  - {time-from: '14:30', title: 'Bajada por el camino de Sagano — 45 min de callecitas, Adashino opcional.'}
-  - {time-from: '15:15', title: Tarde a elegir — 2 h. 👉 Desliza para ver la opción kimono con su horario.}
+  - {transit: d10-e15, time-from: '14:30', title: 'Bajada por el camino de Sagano — 45 min de callecitas, Adashino opcional.'}
   - time-from: '15:15'
-    title: Elige tu plan del día
+    duration: 2 h
+    title: Tarde a elegir — 2 h. 👉 Desliza para ver la opción kimono con su horario.
     options:
     - title: 👘 Kimono en Arashiyama
       steps:
@@ -2295,14 +2293,15 @@ days:
       - {time-from: '15:45', title: '🚶 Puente Togetsukyō — 20 min: la postal del río y la montaña'}
       - {time-from: '16:05', title: '🚶 Callecitas de Sagano — 40 min: casas de madera y tiendas'}
       - {time-from: '16:45', title: '🚶 Bosque Kimono (estación Randen) — 30 min: las columnas de kimono iluminadas'}
-      - {time-from: '17:30', fixed: true, title: 'Devolver el kimono (enlaza con el plan de las 17:30)'}
+      - {time-from: '17:30', fixed: true, duration: 15 min, title: 'Devolver el kimono (enlaza con el plan de las 17:30)'}
     - title: Opción libre
       steps:
-      - {title: 'Café con vista al río, o de vuelta al hotel a descansar'}
+      - {time-from: '15:15', duration: 2 h, title: 'Café con vista al río, o de vuelta al hotel a descansar'}
   - {location: bosque-kimono, time-from: '17:30', title: '@[Bosque Kimono](bosque-kimono) 🏴 — 30 min: las columnas iluminadas de la estación Randen. La estación Randen está en el corazón del pueblo — máx. 10 min desde donde estén.'}
   - {transit: d10-7, time-from: '18:00', title: 'El trenecito @[Randen](d10-7) (el bonito): Randen-Arashiyama → Shijo-Omiya — 25 min.'}
   - {transit: d10-8, time-from: '18:30', title: '@[Hankyu](d10-8): Omiya → Karasuma — 4 min + caminar/1 estación a Gojō — 15 min.'}
   - time-from: '19:30'
+    duration: 1 h 30
     title: 'Cena por Shijo — 1 h 30. 🏪 AVISO PARA MAÑANA: Fushimi a las 6:10 (último madrugón, lo juro) — konbini esta noche.'
     options:
     - title: Take
@@ -2370,20 +2369,16 @@ days:
   anchor: Fushimi Inari
   date: '2026-10-11'
   steps:
-  - {location: fushimi-inari, time-from: '05:00', fixed: true, title: '🏪 Desayuno konbini (precomprado anoche) — hoy los @[portales](fushimi-inari) al alba, vacíos.'}
+  - {location: keio-prelia, time-from: '05:00', fixed: true, title: '🏪 Desayuno konbini (precomprado anoche) — hoy los @[portales](fushimi-inari) al alba, vacíos.'}
+  - {transit: hotel-a-gojo, time-from: '05:50', duration: 4 min, title: Del hotel a la estación Gojō — 4 min.}
   - {transit: d11-1, time-from: '05:55', title: 'Gojō → @[Karasuma Line](d11-1) → Kyoto Station — 4 min.'}
-  - {transit: d11-e8, hidden-summary: true, title: Kyoto-eki-mae → Kinkakuji-michi}
-  - {transit: d11-e11, hidden-summary: true, title: Kinkakuji-michi → Nijōjō-mae}
-  - {transit: d11-e12, hidden-summary: true, title: Nijōjō-mae → Castillo de Nijo}
-  - {transit: d11-e13, hidden-summary: true, title: Castillo de Nijo → Nijōjō-mae}
-  - {transit: d11-e9, hidden-summary: true, title: Kinkakuji-michi → Pabellón Dorado (Kinkaku-ji)}
-  - {transit: d11-e10, hidden-summary: true, title: Pabellón Dorado (Kinkaku-ji) → Kinkakuji-michi}
   - {transit: d11-2, time-from: '06:03', title: '@[JR Nara Line](d11-2) (local), 2 estaciones → Inari — 5 min; la estación queda ENFRENTE de los torii.'}
+  - {transit: d11-3, time-from: '06:08', title: De la estación a los torii y la entrada del santuario — enfrente, subiendo por la calle de acceso.}
   - {location: fushimi-inari, time-from: '06:15', fixed: true, title: '@[Fushimi Inari](fushimi-inari) ★ — 2 h: subir entre miles de portales al mirador Yotsutsuji (con eso basta). Gratis, abierto siempre — al alba está vacío.'}
   - {time-from: '08:20', title: Desayuno cerca de Inari ☕ — 40 min (mochi de sésamo y té en la calle de acceso).}
-  - {transit: d11-3, time-from: '09:40', title: 'La diagonal larga del día: JR de vuelta a Kyoto Station — 5 min.'}
-  - {transit: d11-e7, hidden-summary: true, title: Fushimi Inari → Kyoto-eki-mae}
-  - {transit: d11-4, time-from: '09:50', title: '@[Bus 205](d11-4) (andén B3) → Kinkakuji-michi — 40 min; o taxis ×3 ¥2,800 en 35 — en domingo, taxi gana.'}
+  - {transit: inari-jr-regreso, time-from: '09:40', duration: 5 min, title: 'La diagonal larga del día: JR de vuelta a Kyoto Station — 5 min.'}
+  - {transit: d11-e8, time-from: '09:50', title: '@[Bus 205](d11-e8) (andén B3) → Kinkakuji-michi — 40 min; o taxis ×3 ¥2,800 en 35 — en domingo, taxi gana.'}
+  - {transit: d11-e9, hidden-summary: true, title: Kinkakuji-michi → Pabellón Dorado (Kinkaku-ji)}
   - {location: pabellon-dorado-kinkaku-ji, time-from: '10:45', title: '@[Pabellón Dorado (Kinkaku-ji)](pabellon-dorado-kinkaku-ji) ★ — 1 h (¥500): el reflejo perdona la multitud.'}
   - time-from: '12:00'
     title: Comida — 1 h 15, ligera a propósito. En la zona de Kinkaku — 5 min a pie.
@@ -2448,24 +2443,28 @@ days:
         - {transit: to-anago, title: To Anago}
         - {location: anago}
         - {transit: from-anago, title: From Anago}
-  - {transit: d11-5, time-from: '13:30', title: '@[Bus 12/101](d11-5) por Nishioji → Nijojo-mae — 20 min; o taxis ×3 ¥1,400.'}
+  - {transit: d11-e10, hidden-summary: true, title: Pabellón Dorado (Kinkaku-ji) → Kinkakuji-michi}
+  - {transit: d11-e11, time-from: '13:30', title: '@[Bus 12/101](d11-e11) por Nishioji → Nijojo-mae — 20 min; o taxis ×3 ¥1,400.'}
+  - {transit: d11-e12, hidden-summary: true, title: Nijōjō-mae → Castillo de Nijo}
   - {location: castillo-de-nijo, time-from: '14:00', fixed: true, title: '@[Castillo de Nijo](castillo-de-nijo) ★ — 1 h 30 (¥1,300 con palacio): los pisos de ruiseñor del Shogun — del Keep de Juan (a las 14:00 hay menos grupo escolar).'}
+  - {transit: d11-e13, hidden-summary: true, title: Castillo de Nijo → Nijōjō-mae}
   - {transit: d11-6, time-from: '15:40', title: 'Nijojo-mae → @[Tozai Line](d11-6) → Higashiyama — 12 min directo (la ceremonia de té es en Higashiyama/Gion).'}
   - {transit: d11-e14, hidden-summary: true, title: Higashiyama → Palacio Imperial de Kioto}
   - {location: palacio-imperial-de-kioto, time-from: '16:00', title: 'Opción A de Juan: ceremonia de té privada para 10 — ~¥3,500–5,000 pp, 1 h (reservar YA, para 10 se aparta con semanas). Subgrupo B: @[Palacio Imperial](palacio-imperial-de-kioto) ★ (gratis, último acceso 16:20) o Teramachi libre.'}
-  - {time-from: '18:30', title: 'Cena de despedida de Kioto — 2 h (desde Gion, la cena queda a 10 min a pie), mesa de 10 RESERVADA.'}
-  - time-from: '18:30'
+  - time-from: '16:00'
+    duration: 2 h 30
     title: Elige tu plan del día
     options:
     - title: Templeros
       steps:
-      - {title: 'Bishamondo ★, escondido en las colinas'}
+      - {time-from: '16:00', duration: 2 h, title: 'Bishamondo ★, escondido en las colinas'}
     - title: Vista
       steps:
-      - {title: Torre de Kioto 🔘 (~¥900)}
+      - {time-from: '16:00', duration: 2 h, title: Torre de Kioto 🔘 (~¥900)}
     - title: Libre
       steps:
-      - {title: 'Café, compras en Teramachi, o el matcha parfait de Saryo Tsujiri en Gion ¥1,300'}
+      - {time-from: '16:00', duration: 2 h, title: 'Café, compras en Teramachi, o el matcha parfait de Saryo Tsujiri en Gion ¥1,300'}
+  - {time-from: '18:30', duration: 2 h, title: 'Cena de despedida de Kioto — 2 h (desde Gion, la cena queda a 10 min a pie), mesa de 10 RESERVADA.'}
 - title: lun 12 · → Tokio
   note: shinkansen con vista al Fuji
   anchor: Omoide Yokocho
