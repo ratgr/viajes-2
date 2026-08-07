@@ -61,6 +61,13 @@ URL sin hash: `…/2026-Japon/mapa.html`.
 - Rotar un teléfono (portrait↔landscape) equivale al cruce: verificarlo.
 - Pantalla táctil: ☰, casillas y caminador responden al primer tap (sin
   doble-tap fantasma).
+- **Fichas de pestañas vs caminador (teléfono)**: en < 821 px la barra de
+  pestañas (Itinerario/Mapa/Info/…) debe quedar en UNA sola fila deslizable
+  horizontalmente (sin scrollbar visible) y NUNCA envolverse en 2+ renglones
+  tapando el chip del caminador que vive justo debajo (top 36 px). Verificar
+  en ~360 px de ancho: chip del paso legible y tocable, fichas deslizables
+  con el dedo, y el selector de opciones (Take/Ai/Shu) tampoco queda
+  cubierto por las fichas.
 
 ## Historia 3 — Splitter (divisor arrastrable)
 

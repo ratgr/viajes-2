@@ -227,6 +227,12 @@ body.show-free .panel .steps > li[data-free]::after { content: '⏳ ' attr(data-
 /* pestañas de la app FLOTANDO arriba del mapa (siempre visibles) */
 body > .app-tabs { position: absolute; top: 0; left: 0; right: 0; z-index: 1100; padding: 6px 8px 4px; pointer-events: none; }
 body > .app-tabs a { pointer-events: auto; background: var(--card); box-shadow: 0 2px 8px rgba(0,0,0,.22); }
+/* teléfono: las fichas en UNA fila deslizable — envueltas en 2-3 renglones
+   tapaban el chip del caminador (que vive a top:36px) */
+@media (max-width: 820px) {
+  body > .app-tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  body > .app-tabs::-webkit-scrollbar { display: none; }
+}
 
 /* aviso de login por device flow */
 .dev-login { position: fixed; bottom: 54px; right: 10px; z-index: 1300; background: var(--card); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,.3); padding: 10px 14px; font-size: 13px; }
