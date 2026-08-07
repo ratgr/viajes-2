@@ -1285,22 +1285,26 @@
       geomEd = null;
     }
   }
-  function geomToYaml() {
-    if (!geomEd) return;
-    var s = geomEd.coords.map(function (c) {
+  // reescribe la línea coords: del textarea de entidad y refleja en GEO —
+  // lo usan el editor de geometría, el snap y el trazado Geo auto
+  function setCoordsIn(ta, key, coords) {
+    var s = coords.map(function (c) {
       return c[0].toFixed(6) + ',' + c[1].toFixed(6);
     }).join(' ');
-    var ta = geomEd.ta;
-    // OJO: el dump del server puede PLEGAR la escalar larga en varias líneas
-    // (más indentadas): reemplazar el bloque completo, no solo la primera
+    // OJO: la escalar larga puede venir PLEGADA en varias líneas (más
+    // indentadas): reemplazar el bloque completo, no solo la primera
     var re = /^([ \t]*)coords:[^\n]*(?:\n\1[ \t]+[^\n]*)*/m;
     if (re.test(ta.value)) {
       ta.value = ta.value.replace(re, '$1coords: ' + s);
     } else {
-      ta.value = ta.value.replace(/\s*$/, '\n') + 'coords: ' + s + '\n';
+      ta.value = ta.value.replace(/\s*$/, '\n') + '  coords: ' + s + '\n';
     }
-    GEO.transits[geomEd.key] = GEO.transits[geomEd.key] || { color: '#7a6f63', mode: 'walk' };
-    GEO.transits[geomEd.key].coords = geomEd.coords;
+    GEO.transits[key] = GEO.transits[key] || { color: '#7a6f63', mode: 'walk' };
+    GEO.transits[key].coords = coords;
+  }
+  function geomToYaml() {
+    if (!geomEd) return;
+    setCoordsIn(geomEd.ta, geomEd.key, geomEd.coords);
   }
   function startGeomEdit(key, ta, msg) {
     stopGeomEdit();
@@ -1424,12 +1428,24 @@
       '<button class="dev-move-up" type="button" title="Subir esta fila un lugar">▲ subir</button>' +
       '<button class="dev-move-down" type="button" title="Bajar esta fila un lugar">▼ bajar</button></div>' +
       '<div class="dev-refs"></div>' +
+      '<div class="dev-btns dev-newref-row">' +
+      '<input class="dev-newref" spellcheck="false" placeholder="nueva-clave">' +
+      '<button class="dev-addref" type="button" ' +
+      'title="Crear una referencia aún sin catálogo (queda pendiente de geometría)">➕ ref</button></div>' +
+      '<div class="dev-btns dev-tpl" hidden><span class="dev-tpl-label">plantilla:</span>' +
+      '<button type="button" data-tpl="lugar">lugar</button>' +
+      '<button type="button" data-tpl="walk">caminata</button>' +
+      '<button type="button" data-tpl="train">tren</button>' +
+      '<button type="button" data-tpl="bus">bus</button>' +
+      '<button type="button" data-tpl="ferry">ferry</button></div>' +
       '<textarea class="dev-entity" spellcheck="false" hidden></textarea>' +
       '<div class="dev-btns dev-entity-btns" hidden>' +
       '<button class="dev-save-entity" type="button">Guardar referencia</button>' +
       '<button class="dev-geom" type="button" hidden ' +
       'title="Arrastra vértices · click en punto medio inserta · click derecho borra">Geometría</button>' +
       '<button class="dev-snap" type="button" hidden>Ajustar a calle</button>' +
+      '<button class="dev-autogeo" type="button" hidden ' +
+      'title="Trazar coords por ruta OSRM entre las anclas vecinas del paso">Geo auto</button>' +
       '<span class="dev-entity-name"></span></div>';
     drawer.querySelector('.dev-info').textContent = facts.join('\n');
     document.body.appendChild(drawer);
@@ -1481,38 +1497,112 @@
       snapBtn.hidden = false;
     });
     snapBtn.addEventListener('click', snapGeomToRoads);
+    var autogeoBtn = drawer.querySelector('.dev-autogeo');
+    var tplRow = drawer.querySelector('.dev-tpl');
+    // plantillas para referencias NUEVAS (aún sin catálogo)
+    var TPL = {
+      lugar: { kind: 'places', body: "name: \ngps: \ndescription: ''" },
+      walk: { kind: 'transits', body: "mode: walk\ncolor: '#7a6f63'" },
+      train: { kind: 'transits', body: "mode: train\nline: \ncolor: '#0d6bb7'\nchip: ''\nplatform: []\nreverse: ''\nstations: []" },
+      bus: { kind: 'transits', body: "mode: bus\nline: \ncolor: '#8a6d3b'" },
+      ferry: { kind: 'transits', body: "mode: ferry\ncolor: '#005caf'" }
+    };
+    function showEntity(kind, key, yamlText, isNew) {
+      entCur = { kind: kind, key: key };
+      entName.textContent = (kind || '¿tipo?') + ' · ' + key + (isNew ? ' (NUEVA)' : '');
+      entTa.value = yamlText;
+      entTa.hidden = false;
+      entBtns.hidden = false;
+      tplRow.hidden = !isNew;
+      stopGeomEdit();
+      geomBtn.hidden = kind !== 'transits';
+      geomBtn.textContent = 'Geometría';
+      snapBtn.hidden = true;
+      autogeoBtn.hidden = kind !== 'transits';
+    }
     var entReq = 0;    // generación: gana el ÚLTIMO click, no la respuesta más lenta
+    function loadRef(key) {
+      msg.textContent = '';
+      var myReq = ++entReq;
+      api('/api/entity?trip=' + encodeURIComponent(TRIP) + '&key=' + encodeURIComponent(key))
+        .then(function (d) {
+          if (myReq !== entReq) return;   // ya se pidió otra referencia
+          if (d.ok) {
+            showEntity(d.kind, key, d.yaml, false);
+          } else {
+            // no existe: modo CREAR — elegir plantilla y Guardar referencia
+            showEntity(null, key, key + ':\n  # referencia nueva — elige una plantilla arriba\n', true);
+            msg.textContent = 'referencia sin catálogo: elige plantilla y guarda';
+          }
+        })
+        .catch(function (e) { msg.textContent = 'error: ' + e; });
+    }
     refKeys.forEach(function (key) {
       var b = document.createElement('button');
       b.type = 'button';
       b.textContent = key;
-      b.addEventListener('click', function () {
-        msg.textContent = '';
-        var myReq = ++entReq;
-        api('/api/entity?trip=' + encodeURIComponent(TRIP) + '&key=' + encodeURIComponent(key))
-          .then(function (d) {
-            if (myReq !== entReq) return;   // ya se pidió otra referencia
-            if (!d.ok) { msg.textContent = 'error: ' + d.error; return; }
-            entCur = { kind: d.kind, key: key };
-            entName.textContent = d.kind + ' · ' + key;
-            entTa.value = d.yaml;
-            entTa.hidden = false;
-            entBtns.hidden = false;
-            stopGeomEdit();
-            geomBtn.hidden = d.kind !== 'transits';
-            geomBtn.textContent = 'Geometría';
-            snapBtn.hidden = true;
-          })
-          .catch(function (e) { msg.textContent = 'error: ' + e; });
-      });
+      b.addEventListener('click', function () { loadRef(key); });
       refsBox.appendChild(b);
+    });
+    // crear una referencia SIN CUMPLIR desde cero (clave nueva escrita a mano)
+    drawer.querySelector('.dev-addref').addEventListener('click', function () {
+      var key = drawer.querySelector('.dev-newref').value.trim();
+      if (!/^[a-z0-9][a-z0-9-]*$/.test(key)) {
+        msg.textContent = 'clave inválida (minúsculas, dígitos y guiones)';
+        return;
+      }
+      loadRef(key);
+    });
+    tplRow.addEventListener('click', function (e) {
+      var tpl = e.target.dataset && TPL[e.target.dataset.tpl];
+      if (!tpl || !entCur) return;
+      var body = tpl.body.split('\n').map(function (l) { return '  ' + l; }).join('\n');
+      showEntity(tpl.kind, entCur.key, entCur.key + ':\n' + body + '\n', true);
+      tplRow.hidden = false;   // se puede cambiar de plantilla antes de guardar
+      msg.textContent = 'plantilla ' + e.target.dataset.tpl + ' — edita y Guardar referencia';
+    });
+    // GEO AUTO: trazar coords por ruta OSRM entre las anclas vecinas del paso
+    autogeoBtn.addEventListener('click', function () {
+      if (!entCur) return;
+      var a = (GEO.anchors || {})[li.id] || {};
+      var prev = a.prev, next = a.next;
+      if (!prev || !next) {
+        var idx = stEls.indexOf(li);
+        if (idx >= 0) {
+          var na = neighborAnchors(stEls, idx, false);
+          prev = prev || na.prev;
+          next = next || na.next;
+        }
+      }
+      if (!prev || !next) { msg.textContent = 'sin anclas vecinas para trazar'; return; }
+      var walk = /mode:\s*walk/.test(entTa.value);
+      var base = walk
+        ? 'https://routing.openstreetmap.de/routed-foot/route/v1/foot/'
+        : 'https://router.project-osrm.org/route/v1/driving/';
+      msg.textContent = 'trazando ruta (' + (walk ? 'peatonal' : 'auto') + ')…';
+      fetch(base + prev[1] + ',' + prev[0] + ';' + next[1] + ',' + next[0] +
+            '?overview=full&geometries=geojson')
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          var cs = d.routes && d.routes[0] && d.routes[0].geometry.coordinates;
+          if (!cs || !cs.length) { msg.textContent = 'ruta no encontrada (' + (d.code || '?') + ')'; return; }
+          var pts = cs.map(function (c) { return [c[1], c[0]]; });
+          setCoordsIn(entTa, entCur.key, pts);
+          if (geomEd && geomEd.key === entCur.key) startGeomEdit(entCur.key, entTa, msg);
+          msg.textContent = 'geo auto ✓ (' + pts.length + ' pts) — Guardar referencia para persistir';
+        })
+        .catch(function (e) { msg.textContent = 'error: ' + e; });
     });
     drawer.querySelector('.dev-save-entity').addEventListener('click', function () {
       if (!entCur) return;
+      if (!entCur.kind) { msg.textContent = 'elige una plantilla primero (fija el catálogo)'; return; }
       msg.textContent = 'guardando referencia…';
       api('/api/entity', { kind: entCur.kind, key: entCur.key, yaml: entTa.value })
         .then(function (d) {
-          msg.textContent = d.ok ? 'referencia guardada ✓ (pendiente rebuild)' : 'error: ' + d.error;
+          if (!d.ok) { msg.textContent = 'error: ' + d.error; return; }
+          msg.textContent = 'referencia guardada ✓ (pendiente rebuild)';
+          tplRow.hidden = true;
+          entName.textContent = entCur.kind + ' · ' + entCur.key;
         })
         .catch(function (e) { msg.textContent = 'error: ' + e; });
     });

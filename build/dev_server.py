@@ -293,7 +293,18 @@ def save_entity_raw(trip, kind, key, raw):
     with _YAML_LOCK:
         text = open(yaml_path(trip), encoding="utf-8").read()
         lines = text.splitlines(keepends=True)
-        _k, start, end, col = _entity_span(yaml.compose(text), [kind], key, len(lines))
+        root = yaml.compose(text)
+        try:
+            _k, start, end, col = _entity_span(root, [kind], key, len(lines))
+        except ValueError:
+            # clave NUEVA: se crea al FINAL de su catálogo (referencia sin
+            # cumplir → entra al mapa como conector pendiente hasta tener geo)
+            cat = _map_get(root, kind)
+            if not cat.value:
+                raise ValueError(f"catálogo {kind} vacío: agrégala a mano")
+            last_key = cat.value[-1][0].value
+            _k, _s, end, col = _entity_span(root, [kind], last_key, len(lines))
+            start = end
         pad = " " * col
         block = "".join((pad + ln if ln.strip() else ("\n" if ln.endswith("\n") else ln))
                         for ln in raw.splitlines(True))
