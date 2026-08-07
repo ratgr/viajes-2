@@ -260,7 +260,17 @@ def gen_pwa(trip):
             rel = os.path.relpath(p, pages_dir).replace(os.sep, "/")
             files.append((rel, os.path.getsize(p)))
     files.sort()
-    ver = hashlib.sha1(_json.dumps(files).encode()).hexdigest()[:12]
+    # versión por COMMIT (CI) o por contenido real — nunca solo la lista de
+    # archivos: una edición del mismo tamaño no cambiaría sw.js y los
+    # navegadores se quedarían con la versión vieja para siempre
+    ver = (os.environ.get("GITHUB_SHA") or "")[:12]
+    if not ver:
+        h = hashlib.sha1()
+        for rel, _s in files:
+            h.update(rel.encode())
+            with open(os.path.join(pages_dir, rel.replace("/", os.sep)), "rb") as fh:
+                h.update(fh.read())
+        ver = h.hexdigest()[:12]
     lista = _json.dumps(["./"] + [f for f, _s in files], ensure_ascii=False)
     sw = """// generado por build_mapa.gen_pwa — NO editar a mano
 const CACHE = 'viaje-%s';
@@ -269,9 +279,12 @@ const PRECACHE = %s;
 self.addEventListener('install', (e) => {
   e.waitUntil((async () => {
     const c = await caches.open(CACHE);
-    // en lotes y tolerante: una imagen caída no debe tirar la instalación
+    // en lotes y tolerante: una imagen caída no debe tirar la instalación.
+    // cache:'no-cache' — GitHub Pages sirve max-age=600 y sin esto la
+    // instalación nueva copiaría assets VIEJOS del caché HTTP (versión mixta)
     for (let i = 0; i < PRECACHE.length; i += 20) {
-      await Promise.allSettled(PRECACHE.slice(i, i + 20).map((u) => c.add(u)));
+      await Promise.allSettled(PRECACHE.slice(i, i + 20).map((u) =>
+        c.add(new Request(u, { cache: 'no-cache' }))));
     }
     self.skipWaiting();
   })());
