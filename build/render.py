@@ -592,6 +592,14 @@ def render_options(node, refs, ctx="", row_id=None):
 
 
 def render_li(n, refs, row_id=None, sc=None, ctx=""):
+    # caminatas SOLO-MAPA (hidden-summary): fuera del horario, pero su
+    # duración calculada SÍ se muestra (largo del trazo a 4 km/h)
+    if (n.get("hidden-summary") and not (sc or {}).get("dur")
+            and n.get("duration") in contract.SKIP_DUR):
+        g = step_walk_geometry(n)
+        wc = walk_calc(g, f"{ctx} oculto") if g else None
+        if wc:
+            sc = dict(sc or {}, dur=wc[1], dur_derived=True, approx=True)
     body = row_text(n, refs, sc)
     if "options" in n:
         body += render_options(n, refs, ctx or row_id or "", row_id)
