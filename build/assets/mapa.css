@@ -4,9 +4,17 @@
 /* ---------- disposición: barra lateral + divisor arrastrable + mapa ---------- */
 html, body { height: 100%; }
 body { padding: 0; overflow: hidden; position: relative; }
-/* el MAPA va de lado a lado; el panel FLOTA encima (☰ lo abre/cierra) */
+/* teléfono: el mapa va de lado a lado y el panel FLOTA encima (☰);
+   escritorio (≥821px): el panel es COLUMNA junto al mapa */
 .panel { display: none; position: absolute; top: 0; left: 0; bottom: 0; z-index: 1050; width: 380px; max-width: 85vw; overflow-y: auto; padding: 90px 14px 50px; background: var(--paper); box-shadow: 4px 0 18px rgba(0,0,0,.3); }
 body.panel-open .panel { display: block; }
+@media (min-width: 821px) {
+  body { display: flex; }
+  .panel { position: static; z-index: auto; max-width: 70vw; min-width: 260px; flex: 0 0 auto; padding: 10px 14px 40px; box-shadow: none; height: 100%; box-sizing: border-box; }
+  .splitter { position: static; left: auto; flex: 0 0 5px; height: 100%; }
+  #map { position: relative; inset: auto; flex: 1; min-width: 0; height: 100%; }
+  body.panel-open > .app-tabs { left: calc(var(--panel-w, 380px) + 5px); }
+}
 .splitter { display: none; position: absolute; top: 0; bottom: 0; left: 380px; width: 5px; z-index: 1051; cursor: col-resize; background: var(--line); }
 body.panel-open .splitter { display: block; }
 .splitter:hover, .splitter.dragging { background: var(--shu); }
@@ -240,3 +248,7 @@ body > .app-tabs a { pointer-events: auto; background: var(--card); box-shadow: 
 .gh-login-btns .gh-ok { border-color: var(--shu); color: var(--shu); font-weight: 700; }
 .gh-msg { font-size: 12px; color: var(--ink-soft); }
 .gh-note { font-size: 11.5px; color: var(--ink-soft); margin: 10px 0 0; }
+
+/* capa de POIs en la barra */
+.panel .poi-layer { display: block; font-size: 12.5px; color: var(--ink-soft); padding: 2px 0 6px; cursor: pointer; user-select: none; }
+.panel .poi-layer .ck { margin-right: 6px; }

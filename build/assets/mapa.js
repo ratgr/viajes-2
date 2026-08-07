@@ -108,6 +108,7 @@
     var saved = localStorage.getItem('mapa-panel-w');
     if (saved) panel.style.width = saved + 'px';
     splitter.style.left = (parseInt(saved, 10) || 380) + 'px';
+    document.body.style.setProperty('--panel-w', (parseInt(saved, 10) || 380) + 'px');
     // escritorio: el panel llega ABIERTO (flota sobre el mapa de lado a lado)
     if (window.matchMedia('(min-width: 821px)').matches) {
       document.body.classList.add('panel-open');
@@ -124,6 +125,8 @@
       var w = Math.max(260, Math.min(e.clientX, window.innerWidth * 0.7));
       panel.style.width = w + 'px';
       splitter.style.left = w + 'px';
+      document.body.style.setProperty('--panel-w', w + 'px');
+      if (map) map.invalidateSize();
     });
     splitter.addEventListener('pointerup', function () {
       dragging = false;
@@ -133,7 +136,9 @@
     splitter.addEventListener('dblclick', function () {
       panel.style.width = '380px';
       splitter.style.left = '380px';
+      document.body.style.setProperty('--panel-w', '380px');
       localStorage.removeItem('mapa-panel-w');
+      if (map) map.invalidateSize();
     });
   }
 
@@ -1101,6 +1106,43 @@
     }
   }
 
+  // ---------- capa de POIs en la barra: todos los puntos del viaje ----------
+  var poiLayer = null;
+  (function poiControl() {
+    if (!map || !panel) return;
+    var all = {};
+    Object.keys(GEO.transits).forEach(function (k) {
+      (GEO.transits[k].pois || []).forEach(function (p) { all[p[2]] = p; });
+    });
+    var keys = Object.keys(all);
+    if (!keys.length) return;
+    var row = document.createElement('label');
+    row.className = 'poi-layer';
+    row.innerHTML = '<input type="checkbox" class="ck"> 📍 Puntos de interés (' + keys.length + ')';
+    var nav = panel.querySelector('.day-nav');
+    nav.parentNode.insertBefore(row, nav.nextSibling);
+    var ck = row.querySelector('input');
+    ck.checked = localStorage.getItem('mapa-pois') === '1';
+    function syncPois() {
+      if (poiLayer) { map.removeLayer(poiLayer); poiLayer = null; }
+      if (!ck.checked) return;
+      poiLayer = L.layerGroup(keys.map(function (k) {
+        var p = all[k];
+        var mk = L.circleMarker([p[0], p[1]], {
+          radius: 4.5, color: '#fff', weight: 1.5, fillColor: '#c9a227', fillOpacity: 1
+        });
+        mk.bindTooltip(p[3], { direction: 'top', offset: [0, -5] });
+        mk.on('click', function () { showOnMap(p[2], p[3]); selectByKey(p[2]); });
+        return mk;
+      })).addTo(map);
+    }
+    ck.addEventListener('change', function () {
+      localStorage.setItem('mapa-pois', ck.checked ? '1' : '0');
+      syncPois();
+    });
+    syncPois();
+  })();
+
   // ---------- chip de DEPLOY: la página vigila su propia Action ----------
   // repo público: sin auth. 'publicando…' mientras corre; si el último run
   // exitoso no es ESTE build, ofrece recargar (el SW trae la versión nueva).
@@ -1218,6 +1260,7 @@
   document.body.appendChild(toggle);
   toggle.addEventListener('click', function () {
     document.body.classList.toggle('panel-open');
+    if (map) setTimeout(function () { map.invalidateSize(); }, 60);
   });
   function closePanelIfNarrow() {
     if (narrow.matches) document.body.classList.remove('panel-open');
