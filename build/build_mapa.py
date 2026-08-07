@@ -12,6 +12,8 @@ import json
 import os
 import sys
 
+import yaml
+
 import render
 from common import resolve_trip
 
@@ -111,6 +113,61 @@ def anchors_tokens():
     return anchors
 
 
+def spans_tokens(trip):
+    """spans de TEXTO por id de fila y por entidad + sha git del YAML: con
+    esto la página editada EN LÍNEA (dev-github.js) corta/empalma el archivo
+    vía contents API con la MISMA semántica que el dev_server local, sin
+    parsear YAML en el navegador. Ligado al blob sha: si el sitio va atrás
+    del archivo, el editor lo detecta y espera el deploy."""
+    import hashlib
+    import dev_server as ds     # la lógica de spans (compose marks) vive ahí
+    path = os.path.join(render_root(), "src", trip, "viaje.yaml")
+    raw = open(path, "rb").read()
+    sha = hashlib.sha1(b"blob %d\x00" % len(raw) + raw).hexdigest()
+    text = raw.decode("utf-8")
+    lines = text.splitlines(keepends=True)
+    root = yaml.compose(text)
+    steps = {}
+
+    def walk(day_n, step_n, sub, s):
+        sid = f"d{day_n}-r{step_n:02d}{sub}"
+        try:
+            seq, idx = ds._resolve_step_seq(root, day_n, step_n, sub)
+            steps[sid] = list(ds._seq_item_span(seq, idx, len(lines)))
+        except Exception:
+            return
+        for gi, o in enumerate(s.get("options") or [], 1):
+            if not isinstance(o, dict):
+                continue
+            if "steps" in o:
+                for si, sub_s in enumerate(o["steps"], 1):
+                    if isinstance(sub_s, dict):
+                        walk(day_n, step_n, f"{sub}-g{gi}-s{si}", sub_s)
+            else:
+                for oi, x in enumerate(o.get("options") or [], 1):
+                    if isinstance(x, dict):
+                        for si, sub_s in enumerate(x.get("steps") or [], 1):
+                            if isinstance(sub_s, dict):
+                                walk(day_n, step_n, f"{sub}-g{gi}-o{oi}-s{si}", sub_s)
+
+    for dn, day in enumerate(render.DAYS, 1):
+        for sn, s in enumerate(day.get("steps", []), 1):
+            if isinstance(s, dict):
+                walk(dn, sn, "", s)
+    ents = {}
+    data = yaml.safe_load(text)
+    for kind in ("places", "transits", "lines"):
+        for key in (data.get(kind) or {}):
+            try:
+                k, a, b, col = ds._entity_span(root, [kind], key, len(lines))
+                ents[key] = [k, a, b, col]
+            except Exception:
+                pass
+    return {"sha": sha, "repo": "ratgr/viajes-2",
+            "path": f"src/{trip}/viaje.yaml", "branch": "main",
+            "steps": steps, "entities": ents}
+
+
 def geo_tokens():
     """geometría por clave YAML para el mapa: gps de places, coords de transits.
     (Se inyecta como JSON aparte: las coordenadas no son parte de las filas.)"""
@@ -152,7 +209,7 @@ def geo_tokens():
     # para el modo dev, en vez de olfatear la URL)
     pts = list(locs.values()) + [p for t in transits.values() for p in t["coords"]]
     geo = {"locations": locs, "transits": transits, "trip": _TRIP[0],
-           "anchors": anchors_tokens()}
+           "anchors": anchors_tokens(), "edit": spans_tokens(_TRIP[0])}
     if pts:
         geo["bbox"] = [min(p[0] for p in pts), min(p[1] for p in pts),
                        max(p[0] for p in pts), max(p[1] for p in pts)]
