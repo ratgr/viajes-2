@@ -5,7 +5,7 @@
 html, body { height: 100%; }
 body { padding: 0; overflow: hidden; position: relative; }
 /* el MAPA va de lado a lado; el panel FLOTA encima (☰ lo abre/cierra) */
-.panel { display: none; position: absolute; top: 0; left: 0; bottom: 0; z-index: 1050; width: 380px; max-width: 85vw; overflow-y: auto; padding: 54px 14px 50px; background: var(--paper); box-shadow: 4px 0 18px rgba(0,0,0,.3); }
+.panel { display: none; position: absolute; top: 0; left: 0; bottom: 0; z-index: 1050; width: 380px; max-width: 85vw; overflow-y: auto; padding: 90px 14px 50px; background: var(--paper); box-shadow: 4px 0 18px rgba(0,0,0,.3); }
 body.panel-open .panel { display: block; }
 .splitter { display: none; position: absolute; top: 0; bottom: 0; left: 380px; width: 5px; z-index: 1051; cursor: col-resize; background: var(--line); }
 body.panel-open .splitter { display: block; }
@@ -127,13 +127,13 @@ body.show-free .panel .steps > li[data-free]::after { content: '⏳ ' attr(data-
 /* ---------- teléfono: el mapa es la vista; el panel se abre con ☰ ---------- */
 /* botones flotantes de la derecha: base común, cada uno solo fija su altura */
 .panel-toggle, .dev-toggle, .free-toggle { position: absolute; right: 10px; z-index: 1100; width: 40px; height: 40px; border: none; border-radius: 10px; background: var(--card); color: var(--ink); box-shadow: 0 2px 8px rgba(0,0,0,.28); font-size: 17px; cursor: pointer; }
-.panel-toggle { top: 46px; font-size: 18px; }
+.panel-toggle { top: 84px; font-size: 18px; }
 
 
 /* ---------- modo dev (solo localhost): editor de pasos YAML ---------- */
-.dev-toggle { top: 94px; }
+.dev-toggle { top: 132px; }
 .dev-toggle.on { background: var(--shu); }
-.free-toggle { top: 142px; }
+.free-toggle { top: 180px; }
 .free-toggle.on { background: var(--matcha); }
 .dev-drawer { position: absolute; right: 10px; bottom: 10px; z-index: 1300; width: min(520px, 92vw); background: var(--card); color: var(--ink); border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,.35); padding: 12px; }
 .dev-drawer .dev-info { font: 11px ui-monospace, Consolas, monospace; color: var(--ink-soft); white-space: pre-wrap; margin-bottom: 8px; }
@@ -168,7 +168,7 @@ body.show-free .panel .steps > li[data-free]::after { content: '⏳ ' attr(data-
    a las orillas, título centrado) y el mapa se ve y se usa entre ellas —
    en teléfono la barra sólida tapaba medio mapa y los botones de zoom.
    El stepper de DÍA vive abajo, igual de suelto. */
-.stepper { position: absolute; top: 0; left: 0; right: 0; z-index: 1000; font-size: 12.5px; pointer-events: none; }
+.stepper { position: absolute; top: 36px; left: 0; right: 0; z-index: 1000; font-size: 12.5px; pointer-events: none; }
 .stepper .st-row { display: flex; align-items: center; gap: 8px; padding: 8px; }
 /* pastilla flotante común del caminador (ambas barras) */
 .stepper .st-prev, .stepper .st-next, .stepper .st-cur, .stepper .st-jump-toggle, .stepper .st-col-head,
@@ -205,15 +205,16 @@ body.show-free .panel .steps > li[data-free]::after { content: '⏳ ' attr(data-
 .day-stepper .ds-cur { padding: 5px 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 
 /* el cromo de Leaflet solo libra la fila de pastillas de arriba/abajo */
-#map .leaflet-top .leaflet-control { margin-top: 52px; }
+#map .leaflet-top .leaflet-control { margin-top: 92px; }
 #map .leaflet-bottom .leaflet-control { margin-bottom: 42px; }
 
 /* alta de referencias nuevas en el cajón dev */
 .dev-drawer .dev-newref { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); color: var(--ink); font: 12px ui-monospace, monospace; padding: 4px 8px; }
 .dev-drawer .dev-tpl-label { color: var(--ink-soft); font-size: 11px; align-self: center; }
 
-/* pestañas de la app en la barra del mapa */
-.panel .app-tabs { padding: 0 0 6px; }
+/* pestañas de la app FLOTANDO arriba del mapa (siempre visibles) */
+body > .app-tabs { position: absolute; top: 0; left: 0; right: 0; z-index: 1100; padding: 6px 8px 4px; pointer-events: none; }
+body > .app-tabs a { pointer-events: auto; background: var(--card); box-shadow: 0 2px 8px rgba(0,0,0,.22); }
 
 /* aviso de login por device flow */
 .dev-login { position: fixed; bottom: 54px; right: 10px; z-index: 1300; background: var(--card); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,.3); padding: 10px 14px; font-size: 13px; }

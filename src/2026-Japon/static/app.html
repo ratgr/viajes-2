@@ -663,42 +663,7 @@
 })();
 </script>
 <!--SOLO-ARTIFACT-START-->
-<button id="btn-corregir" type="button">✏️ Corregir con Claude</button>
-<script>
-(function () {
-  var pop2 = document.getElementById('pop');
-  document.getElementById('btn-corregir').addEventListener('click', function () {
-    var ahora = document.querySelector('.now-slot');
-    var dia = document.querySelector('.now-day h3');
-    var ctx = (dia ? dia.textContent : '') + (ahora && ahora.querySelector('.t') ? ' · ' + ahora.querySelector('.t').textContent.trim() : '');
-    document.getElementById('pop-t').textContent = 'Corrección en vivo';
-    document.getElementById('pop-e').innerHTML =
-      (ctx ? '<span style="color:var(--ink-soft)">Contexto: ' + ctx + '</span><br>' : '') +
-      '<textarea id="fix-txt" rows="4" style="width:100%;margin:8px 0;padding:10px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font:14px system-ui, sans-serif" placeholder="¿Qué corregimos del plan?"></textarea>' +
-      '<button id="fix-copy" type="button" style="background:var(--shu);color:#fff;border:none;border-radius:6px;padding:9px 16px;font:700 13.5px system-ui, sans-serif;cursor:pointer">📋 Copiar para Claude</button>' +
-      '<span id="fix-ok" style="margin-left:10px;color:var(--matcha);font-weight:700"></span>' +
-      '<p style="margin-top:12px;font-size:13.5px">Luego: <a href="https://claude.ai/code" target="_blank" rel="noopener" style="color:var(--shu);font-weight:700">abrir claude.ai/code ↗</a>, sesión en el repo <b>ratgr/viajes-2</b>, y pegar — el CLAUDE.md del repo hace el resto; al hacer push, la app de la familia se actualiza sola.</p>';
-    document.getElementById('pop-v').innerHTML = '';
-    pop2.classList.add('open');
-    document.getElementById('fix-copy').addEventListener('click', function () {
-      var txt = document.getElementById('fix-txt').value.trim();
-      if (!txt) { document.getElementById('fix-txt').focus(); return; }
-      var msg = 'Corrección al plan de Japón' + (ctx ? ' [' + ctx + ']' : '') + ': ' + txt +
-        ' — trabaja en el repo ratgr/viajes-2 (lee su CLAUDE.md): edita src/2026-Japon/viaje.yaml y haz push a main; el Action publica solo a la app familiar.';
-      function hecho() { document.getElementById('fix-ok').textContent = '✓ copiada'; }
-      function fallback() {
-        var ta = document.createElement('textarea');
-        ta.value = msg; ta.style.position = 'fixed'; ta.style.opacity = '0';
-        document.body.appendChild(ta); ta.select();
-        try { document.execCommand('copy'); hecho(); } catch (e) { document.getElementById('fix-txt').value = msg; document.getElementById('fix-ok').textContent = 'cópiala manual ↑'; }
-        document.body.removeChild(ta);
-      }
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(msg).then(hecho, fallback);
-      } else { fallback(); }
-    });
-  });
-})();
-</script>
+
+
 <!--SOLO-ARTIFACT-END-->
 <script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');</script>
