@@ -1,0 +1,6423 @@
+[
+ {
+  "key": "itami-monorail",
+  "line": "Osaka Monorail",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "",
+    "jp": "大阪空港",
+    "romaji": "Osaka-kūkō",
+    "exp": [
+     34.791396,
+     135.44201
+    ],
+    "osm": [
+     34.791377,
+     135.442003
+    ],
+    "osm_name": "大阪空港",
+    "osm_kind": "station",
+    "dist_m": 2,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "",
+    "jp": "蛍池",
+    "romaji": "Hotarugaike",
+    "exp": [
+     34.794606,
+     135.449324
+    ],
+    "osm": [
+     34.794616,
+     135.44927
+    ],
+    "osm_name": "蛍池",
+    "osm_kind": "station",
+    "dist_m": 5,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "",
+    "jp": "柴原阪大前",
+    "romaji": "Shibahara-Handai-mae",
+    "exp": [
+     34.800368,
+     135.458652
+    ],
+    "osm": [
+     34.800347,
+     135.458675
+    ],
+    "osm_name": "柴原阪大前",
+    "osm_kind": "station",
+    "dist_m": 3,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "",
+    "jp": "少路",
+    "romaji": "Shōji",
+    "exp": [
+     34.804269,
+     135.475437
+    ],
+    "osm": [
+     34.804265,
+     135.47543
+    ],
+    "osm_name": "少路",
+    "osm_kind": "station",
+    "dist_m": 1,
+    "status": "ok"
+   },
+   {
+    "i": 4,
+    "code": "",
+    "jp": "千里中央",
+    "romaji": "Senri-Chūō",
+    "exp": [
+     34.809825,
+     135.495054
+    ],
+    "osm": [
+     34.80988,
+     135.495052
+    ],
+    "osm_name": "千里中央",
+    "osm_kind": "station",
+    "dist_m": 6,
+    "status": "ok"
+   },
+   {
+    "i": 5,
+    "code": "",
+    "jp": "山田",
+    "romaji": "Yamada",
+    "exp": [
+     34.804454,
+     135.515672
+    ],
+    "osm": [
+     34.804238,
+     135.515686
+    ],
+    "osm_name": "山田",
+    "osm_kind": "station",
+    "dist_m": 24,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "yamada-hankyu",
+  "line": "Hankyu (Senri / Kyoto / Arashiyama)",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "",
+    "jp": "山田",
+    "romaji": "Yamada",
+    "exp": [
+     34.804454,
+     135.515672
+    ],
+    "osm": [
+     34.804238,
+     135.515686
+    ],
+    "osm_name": "山田",
+    "osm_kind": "station",
+    "dist_m": 24,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "",
+    "jp": "南千里",
+    "romaji": "Minami-Senri",
+    "exp": [
+     34.792591,
+     135.508837
+    ],
+    "osm": [
+     34.792524,
+     135.508731
+    ],
+    "osm_name": "南千里",
+    "osm_kind": "station",
+    "dist_m": 12,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "",
+    "jp": "千里山",
+    "romaji": "Senriyama",
+    "exp": [
+     34.778678,
+     135.505422
+    ],
+    "osm": [
+     34.77921,
+     135.505411
+    ],
+    "osm_name": "千里山",
+    "osm_kind": "station",
+    "dist_m": 59,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "",
+    "jp": "関大前",
+    "romaji": "Kandai-mae",
+    "exp": [
+     34.77092,
+     135.506181
+    ],
+    "osm": [
+     34.77109,
+     135.506038
+    ],
+    "osm_name": "関大前",
+    "osm_kind": "station",
+    "dist_m": 23,
+    "status": "ok"
+   },
+   {
+    "i": 4,
+    "code": "",
+    "jp": "豊津",
+    "romaji": "Toyotsu",
+    "exp": [
+     34.764629,
+     135.509044
+    ],
+    "osm": [
+     34.764349,
+     135.509255
+    ],
+    "osm_name": "豊津",
+    "osm_kind": "station",
+    "dist_m": 37,
+    "status": "ok"
+   },
+   {
+    "i": 5,
+    "code": "",
+    "jp": "吹田",
+    "romaji": "Suita",
+    "exp": [
+     34.763003,
+     135.523826
+    ],
+    "osm": [
+     34.763158,
+     135.523588
+    ],
+    "osm_name": "吹田",
+    "osm_kind": "station",
+    "dist_m": 28,
+    "status": "ok"
+   },
+   {
+    "i": 6,
+    "code": "",
+    "jp": "下新庄",
+    "romaji": "Shimo-Shinjō",
+    "exp": [
+     34.746914,
+     135.519944
+    ],
+    "osm": [
+     34.746167,
+     135.52003
+    ],
+    "osm_name": "下新庄",
+    "osm_kind": "station",
+    "dist_m": 83,
+    "status": "ok"
+   },
+   {
+    "i": 7,
+    "code": "",
+    "jp": "淡路",
+    "romaji": "Awaji",
+    "exp": [
+     34.739401,
+     135.516809
+    ],
+    "osm": [
+     34.739255,
+     135.516892
+    ],
+    "osm_name": "淡路",
+    "osm_kind": "station",
+    "dist_m": 18,
+    "status": "ok"
+   },
+   {
+    "i": 8,
+    "code": "",
+    "jp": "柴島",
+    "romaji": "Kunijima",
+    "exp": [
+     34.728332,
+     135.511568
+    ],
+    "osm": [
+     34.728474,
+     135.511534
+    ],
+    "osm_name": "柴島",
+    "osm_kind": "station",
+    "dist_m": 16,
+    "status": "ok"
+   },
+   {
+    "i": 9,
+    "code": "K11",
+    "jp": "天神橋筋六丁目",
+    "romaji": "Tenjimbashisuji 6-chōme",
+    "exp": [
+     34.710761,
+     135.51082
+    ],
+    "osm": [
+     34.710654,
+     135.511851
+    ],
+    "osm_name": "天神橋筋六丁目",
+    "osm_kind": "station",
+    "dist_m": 95,
+    "status": "ok"
+   },
+   {
+    "i": 10,
+    "code": "K12",
+    "jp": "扇町",
+    "romaji": "Ōgimachi",
+    "exp": [
+     34.703715,
+     135.510892
+    ],
+    "osm": [
+     34.704476,
+     135.510843
+    ],
+    "osm_name": "扇町",
+    "osm_kind": "station",
+    "dist_m": 85,
+    "status": "ok"
+   },
+   {
+    "i": 11,
+    "code": "K13",
+    "jp": "南森町",
+    "romaji": "Minami-Morimachi",
+    "exp": [
+     34.697549,
+     135.510864
+    ],
+    "osm": [
+     34.697578,
+     135.511002
+    ],
+    "osm_name": "南森町",
+    "osm_kind": "station",
+    "dist_m": 13,
+    "status": "ok"
+   },
+   {
+    "i": 12,
+    "code": "K14",
+    "jp": "北浜",
+    "romaji": "Kitahama",
+    "exp": [
+     34.691696,
+     135.506652
+    ],
+    "osm": [
+     34.691171,
+     135.506582
+    ],
+    "osm_name": "北浜",
+    "osm_kind": "station",
+    "dist_m": 59,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "metro-tanimachi",
+  "line": "Metro Tanimachi",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "T23",
+    "jp": "谷町四丁目",
+    "romaji": "Tanimachi 4-chōme",
+    "exp": [
+     34.682107,
+     135.517253
+    ],
+    "osm": [
+     34.682358,
+     135.517315
+    ],
+    "osm_name": "谷町四丁目",
+    "osm_kind": "station",
+    "dist_m": 28,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "T24",
+    "jp": "谷町六丁目",
+    "romaji": "Tanimachi 6-chōme",
+    "exp": [
+     34.676028,
+     135.517089
+    ],
+    "osm": [
+     34.675902,
+     135.517104
+    ],
+    "osm_name": "谷町六丁目",
+    "osm_kind": "station",
+    "dist_m": 14,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "T25",
+    "jp": "谷町九丁目",
+    "romaji": "Tanimachi 9-chōme",
+    "exp": [
+     34.666639,
+     135.515947
+    ],
+    "osm": [
+     34.667085,
+     135.515839
+    ],
+    "osm_name": "谷町九丁目",
+    "osm_kind": "station",
+    "dist_m": 51,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "metro-sennichimae",
+  "line": "Metro Sennichimae",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "S18",
+    "jp": "谷町九丁目",
+    "romaji": "Tanimachi 9-chōme",
+    "exp": [
+     34.666639,
+     135.515947
+    ],
+    "osm": [
+     34.667085,
+     135.515839
+    ],
+    "osm_name": "谷町九丁目",
+    "osm_kind": "station",
+    "dist_m": 51,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "S17",
+    "jp": "日本橋",
+    "romaji": "Nippombashi",
+    "exp": [
+     34.666968,
+     135.50612
+    ],
+    "osm": [
+     34.666718,
+     135.506149
+    ],
+    "osm_name": "日本橋",
+    "osm_kind": "station",
+    "dist_m": 28,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "S16",
+    "jp": "なんば",
+    "romaji": "Namba",
+    "exp": [
+     34.667098,
+     135.500342
+    ],
+    "osm": [
+     34.667249,
+     135.499721
+    ],
+    "osm_name": "なんば",
+    "osm_kind": "station",
+    "dist_m": 59,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "metro-midosuji",
+  "line": "Metro Midosuji",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "M20",
+    "jp": "なんば",
+    "romaji": "Namba",
+    "exp": [
+     34.667098,
+     135.500342
+    ],
+    "osm": [
+     34.667249,
+     135.499721
+    ],
+    "osm_name": "なんば",
+    "osm_kind": "station",
+    "dist_m": 59,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "M19",
+    "jp": "心斎橋",
+    "romaji": "Shinsaibashi",
+    "exp": [
+     34.675057,
+     135.500377
+    ],
+    "osm": [
+     34.674517,
+     135.500357
+    ],
+    "osm_name": "心斎橋",
+    "osm_kind": "station",
+    "dist_m": 60,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "M18",
+    "jp": "本町",
+    "romaji": "Hommachi",
+    "exp": [
+     34.682007,
+     135.498829
+    ],
+    "osm": [
+     34.682018,
+     135.498721
+    ],
+    "osm_name": "本町",
+    "osm_kind": "station",
+    "dist_m": 10,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "M17",
+    "jp": "淀屋橋",
+    "romaji": "Yodoyabashi",
+    "exp": [
+     34.692261,
+     135.501053
+    ],
+    "osm": [
+     34.692501,
+     135.501293
+    ],
+    "osm_name": "淀屋橋",
+    "osm_kind": "station",
+    "dist_m": 35,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d5-2",
+  "line": "Metro Midosuji",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "M17",
+    "jp": "淀屋橋",
+    "romaji": "Yodoyabashi",
+    "exp": [
+     34.692261,
+     135.501053
+    ],
+    "osm": [
+     34.692501,
+     135.501293
+    ],
+    "osm_name": "淀屋橋",
+    "osm_kind": "station",
+    "dist_m": 35,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "M16",
+    "jp": "梅田",
+    "romaji": "Umeda",
+    "exp": [
+     34.705027,
+     135.498427
+    ],
+    "osm": [
+     34.703413,
+     135.497588
+    ],
+    "osm_name": "梅田",
+    "osm_kind": "station",
+    "dist_m": 195,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "M15",
+    "jp": "中津",
+    "romaji": "Nakatsu",
+    "exp": [
+     34.711152,
+     135.496999
+    ],
+    "osm": [
+     34.71104,
+     135.496831
+    ],
+    "osm_name": "中津",
+    "osm_kind": "station",
+    "dist_m": 20,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "M14",
+    "jp": "西中島南方",
+    "romaji": "Nishinakajima-Minamigata",
+    "exp": [
+     34.726407,
+     135.498586
+    ],
+    "osm": [
+     34.726637,
+     135.498596
+    ],
+    "osm_name": "西中島南方",
+    "osm_kind": "station",
+    "dist_m": 26,
+    "status": "ok"
+   },
+   {
+    "i": 4,
+    "code": "M13",
+    "jp": "新大阪",
+    "romaji": "Shin-Osaka",
+    "exp": [
+     34.733466,
+     135.500255
+    ],
+    "osm": [
+     34.733539,
+     135.500189
+    ],
+    "osm_name": "新大阪",
+    "osm_kind": "station",
+    "dist_m": 10,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d5-3",
+  "line": "Shinkansen",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "",
+    "jp": "新大阪",
+    "romaji": "Shin-Osaka",
+    "exp": [
+     34.733466,
+     135.500264
+    ],
+    "osm": [
+     34.733539,
+     135.500189
+    ],
+    "osm_name": "新大阪",
+    "osm_kind": "station",
+    "dist_m": 11,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "",
+    "jp": "新神戸",
+    "romaji": "Shin-Kōbe",
+    "exp": [
+     34.706288,
+     135.195468
+    ],
+    "osm": [
+     34.706488,
+     135.195616
+    ],
+    "osm_name": "新神戸",
+    "osm_kind": "station",
+    "dist_m": 26,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "",
+    "jp": "岡山",
+    "romaji": "Okayama",
+    "exp": [
+     34.66675,
+     133.918266
+    ],
+    "osm": [
+     34.66675,
+     133.918266
+    ],
+    "osm_name": "岡山",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "",
+    "jp": "広島",
+    "romaji": "Hiroshima",
+    "exp": [
+     34.397667,
+     132.475379
+    ],
+    "osm": [
+     34.397395,
+     132.475837
+    ],
+    "osm_name": "広島",
+    "osm_kind": "station",
+    "dist_m": 52,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d5-4",
+  "line": "JR San-yō Line (local)",
+  "exp_src": "n/a",
+  "stations": [
+   {
+    "i": 0,
+    "code": "",
+    "jp": "広島",
+    "romaji": "Hiroshima",
+    "osm": [
+     34.397395,
+     132.475837
+    ],
+    "osm_name": "広島",
+    "dist_to_polyline_m": 52,
+    "status": "exists"
+   },
+   {
+    "i": 1,
+    "code": "",
+    "jp": "新白島",
+    "romaji": "Shin-Hakushima",
+    "osm": [
+     34.408407,
+     132.461564
+    ],
+    "osm_name": "新白島",
+    "dist_to_polyline_m": 298,
+    "status": "exists"
+   },
+   {
+    "i": 2,
+    "code": "",
+    "jp": "横川",
+    "romaji": "Yokogawa",
+    "osm": [
+     34.410418,
+     132.450821
+    ],
+    "osm_name": "横川",
+    "dist_to_polyline_m": 125,
+    "status": "exists"
+   },
+   {
+    "i": 3,
+    "code": "",
+    "jp": "西広島",
+    "romaji": "Nishi-Hiroshima",
+    "osm": [
+     34.397997,
+     132.427916
+    ],
+    "osm_name": "西広島",
+    "dist_to_polyline_m": 329,
+    "status": "exists"
+   },
+   {
+    "i": 4,
+    "code": "",
+    "jp": "新井口",
+    "romaji": "Shin-Inokuchi",
+    "osm": [
+     34.375208,
+     132.391442
+    ],
+    "osm_name": "新井口",
+    "dist_to_polyline_m": 18,
+    "status": "exists"
+   },
+   {
+    "i": 5,
+    "code": "",
+    "jp": "五日市",
+    "romaji": "Itsukaichi",
+    "osm": [
+     34.366764,
+     132.368018
+    ],
+    "osm_name": "五日市",
+    "dist_to_polyline_m": 62,
+    "status": "exists"
+   },
+   {
+    "i": 6,
+    "code": "",
+    "jp": "廿日市",
+    "romaji": "Hatsukaichi",
+    "osm": [
+     34.358027,
+     132.335674
+    ],
+    "osm_name": "廿日市",
+    "dist_to_polyline_m": 246,
+    "status": "exists"
+   },
+   {
+    "i": 7,
+    "code": "",
+    "jp": "宮内串戸",
+    "romaji": "Miyauchi-Kushido",
+    "osm": [
+     34.348043,
+     132.323751
+    ],
+    "osm_name": "宮内串戸",
+    "dist_to_polyline_m": 305,
+    "status": "exists"
+   },
+   {
+    "i": 8,
+    "code": "",
+    "jp": "阿品",
+    "romaji": "Ajina",
+    "osm": [
+     34.323098,
+     132.314312
+    ],
+    "osm_name": "阿品",
+    "dist_to_polyline_m": 149,
+    "status": "exists"
+   },
+   {
+    "i": 9,
+    "code": "",
+    "jp": "宮島口",
+    "romaji": "Miyajimaguchi",
+    "osm": [
+     34.312313,
+     132.302938
+    ],
+    "osm_name": "宮島口",
+    "dist_to_polyline_m": 34,
+    "status": "exists"
+   }
+  ]
+ },
+ {
+  "key": "d5-5",
+  "line": "Ferry JR a Miyajima",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "",
+    "jp": "宮島口",
+    "romaji": "Miyajimaguchi",
+    "exp": [
+     34.311003,
+     132.306241
+    ],
+    "osm": [
+     34.312313,
+     132.302938
+    ],
+    "osm_name": "宮島口",
+    "osm_kind": "station",
+    "dist_m": 336,
+    "status": "far"
+   },
+   {
+    "i": 1,
+    "code": "",
+    "jp": "宮島",
+    "romaji": "Miyajima",
+    "exp": [
+     34.3027,
+     132.321902
+    ],
+    "status": "far",
+    "osm": [
+     34.312313,
+     132.302938
+    ],
+    "osm_name": "宮島口",
+    "osm_kind": "station",
+    "dist_m": 2044
+   }
+  ]
+ },
+ {
+  "key": "d5-6",
+  "line": "Ferry JR a Miyajima",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "",
+    "jp": "宮島",
+    "romaji": "Miyajima",
+    "exp": [
+     34.3027,
+     132.321902
+    ],
+    "status": "far",
+    "osm": [
+     34.312313,
+     132.302938
+    ],
+    "osm_name": "宮島口",
+    "osm_kind": "station",
+    "dist_m": 2044
+   },
+   {
+    "i": 1,
+    "code": "",
+    "jp": "宮島口",
+    "romaji": "Miyajimaguchi",
+    "exp": [
+     34.311003,
+     132.306241
+    ],
+    "osm": [
+     34.312313,
+     132.302938
+    ],
+    "osm_name": "宮島口",
+    "osm_kind": "station",
+    "dist_m": 336,
+    "status": "far"
+   }
+  ]
+ },
+ {
+  "key": "d5-7",
+  "line": "JR San-yō Line (local)",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "",
+    "jp": "宮島口",
+    "romaji": "Miyajimaguchi",
+    "exp": [
+     34.312009,
+     132.302951
+    ],
+    "osm": [
+     34.312313,
+     132.302938
+    ],
+    "osm_name": "宮島口",
+    "osm_kind": "station",
+    "dist_m": 34,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "",
+    "jp": "阿品",
+    "romaji": "Ajina",
+    "exp": [
+     34.323073,
+     132.314302
+    ],
+    "osm": [
+     34.323098,
+     132.314312
+    ],
+    "osm_name": "阿品",
+    "osm_kind": "station",
+    "dist_m": 3,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "",
+    "jp": "宮内串戸",
+    "romaji": "Miyauchi-Kushido",
+    "exp": [
+     34.348964,
+     132.324075
+    ],
+    "osm": [
+     34.348043,
+     132.323751
+    ],
+    "osm_name": "宮内串戸",
+    "osm_kind": "station",
+    "dist_m": 107,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "",
+    "jp": "廿日市",
+    "romaji": "Hatsukaichi",
+    "exp": [
+     34.358027,
+     132.335676
+    ],
+    "osm": [
+     34.358027,
+     132.335674
+    ],
+    "osm_name": "廿日市",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 4,
+    "code": "",
+    "jp": "五日市",
+    "romaji": "Itsukaichi",
+    "exp": [
+     34.366927,
+     132.3681
+    ],
+    "osm": [
+     34.366764,
+     132.368018
+    ],
+    "osm_name": "五日市",
+    "osm_kind": "station",
+    "dist_m": 20,
+    "status": "ok"
+   },
+   {
+    "i": 5,
+    "code": "",
+    "jp": "新井口",
+    "romaji": "Shin-Inokuchi",
+    "exp": [
+     34.375716,
+     132.392096
+    ],
+    "osm": [
+     34.375208,
+     132.391442
+    ],
+    "osm_name": "新井口",
+    "osm_kind": "station",
+    "dist_m": 82,
+    "status": "ok"
+   },
+   {
+    "i": 6,
+    "code": "",
+    "jp": "西広島",
+    "romaji": "Nishi-Hiroshima",
+    "exp": [
+     34.398048,
+     132.427982
+    ],
+    "osm": [
+     34.397997,
+     132.427916
+    ],
+    "osm_name": "西広島",
+    "osm_kind": "station",
+    "dist_m": 8,
+    "status": "ok"
+   },
+   {
+    "i": 7,
+    "code": "",
+    "jp": "横川",
+    "romaji": "Yokogawa",
+    "exp": [
+     34.40996,
+     132.450602
+    ],
+    "osm": [
+     34.409524,
+     132.450474
+    ],
+    "osm_name": "横川駅",
+    "osm_kind": "tram_stop",
+    "dist_m": 50,
+    "status": "ok"
+   },
+   {
+    "i": 8,
+    "code": "",
+    "jp": "広島",
+    "romaji": "Hiroshima",
+    "exp": [
+     34.397667,
+     132.475379
+    ],
+    "osm": [
+     34.397395,
+     132.475837
+    ],
+    "osm_name": "広島",
+    "osm_kind": "station",
+    "dist_m": 52,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d5-8",
+  "line": "Tranvía Hiroden",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "",
+    "jp": "広島駅",
+    "romaji": "Hiroshima-eki",
+    "exp": [
+     34.397667,
+     132.475379
+    ],
+    "osm": [
+     34.397395,
+     132.475837
+    ],
+    "osm_name": "広島",
+    "osm_kind": "station",
+    "dist_m": 52,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "",
+    "jp": "的場町",
+    "romaji": "Matoba-chō",
+    "exp": [
+     34.393136,
+     132.474551
+    ],
+    "osm": [
+     34.393148,
+     132.474513
+    ],
+    "osm_name": "的場町",
+    "osm_kind": "tram_stop",
+    "dist_m": 4,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "",
+    "jp": "稲荷町",
+    "romaji": "Inari-machi",
+    "exp": [
+     34.392704,
+     132.471103
+    ],
+    "osm": [
+     34.392651,
+     132.471192
+    ],
+    "osm_name": "稲荷町",
+    "osm_kind": "tram_stop",
+    "dist_m": 10,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "",
+    "jp": "銀山町",
+    "romaji": "Kanayama-chō",
+    "exp": [
+     34.393228,
+     132.466905
+    ],
+    "osm": [
+     34.39323,
+     132.46692
+    ],
+    "osm_name": "銀山町",
+    "osm_kind": "tram_stop",
+    "dist_m": 1,
+    "status": "ok"
+   },
+   {
+    "i": 4,
+    "code": "",
+    "jp": "胡町",
+    "romaji": "Ebisu-chō",
+    "exp": [
+     34.393367,
+     132.465089
+    ],
+    "osm": [
+     34.393377,
+     132.465117
+    ],
+    "osm_name": "胡町",
+    "osm_kind": "tram_stop",
+    "dist_m": 3,
+    "status": "ok"
+   },
+   {
+    "i": 5,
+    "code": "",
+    "jp": "八丁堀",
+    "romaji": "Hatchōbori",
+    "exp": [
+     34.394005,
+     132.462832
+    ],
+    "osm": [
+     34.393927,
+     132.463045
+    ],
+    "osm_name": "八丁堀",
+    "osm_kind": "tram_stop",
+    "dist_m": 21,
+    "status": "ok"
+   },
+   {
+    "i": 6,
+    "code": "",
+    "jp": "立町",
+    "romaji": "Tatemachi",
+    "exp": [
+     34.394322,
+     132.461605
+    ],
+    "osm": [
+     34.394298,
+     132.461598
+    ],
+    "osm_name": "立町",
+    "osm_kind": "tram_stop",
+    "dist_m": 3,
+    "status": "ok"
+   },
+   {
+    "i": 7,
+    "code": "",
+    "jp": "紙屋町東",
+    "romaji": "Kamiyachō-Higashi",
+    "exp": [
+     34.395084,
+     132.458412
+    ],
+    "osm": [
+     34.395032,
+     132.458596
+    ],
+    "osm_name": "紙屋町東",
+    "osm_kind": "tram_stop",
+    "dist_m": 18,
+    "status": "ok"
+   },
+   {
+    "i": 8,
+    "code": "",
+    "jp": "原爆ドーム前",
+    "romaji": "Gembaku Dome-mae",
+    "exp": [
+     34.395945,
+     132.454467
+    ],
+    "osm": [
+     34.396099,
+     132.454115
+    ],
+    "osm_name": "原爆ドーム前",
+    "osm_kind": "tram_stop",
+    "dist_m": 37,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d5-10",
+  "line": "Tranvía Hiroden",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "",
+    "jp": "本通",
+    "romaji": "Hondōri",
+    "exp": [
+     34.393382,
+     132.457008
+    ],
+    "osm": [
+     34.393159,
+     132.456977
+    ],
+    "osm_name": "本通",
+    "osm_kind": "station",
+    "dist_m": 25,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "",
+    "jp": "紙屋町東",
+    "romaji": "Kamiyachō-Higashi",
+    "exp": [
+     34.395084,
+     132.458412
+    ],
+    "osm": [
+     34.395032,
+     132.458596
+    ],
+    "osm_name": "紙屋町東",
+    "osm_kind": "tram_stop",
+    "dist_m": 18,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "",
+    "jp": "立町",
+    "romaji": "Tatemachi",
+    "exp": [
+     34.394322,
+     132.461605
+    ],
+    "osm": [
+     34.394298,
+     132.461598
+    ],
+    "osm_name": "立町",
+    "osm_kind": "tram_stop",
+    "dist_m": 3,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "",
+    "jp": "八丁堀",
+    "romaji": "Hatchōbori",
+    "exp": [
+     34.394005,
+     132.462832
+    ],
+    "osm": [
+     34.393927,
+     132.463045
+    ],
+    "osm_name": "八丁堀",
+    "osm_kind": "tram_stop",
+    "dist_m": 21,
+    "status": "ok"
+   },
+   {
+    "i": 4,
+    "code": "",
+    "jp": "胡町",
+    "romaji": "Ebisu-chō",
+    "exp": [
+     34.393367,
+     132.465089
+    ],
+    "osm": [
+     34.393377,
+     132.465117
+    ],
+    "osm_name": "胡町",
+    "osm_kind": "tram_stop",
+    "dist_m": 3,
+    "status": "ok"
+   },
+   {
+    "i": 5,
+    "code": "",
+    "jp": "銀山町",
+    "romaji": "Kanayama-chō",
+    "exp": [
+     34.393228,
+     132.466905
+    ],
+    "osm": [
+     34.39323,
+     132.46692
+    ],
+    "osm_name": "銀山町",
+    "osm_kind": "tram_stop",
+    "dist_m": 1,
+    "status": "ok"
+   },
+   {
+    "i": 6,
+    "code": "",
+    "jp": "稲荷町",
+    "romaji": "Inari-machi",
+    "exp": [
+     34.392704,
+     132.471103
+    ],
+    "osm": [
+     34.392651,
+     132.471192
+    ],
+    "osm_name": "稲荷町",
+    "osm_kind": "tram_stop",
+    "dist_m": 10,
+    "status": "ok"
+   },
+   {
+    "i": 7,
+    "code": "",
+    "jp": "的場町",
+    "romaji": "Matoba-chō",
+    "exp": [
+     34.393136,
+     132.474551
+    ],
+    "osm": [
+     34.393148,
+     132.474513
+    ],
+    "osm_name": "的場町",
+    "osm_kind": "tram_stop",
+    "dist_m": 4,
+    "status": "ok"
+   },
+   {
+    "i": 8,
+    "code": "",
+    "jp": "広島駅",
+    "romaji": "Hiroshima-eki",
+    "exp": [
+     34.397667,
+     132.475379
+    ],
+    "osm": [
+     34.397395,
+     132.475837
+    ],
+    "osm_name": "広島",
+    "osm_kind": "station",
+    "dist_m": 52,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d5-11",
+  "line": "Shinkansen",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "",
+    "jp": "広島",
+    "romaji": "Hiroshima",
+    "exp": [
+     34.397667,
+     132.475379
+    ],
+    "osm": [
+     34.397395,
+     132.475837
+    ],
+    "osm_name": "広島",
+    "osm_kind": "station",
+    "dist_m": 52,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "",
+    "jp": "岡山",
+    "romaji": "Okayama",
+    "exp": [
+     34.66675,
+     133.918266
+    ],
+    "osm": [
+     34.66675,
+     133.918266
+    ],
+    "osm_name": "岡山",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "",
+    "jp": "新神戸",
+    "romaji": "Shin-Kōbe",
+    "exp": [
+     34.706288,
+     135.195468
+    ],
+    "osm": [
+     34.706488,
+     135.195616
+    ],
+    "osm_name": "新神戸",
+    "osm_kind": "station",
+    "dist_m": 26,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "",
+    "jp": "新大阪",
+    "romaji": "Shin-Osaka",
+    "exp": [
+     34.733466,
+     135.500259
+    ],
+    "osm": [
+     34.733539,
+     135.500189
+    ],
+    "osm_name": "新大阪",
+    "osm_kind": "station",
+    "dist_m": 10,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d5-12",
+  "line": "Metro Midosuji",
+  "exp_src": "n/a",
+  "stations": [
+   {
+    "i": 0,
+    "code": "M13",
+    "jp": "新大阪",
+    "romaji": "Shin-Osaka",
+    "status": "exists_no_pos",
+    "n_cands": 3
+   },
+   {
+    "i": 1,
+    "code": "M14",
+    "jp": "西中島南方",
+    "romaji": "Nishinakajima-Minamigata",
+    "status": "exists_no_pos",
+    "n_cands": 1
+   },
+   {
+    "i": 2,
+    "code": "M15",
+    "jp": "中津",
+    "romaji": "Nakatsu",
+    "status": "exists_no_pos",
+    "n_cands": 2
+   },
+   {
+    "i": 3,
+    "code": "M16",
+    "jp": "梅田",
+    "romaji": "Umeda",
+    "status": "exists_no_pos",
+    "n_cands": 1
+   },
+   {
+    "i": 4,
+    "code": "M17",
+    "jp": "淀屋橋",
+    "romaji": "Yodoyabashi",
+    "status": "exists_no_pos",
+    "n_cands": 2
+   }
+  ]
+ },
+ {
+  "key": "d6-1",
+  "line": "Metro Sakaisuji",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "K14",
+    "jp": "北浜",
+    "romaji": "Kitahama",
+    "exp": [
+     34.691696,
+     135.506652
+    ],
+    "osm": [
+     34.691171,
+     135.506582
+    ],
+    "osm_name": "北浜",
+    "osm_kind": "station",
+    "dist_m": 59,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "K15",
+    "jp": "堺筋本町",
+    "romaji": "Sakaisuji-Hommachi",
+    "exp": [
+     34.681829,
+     135.506976
+    ],
+    "osm": [
+     34.681875,
+     135.506933
+    ],
+    "osm_name": "堺筋本町",
+    "osm_kind": "station",
+    "dist_m": 6,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d6-2",
+  "line": "Metro Chūō (Osaka)",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "C17",
+    "jp": "堺筋本町",
+    "romaji": "Sakaisuji-Hommachi",
+    "exp": [
+     34.681829,
+     135.506976
+    ],
+    "osm": [
+     34.681875,
+     135.506933
+    ],
+    "osm_name": "堺筋本町",
+    "osm_kind": "station",
+    "dist_m": 6,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "C16",
+    "jp": "本町",
+    "romaji": "Hommachi",
+    "exp": [
+     34.682007,
+     135.498829
+    ],
+    "osm": [
+     34.682018,
+     135.498721
+    ],
+    "osm_name": "本町",
+    "osm_kind": "station",
+    "dist_m": 10,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "C15",
+    "jp": "阿波座",
+    "romaji": "Awaza",
+    "exp": [
+     34.681281,
+     135.486543
+    ],
+    "osm": [
+     34.681632,
+     135.486251
+    ],
+    "osm_name": "阿波座",
+    "osm_kind": "station",
+    "dist_m": 47,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "C14",
+    "jp": "九条",
+    "romaji": "Kujō",
+    "exp": [
+     34.67525,
+     135.47335
+    ],
+    "osm": [
+     34.675314,
+     135.473526
+    ],
+    "osm_name": "九条",
+    "osm_kind": "station",
+    "dist_m": 18,
+    "status": "ok"
+   },
+   {
+    "i": 4,
+    "code": "C13",
+    "jp": "弁天町",
+    "romaji": "Bentenchō",
+    "exp": [
+     34.670158,
+     135.461987
+    ],
+    "osm": [
+     34.670288,
+     135.46183
+    ],
+    "osm_name": "弁天町",
+    "osm_kind": "station",
+    "dist_m": 20,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d6-3",
+  "line": "JR Osaka Loop Line",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "",
+    "jp": "弁天町",
+    "romaji": "Bentenchō",
+    "exp": [
+     34.670158,
+     135.461987
+    ],
+    "osm": [
+     34.670288,
+     135.46183
+    ],
+    "osm_name": "弁天町",
+    "osm_kind": "station",
+    "dist_m": 20,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "",
+    "jp": "西九条",
+    "romaji": "Nishikujō",
+    "exp": [
+     34.682725,
+     135.465801
+    ],
+    "osm": [
+     34.682725,
+     135.465801
+    ],
+    "osm_name": "西九条",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d6-4",
+  "line": "JR Yumesaki (ramal Universal)",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "",
+    "jp": "西九条",
+    "romaji": "Nishikujō",
+    "exp": [
+     34.682725,
+     135.465801
+    ],
+    "osm": [
+     34.682725,
+     135.465801
+    ],
+    "osm_name": "西九条",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "",
+    "jp": "安治川口",
+    "romaji": "Ajikawaguchi",
+    "exp": [
+     34.669932,
+     135.441938
+    ],
+    "osm": [
+     34.673624,
+     135.444024
+    ],
+    "osm_name": "安治川口",
+    "osm_kind": "station",
+    "dist_m": 453,
+    "status": "far"
+   },
+   {
+    "i": 2,
+    "code": "",
+    "jp": "ユニバーサルシティ",
+    "romaji": "Universal City",
+    "exp": [
+     34.667805,
+     135.438558
+    ],
+    "osm": [
+     34.667942,
+     135.438676
+    ],
+    "osm_name": "ユニバーサルシティ",
+    "osm_kind": "station",
+    "dist_m": 19,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d6-5",
+  "line": "JR Yumesaki (ramal Universal)",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "",
+    "jp": "ユニバーサルシティ",
+    "romaji": "Universal City",
+    "exp": [
+     34.667805,
+     135.438558
+    ],
+    "osm": [
+     34.667942,
+     135.438676
+    ],
+    "osm_name": "ユニバーサルシティ",
+    "osm_kind": "station",
+    "dist_m": 19,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "",
+    "jp": "安治川口",
+    "romaji": "Ajikawaguchi",
+    "exp": [
+     34.669932,
+     135.441938
+    ],
+    "osm": [
+     34.673624,
+     135.444024
+    ],
+    "osm_name": "安治川口",
+    "osm_kind": "station",
+    "dist_m": 453,
+    "status": "far"
+   },
+   {
+    "i": 2,
+    "code": "",
+    "jp": "西九条",
+    "romaji": "Nishikujō",
+    "exp": [
+     34.682725,
+     135.465801
+    ],
+    "osm": [
+     34.682725,
+     135.465801
+    ],
+    "osm_name": "西九条",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d6-6",
+  "line": "JR Osaka Loop Line",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "",
+    "jp": "西九条",
+    "romaji": "Nishikujō",
+    "exp": [
+     34.682725,
+     135.465801
+    ],
+    "osm": [
+     34.682725,
+     135.465801
+    ],
+    "osm_name": "西九条",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "",
+    "jp": "弁天町",
+    "romaji": "Bentenchō",
+    "exp": [
+     34.670158,
+     135.461987
+    ],
+    "osm": [
+     34.670288,
+     135.46183
+    ],
+    "osm_name": "弁天町",
+    "osm_kind": "station",
+    "dist_m": 20,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d6-7",
+  "line": "Metro Chūō (Osaka)",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "C13",
+    "jp": "弁天町",
+    "romaji": "Bentenchō",
+    "exp": [
+     34.670158,
+     135.461987
+    ],
+    "osm": [
+     34.670288,
+     135.46183
+    ],
+    "osm_name": "弁天町",
+    "osm_kind": "station",
+    "dist_m": 20,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "C14",
+    "jp": "九条",
+    "romaji": "Kujō",
+    "exp": [
+     34.67525,
+     135.47335
+    ],
+    "osm": [
+     34.675314,
+     135.473526
+    ],
+    "osm_name": "九条",
+    "osm_kind": "station",
+    "dist_m": 18,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "C15",
+    "jp": "阿波座",
+    "romaji": "Awaza",
+    "exp": [
+     34.681281,
+     135.486543
+    ],
+    "osm": [
+     34.681632,
+     135.486251
+    ],
+    "osm_name": "阿波座",
+    "osm_kind": "station",
+    "dist_m": 47,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "C16",
+    "jp": "本町",
+    "romaji": "Hommachi",
+    "exp": [
+     34.682007,
+     135.498829
+    ],
+    "osm": [
+     34.682018,
+     135.498721
+    ],
+    "osm_name": "本町",
+    "osm_kind": "station",
+    "dist_m": 10,
+    "status": "ok"
+   },
+   {
+    "i": 4,
+    "code": "C17",
+    "jp": "堺筋本町",
+    "romaji": "Sakaisuji-Hommachi",
+    "exp": [
+     34.681829,
+     135.506976
+    ],
+    "osm": [
+     34.681875,
+     135.506933
+    ],
+    "osm_name": "堺筋本町",
+    "osm_kind": "station",
+    "dist_m": 6,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d6-8",
+  "line": "JR Osaka Loop Line",
+  "exp_src": "n/a",
+  "stations": [
+   {
+    "i": 0,
+    "code": "",
+    "jp": "西九条",
+    "romaji": "Nishikujō",
+    "status": "exists_no_pos",
+    "n_cands": 2
+   },
+   {
+    "i": 1,
+    "code": "",
+    "jp": "野田",
+    "romaji": "Noda",
+    "status": "exists_no_pos",
+    "n_cands": 2
+   },
+   {
+    "i": 2,
+    "code": "",
+    "jp": "福島",
+    "romaji": "Fukushima",
+    "status": "exists_no_pos",
+    "n_cands": 2
+   },
+   {
+    "i": 3,
+    "code": "",
+    "jp": "大阪",
+    "romaji": "Osaka",
+    "status": "exists_no_pos",
+    "n_cands": 1
+   },
+   {
+    "i": 4,
+    "code": "",
+    "jp": "天満",
+    "romaji": "Temma",
+    "status": "exists_no_pos",
+    "n_cands": 1
+   }
+  ]
+ },
+ {
+  "key": "d7-1",
+  "line": "Metro Sakaisuji",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "K14",
+    "jp": "北浜",
+    "romaji": "Kitahama",
+    "exp": [
+     34.691696,
+     135.506652
+    ],
+    "osm": [
+     34.691171,
+     135.506582
+    ],
+    "osm_name": "北浜",
+    "osm_kind": "station",
+    "dist_m": 59,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "K15",
+    "jp": "堺筋本町",
+    "romaji": "Sakaisuji-Hommachi",
+    "exp": [
+     34.681829,
+     135.506976
+    ],
+    "osm": [
+     34.681875,
+     135.506933
+    ],
+    "osm_name": "堺筋本町",
+    "osm_kind": "station",
+    "dist_m": 6,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "K16",
+    "jp": "長堀橋",
+    "romaji": "Nagahoribashi",
+    "exp": [
+     34.67446,
+     135.506331
+    ],
+    "osm": [
+     34.675318,
+     135.506297
+    ],
+    "osm_name": "長堀橋",
+    "osm_kind": "station",
+    "dist_m": 95,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "K17",
+    "jp": "日本橋",
+    "romaji": "Nippombashi",
+    "exp": [
+     34.666968,
+     135.50612
+    ],
+    "osm": [
+     34.666718,
+     135.506149
+    ],
+    "osm_name": "日本橋",
+    "osm_kind": "station",
+    "dist_m": 28,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d7-3",
+  "line": "Kintetsu Nara Line",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "A02",
+    "jp": "近鉄日本橋",
+    "romaji": "Kintetsu-Nippombashi",
+    "exp": [
+     34.666976,
+     135.506063
+    ],
+    "osm": [
+     34.666909,
+     135.5057
+    ],
+    "osm_name": "近鉄日本橋",
+    "osm_kind": "station",
+    "dist_m": 34,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "A03",
+    "jp": "大阪上本町",
+    "romaji": "Osaka-Uehommachi",
+    "exp": [
+     34.665581,
+     135.52015
+    ],
+    "osm": [
+     34.665581,
+     135.52015
+    ],
+    "osm_name": "大阪上本町",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "A04",
+    "jp": "鶴橋",
+    "romaji": "Tsuruhashi",
+    "exp": [
+     34.665246,
+     135.530318
+    ],
+    "osm": [
+     34.665404,
+     135.53021
+    ],
+    "osm_name": "鶴橋",
+    "osm_kind": "station",
+    "dist_m": 20,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "A17",
+    "jp": "生駒",
+    "romaji": "Ikoma",
+    "exp": [
+     34.693236,
+     135.697921
+    ],
+    "osm": [
+     34.693236,
+     135.697921
+    ],
+    "osm_name": "生駒",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 4,
+    "code": "A20",
+    "jp": "学園前",
+    "romaji": "Gakuemmae",
+    "exp": [
+     34.697283,
+     135.750546
+    ],
+    "osm": [
+     34.697129,
+     135.750866
+    ],
+    "osm_name": "学園前",
+    "osm_kind": "station",
+    "dist_m": 34,
+    "status": "ok"
+   },
+   {
+    "i": 5,
+    "code": "A26",
+    "jp": "大和西大寺",
+    "romaji": "Yamato-Saidaiji",
+    "exp": [
+     34.693798,
+     135.782681
+    ],
+    "osm": [
+     34.693798,
+     135.782681
+    ],
+    "osm_name": "大和西大寺",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 6,
+    "code": "A28",
+    "jp": "近鉄奈良",
+    "romaji": "Kintetsu-Nara",
+    "exp": [
+     34.684249,
+     135.827528
+    ],
+    "osm": [
+     34.684138,
+     135.828541
+    ],
+    "osm_name": "近鉄奈良",
+    "osm_kind": "station",
+    "dist_m": 93,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d7-9",
+  "line": "Kintetsu Nara Line",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "A28",
+    "jp": "近鉄奈良",
+    "romaji": "Kintetsu-Nara",
+    "exp": [
+     34.684249,
+     135.827528
+    ],
+    "osm": [
+     34.684138,
+     135.828541
+    ],
+    "osm_name": "近鉄奈良",
+    "osm_kind": "station",
+    "dist_m": 93,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "A26",
+    "jp": "大和西大寺",
+    "romaji": "Yamato-Saidaiji",
+    "exp": [
+     34.693798,
+     135.782681
+    ],
+    "osm": [
+     34.693798,
+     135.782681
+    ],
+    "osm_name": "大和西大寺",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "A20",
+    "jp": "学園前",
+    "romaji": "Gakuemmae",
+    "exp": [
+     34.697283,
+     135.750546
+    ],
+    "osm": [
+     34.697129,
+     135.750866
+    ],
+    "osm_name": "学園前",
+    "osm_kind": "station",
+    "dist_m": 34,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "A17",
+    "jp": "生駒",
+    "romaji": "Ikoma",
+    "exp": [
+     34.693236,
+     135.697921
+    ],
+    "osm": [
+     34.693236,
+     135.697921
+    ],
+    "osm_name": "生駒",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 4,
+    "code": "A04",
+    "jp": "鶴橋",
+    "romaji": "Tsuruhashi",
+    "exp": [
+     34.665246,
+     135.530318
+    ],
+    "osm": [
+     34.665404,
+     135.53021
+    ],
+    "osm_name": "鶴橋",
+    "osm_kind": "station",
+    "dist_m": 20,
+    "status": "ok"
+   },
+   {
+    "i": 5,
+    "code": "A03",
+    "jp": "大阪上本町",
+    "romaji": "Osaka-Uehommachi",
+    "exp": [
+     34.665581,
+     135.52015
+    ],
+    "osm": [
+     34.665581,
+     135.52015
+    ],
+    "osm_name": "大阪上本町",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 6,
+    "code": "A02",
+    "jp": "近鉄日本橋",
+    "romaji": "Kintetsu-Nippombashi",
+    "exp": [
+     34.666976,
+     135.506063
+    ],
+    "osm": [
+     34.666909,
+     135.5057
+    ],
+    "osm_name": "近鉄日本橋",
+    "osm_kind": "station",
+    "dist_m": 34,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d7-10",
+  "line": "Metro Sakaisuji",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "K17",
+    "jp": "日本橋",
+    "romaji": "Nippombashi",
+    "exp": [
+     34.666968,
+     135.50612
+    ],
+    "osm": [
+     34.666718,
+     135.506149
+    ],
+    "osm_name": "日本橋",
+    "osm_kind": "station",
+    "dist_m": 28,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "K16",
+    "jp": "長堀橋",
+    "romaji": "Nagahoribashi",
+    "exp": [
+     34.67446,
+     135.506331
+    ],
+    "osm": [
+     34.675318,
+     135.506297
+    ],
+    "osm_name": "長堀橋",
+    "osm_kind": "station",
+    "dist_m": 95,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "K15",
+    "jp": "堺筋本町",
+    "romaji": "Sakaisuji-Hommachi",
+    "exp": [
+     34.681829,
+     135.506976
+    ],
+    "osm": [
+     34.681875,
+     135.506933
+    ],
+    "osm_name": "堺筋本町",
+    "osm_kind": "station",
+    "dist_m": 6,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "K14",
+    "jp": "北浜",
+    "romaji": "Kitahama",
+    "exp": [
+     34.691696,
+     135.506652
+    ],
+    "osm": [
+     34.691171,
+     135.506582
+    ],
+    "osm_name": "北浜",
+    "osm_kind": "station",
+    "dist_m": 59,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d8-1",
+  "line": "Metro Sakaisuji",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "K14",
+    "jp": "北浜",
+    "romaji": "Kitahama",
+    "exp": [
+     34.691696,
+     135.506652
+    ],
+    "osm": [
+     34.691171,
+     135.506582
+    ],
+    "osm_name": "北浜",
+    "osm_kind": "station",
+    "dist_m": 59,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "K15",
+    "jp": "堺筋本町",
+    "romaji": "Sakaisuji-Hommachi",
+    "exp": [
+     34.681829,
+     135.506976
+    ],
+    "osm": [
+     34.681875,
+     135.506933
+    ],
+    "osm_name": "堺筋本町",
+    "osm_kind": "station",
+    "dist_m": 6,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "K16",
+    "jp": "長堀橋",
+    "romaji": "Nagahoribashi",
+    "exp": [
+     34.67446,
+     135.506331
+    ],
+    "osm": [
+     34.675318,
+     135.506297
+    ],
+    "osm_name": "長堀橋",
+    "osm_kind": "station",
+    "dist_m": 95,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "K17",
+    "jp": "日本橋",
+    "romaji": "Nippombashi",
+    "exp": [
+     34.666968,
+     135.50612
+    ],
+    "osm": [
+     34.666718,
+     135.506149
+    ],
+    "osm_name": "日本橋",
+    "osm_kind": "station",
+    "dist_m": 28,
+    "status": "ok"
+   },
+   {
+    "i": 4,
+    "code": "K18",
+    "jp": "恵美須町",
+    "romaji": "Ebisuchō",
+    "exp": [
+     34.655631,
+     135.505636
+    ],
+    "osm": [
+     34.655598,
+     135.505664
+    ],
+    "osm_name": "恵美須町",
+    "osm_kind": "station",
+    "dist_m": 4,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d8-3",
+  "line": "Metro Midosuji",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "M23",
+    "jp": "天王寺",
+    "romaji": "Tennōji",
+    "exp": [
+     34.64731,
+     135.513869
+    ],
+    "osm": [
+     34.647343,
+     135.515241
+    ],
+    "osm_name": "天王寺",
+    "osm_kind": "station",
+    "dist_m": 126,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "M22",
+    "jp": "動物園前",
+    "romaji": "Dōbutsuen-mae",
+    "exp": [
+     34.648838,
+     135.503507
+    ],
+    "osm": [
+     34.648662,
+     135.50355
+    ],
+    "osm_name": "動物園前",
+    "osm_kind": "station",
+    "dist_m": 20,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "M21",
+    "jp": "大国町",
+    "romaji": "Daikokuchō",
+    "exp": [
+     34.655911,
+     135.497845
+    ],
+    "osm": [
+     34.656242,
+     135.497868
+    ],
+    "osm_name": "大国町",
+    "osm_kind": "station",
+    "dist_m": 37,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "M20",
+    "jp": "なんば",
+    "romaji": "Namba",
+    "exp": [
+     34.667098,
+     135.500342
+    ],
+    "osm": [
+     34.667249,
+     135.499721
+    ],
+    "osm_name": "なんば",
+    "osm_kind": "station",
+    "dist_m": 59,
+    "status": "ok"
+   },
+   {
+    "i": 4,
+    "code": "M19",
+    "jp": "心斎橋",
+    "romaji": "Shinsaibashi",
+    "exp": [
+     34.675057,
+     135.500377
+    ],
+    "osm": [
+     34.674517,
+     135.500357
+    ],
+    "osm_name": "心斎橋",
+    "osm_kind": "station",
+    "dist_m": 60,
+    "status": "ok"
+   },
+   {
+    "i": 5,
+    "code": "M18",
+    "jp": "本町",
+    "romaji": "Hommachi",
+    "exp": [
+     34.682007,
+     135.498829
+    ],
+    "osm": [
+     34.682018,
+     135.498721
+    ],
+    "osm_name": "本町",
+    "osm_kind": "station",
+    "dist_m": 10,
+    "status": "ok"
+   },
+   {
+    "i": 6,
+    "code": "M17",
+    "jp": "淀屋橋",
+    "romaji": "Yodoyabashi",
+    "exp": [
+     34.692261,
+     135.501053
+    ],
+    "osm": [
+     34.692501,
+     135.501293
+    ],
+    "osm_name": "淀屋橋",
+    "osm_kind": "station",
+    "dist_m": 35,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d8-5",
+  "line": "Metro Midosuji",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "M17",
+    "jp": "淀屋橋",
+    "romaji": "Yodoyabashi",
+    "exp": [
+     34.692261,
+     135.501053
+    ],
+    "osm": [
+     34.692501,
+     135.501293
+    ],
+    "osm_name": "淀屋橋",
+    "osm_kind": "station",
+    "dist_m": 35,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "M16",
+    "jp": "梅田",
+    "romaji": "Umeda",
+    "exp": [
+     34.705027,
+     135.498427
+    ],
+    "osm": [
+     34.703413,
+     135.497588
+    ],
+    "osm_name": "梅田",
+    "osm_kind": "station",
+    "dist_m": 195,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d8-6",
+  "line": "HARUKA Limited Express",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "",
+    "jp": "大阪 (うめきた)",
+    "romaji": "Osaka (Umekita)",
+    "exp": [
+     34.705027,
+     135.498427
+    ],
+    "status": "far",
+    "osm": [
+     34.702213,
+     135.495573
+    ],
+    "osm_name": "大阪",
+    "osm_kind": "station",
+    "dist_m": 407
+   },
+   {
+    "i": 1,
+    "code": "",
+    "jp": "新大阪",
+    "romaji": "Shin-Osaka",
+    "exp": [
+     34.733485,
+     135.497888
+    ],
+    "osm": [
+     34.732895,
+     135.498544
+    ],
+    "osm_name": "新大阪",
+    "osm_kind": "station",
+    "dist_m": 89,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "",
+    "jp": "京都",
+    "romaji": "Kyoto",
+    "exp": [
+     34.985849,
+     135.758767
+    ],
+    "osm": [
+     34.98535,
+     135.758766
+    ],
+    "osm_name": "京都",
+    "osm_kind": "station",
+    "dist_m": 56,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d8-7",
+  "line": "Metro Karasuma (Kioto)",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "K11",
+    "jp": "京都",
+    "romaji": "Kyoto",
+    "exp": [
+     34.985849,
+     135.758767
+    ],
+    "osm": [
+     34.98535,
+     135.758766
+    ],
+    "osm_name": "京都",
+    "osm_kind": "station",
+    "dist_m": 56,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "K10",
+    "jp": "五条",
+    "romaji": "Gojō",
+    "exp": [
+     34.995434,
+     135.759718
+    ],
+    "osm": [
+     34.99494,
+     135.759714
+    ],
+    "osm_name": "五条",
+    "osm_kind": "station",
+    "dist_m": 55,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d9-3",
+  "line": "Bus urbano de Kioto",
+  "exp_src": "n/a",
+  "stations": [
+   {
+    "i": 0,
+    "code": "",
+    "jp": "祇園",
+    "romaji": "Gion",
+    "status": "exists_no_pos",
+    "n_cands": 5
+   },
+   {
+    "i": 1,
+    "code": "",
+    "jp": "東山安井",
+    "romaji": "Higashiyama-Yasui",
+    "status": "exists_no_pos",
+    "n_cands": 2
+   },
+   {
+    "i": 2,
+    "code": "",
+    "jp": "清水道",
+    "romaji": "Kiyomizu-michi",
+    "status": "exists_no_pos",
+    "n_cands": 5
+   },
+   {
+    "i": 3,
+    "code": "",
+    "jp": "五条坂",
+    "romaji": "Gojō-zaka",
+    "status": "exists_no_pos",
+    "n_cands": 5
+   },
+   {
+    "i": 4,
+    "code": "",
+    "jp": "馬町",
+    "romaji": "Umamachi",
+    "status": "exists_no_pos",
+    "n_cands": 3
+   },
+   {
+    "i": 5,
+    "code": "",
+    "jp": "東山七条",
+    "romaji": "Higashiyama-Shichijō",
+    "status": "exists_no_pos",
+    "n_cands": 5
+   },
+   {
+    "i": 6,
+    "code": "",
+    "jp": "博物館三十三間堂前",
+    "romaji": "Hakubutsukan-Sanjūsangendō-mae",
+    "status": "exists_no_pos",
+    "n_cands": 2
+   }
+  ]
+ },
+ {
+  "key": "d9-4",
+  "line": "Bus urbano de Kioto",
+  "exp_src": "n/a",
+  "stations": [
+   {
+    "i": 0,
+    "code": "",
+    "jp": "博物館三十三間堂前",
+    "romaji": "Hakubutsukan-Sanjūsangendō-mae",
+    "status": "exists_no_pos",
+    "n_cands": 2
+   },
+   {
+    "i": 1,
+    "code": "",
+    "jp": "七条京阪前",
+    "romaji": "Shichijō-Keihan-mae",
+    "status": "exists_no_pos",
+    "n_cands": 5
+   },
+   {
+    "i": 2,
+    "code": "",
+    "jp": "京都駅前",
+    "romaji": "Kyoto-eki-mae",
+    "status": "exists_no_pos",
+    "n_cands": 23
+   }
+  ]
+ },
+ {
+  "key": "d9-5",
+  "line": "Metro Karasuma (Kioto)",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "K11",
+    "jp": "京都",
+    "romaji": "Kyoto",
+    "exp": [
+     34.985849,
+     135.758767
+    ],
+    "osm": [
+     34.98535,
+     135.758766
+    ],
+    "osm_name": "京都",
+    "osm_kind": "station",
+    "dist_m": 56,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "K10",
+    "jp": "五条",
+    "romaji": "Gojō",
+    "exp": [
+     34.995434,
+     135.759718
+    ],
+    "osm": [
+     34.99494,
+     135.759714
+    ],
+    "osm_name": "五条",
+    "osm_kind": "station",
+    "dist_m": 55,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d10-1",
+  "line": "Metro Karasuma (Kioto)",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "K10",
+    "jp": "五条",
+    "romaji": "Gojō",
+    "exp": [
+     34.995434,
+     135.759718
+    ],
+    "osm": [
+     34.99494,
+     135.759714
+    ],
+    "osm_name": "五条",
+    "osm_kind": "station",
+    "dist_m": 55,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "K09",
+    "jp": "四条",
+    "romaji": "Shijō",
+    "exp": [
+     35.002408,
+     135.759718
+    ],
+    "osm": [
+     35.002469,
+     135.759653
+    ],
+    "osm_name": "四条",
+    "osm_kind": "station",
+    "dist_m": 9,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d10-2",
+  "line": "Hankyu (Senri / Kyoto / Arashiyama)",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "",
+    "jp": "烏丸",
+    "romaji": "Karasuma",
+    "exp": [
+     35.003674,
+     135.76059
+    ],
+    "osm": [
+     35.003686,
+     135.760452
+    ],
+    "osm_name": "烏丸",
+    "osm_kind": "station",
+    "dist_m": 13,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "",
+    "jp": "大宮",
+    "romaji": "Ōmiya",
+    "exp": [
+     35.003636,
+     135.748545
+    ],
+    "osm": [
+     35.003644,
+     135.748588
+    ],
+    "osm_name": "大宮",
+    "osm_kind": "station",
+    "dist_m": 4,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "",
+    "jp": "西院",
+    "romaji": "Saiin",
+    "exp": [
+     35.0036,
+     135.732817
+    ],
+    "osm": [
+     35.003619,
+     135.733592
+    ],
+    "osm_name": "西院",
+    "osm_kind": "station",
+    "dist_m": 71,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "",
+    "jp": "西京極",
+    "romaji": "Nishi-Kyōgoku",
+    "exp": [
+     34.992356,
+     135.718476
+    ],
+    "osm": [
+     34.992478,
+     135.718365
+    ],
+    "osm_name": "西京極",
+    "osm_kind": "station",
+    "dist_m": 17,
+    "status": "ok"
+   },
+   {
+    "i": 4,
+    "code": "",
+    "jp": "桂",
+    "romaji": "Katsura",
+    "exp": [
+     34.979412,
+     135.703255
+    ],
+    "osm": [
+     34.979432,
+     135.703261
+    ],
+    "osm_name": "桂",
+    "osm_kind": "station",
+    "dist_m": 2,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d10-3",
+  "line": "Hankyu (Senri / Kyoto / Arashiyama)",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "",
+    "jp": "桂",
+    "romaji": "Katsura",
+    "exp": [
+     34.979412,
+     135.703255
+    ],
+    "osm": [
+     34.979432,
+     135.703261
+    ],
+    "osm_name": "桂",
+    "osm_kind": "station",
+    "dist_m": 2,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "",
+    "jp": "上桂",
+    "romaji": "Kami-Katsura",
+    "exp": [
+     34.990528,
+     135.695849
+    ],
+    "osm": [
+     34.990296,
+     135.695931
+    ],
+    "osm_name": "上桂",
+    "osm_kind": "station",
+    "dist_m": 27,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "",
+    "jp": "松尾大社",
+    "romaji": "Matsuo-Taisha",
+    "exp": [
+     35.000557,
+     135.688058
+    ],
+    "osm": [
+     35.000319,
+     135.688243
+    ],
+    "osm_name": "松尾大社",
+    "osm_kind": "station",
+    "dist_m": 31,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "",
+    "jp": "嵐山",
+    "romaji": "Arashiyama",
+    "exp": [
+     35.01522,
+     135.677713
+    ],
+    "osm": [
+     35.015287,
+     135.677996
+    ],
+    "osm_name": "嵐山",
+    "osm_kind": "station",
+    "dist_m": 27,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d10-6",
+  "line": "Bus urbano de Kioto",
+  "exp_src": "n/a",
+  "stations": [
+   {
+    "i": 0,
+    "code": "",
+    "jp": "嵐山天龍寺前",
+    "romaji": "Arashiyama Tenryūji-mae",
+    "status": "exists_no_pos",
+    "n_cands": 1
+   },
+   {
+    "i": 1,
+    "code": "",
+    "jp": "愛宕寺前",
+    "romaji": "Otagidera-mae",
+    "status": "exists_no_pos",
+    "n_cands": 2
+   }
+  ]
+ },
+ {
+  "key": "d10-7",
+  "line": "Randen (tranvía de Arashiyama)",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "",
+    "jp": "嵐山",
+    "romaji": "Arashiyama",
+    "exp": [
+     35.01522,
+     135.677713
+    ],
+    "osm": [
+     35.015287,
+     135.677996
+    ],
+    "osm_name": "嵐山",
+    "osm_kind": "station",
+    "dist_m": 27,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "",
+    "jp": "嵐電嵯峨",
+    "romaji": "Randen-Saga",
+    "exp": [
+     35.016464,
+     135.681372
+    ],
+    "osm": [
+     35.016445,
+     135.681443
+    ],
+    "osm_name": "嵐電嵯峨",
+    "osm_kind": "station",
+    "dist_m": 7,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "",
+    "jp": "鹿王院",
+    "romaji": "Rokuōin",
+    "exp": [
+     35.016959,
+     135.68566
+    ],
+    "osm": [
+     35.01699,
+     135.685683
+    ],
+    "osm_name": "鹿王院",
+    "osm_kind": "station",
+    "dist_m": 4,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "",
+    "jp": "車折神社",
+    "romaji": "Kurumazaki-Jinja",
+    "exp": [
+     35.016715,
+     135.689113
+    ],
+    "osm": [
+     35.016747,
+     135.689032
+    ],
+    "osm_name": "車折神社",
+    "osm_kind": "station",
+    "dist_m": 8,
+    "status": "ok"
+   },
+   {
+    "i": 4,
+    "code": "",
+    "jp": "有栖川",
+    "romaji": "Arisugawa",
+    "exp": [
+     35.015162,
+     135.694783
+    ],
+    "osm": [
+     35.015211,
+     135.694615
+    ],
+    "osm_name": "有栖川",
+    "osm_kind": "station",
+    "dist_m": 16,
+    "status": "ok"
+   },
+   {
+    "i": 5,
+    "code": "",
+    "jp": "帷子ノ辻",
+    "romaji": "Katabiranotsuji",
+    "exp": [
+     35.01519,
+     135.700181
+    ],
+    "osm": [
+     35.015251,
+     135.700398
+    ],
+    "osm_name": "帷子ノ辻",
+    "osm_kind": "station",
+    "dist_m": 21,
+    "status": "ok"
+   },
+   {
+    "i": 6,
+    "code": "",
+    "jp": "太秦広隆寺",
+    "romaji": "Uzumasa-Kōryūji",
+    "exp": [
+     35.013491,
+     135.708259
+    ],
+    "osm": [
+     35.013427,
+     135.70832
+    ],
+    "osm_name": "太秦広隆寺",
+    "osm_kind": "station",
+    "dist_m": 9,
+    "status": "ok"
+   },
+   {
+    "i": 7,
+    "code": "",
+    "jp": "蚕ノ社",
+    "romaji": "Kaikonoyashiro",
+    "exp": [
+     35.011953,
+     135.713
+    ],
+    "osm": [
+     35.011906,
+     135.712999
+    ],
+    "osm_name": "蚕ノ社",
+    "osm_kind": "station",
+    "dist_m": 5,
+    "status": "ok"
+   },
+   {
+    "i": 8,
+    "code": "",
+    "jp": "嵐電天神川",
+    "romaji": "Randen-Tenjingawa",
+    "exp": [
+     35.010213,
+     135.715196
+    ],
+    "osm": [
+     35.010235,
+     135.715058
+    ],
+    "osm_name": "嵐電天神川",
+    "osm_kind": "station",
+    "dist_m": 13,
+    "status": "ok"
+   },
+   {
+    "i": 9,
+    "code": "",
+    "jp": "山ノ内",
+    "romaji": "Yamanouchi",
+    "exp": [
+     35.008303,
+     135.72337
+    ],
+    "osm": [
+     35.00838,
+     135.723564
+    ],
+    "osm_name": "山ノ内",
+    "osm_kind": "bus_stop",
+    "dist_m": 20,
+    "status": "ok"
+   },
+   {
+    "i": 10,
+    "code": "",
+    "jp": "西大路三条",
+    "romaji": "Nishiōji-Sanjō",
+    "exp": [
+     35.008046,
+     135.732129
+    ],
+    "osm": [
+     35.007683,
+     135.732
+    ],
+    "osm_name": "西大路三条",
+    "osm_kind": "bus_stop",
+    "dist_m": 42,
+    "status": "ok"
+   },
+   {
+    "i": 11,
+    "code": "",
+    "jp": "西院",
+    "romaji": "Sai",
+    "exp": [
+     35.0036,
+     135.732817
+    ],
+    "osm": [
+     35.003619,
+     135.733592
+    ],
+    "osm_name": "西院",
+    "osm_kind": "station",
+    "dist_m": 71,
+    "status": "ok"
+   },
+   {
+    "i": 12,
+    "code": "",
+    "jp": "四条大宮",
+    "romaji": "Shijō-Ōmiya",
+    "exp": [
+     35.003344,
+     135.74861
+    ],
+    "osm": [
+     35.003248,
+     135.74849
+    ],
+    "osm_name": "四条大宮",
+    "osm_kind": "station",
+    "dist_m": 15,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d10-8",
+  "line": "Hankyu (Senri / Kyoto / Arashiyama)",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "",
+    "jp": "大宮",
+    "romaji": "Ōmiya",
+    "exp": [
+     35.003636,
+     135.748545
+    ],
+    "osm": [
+     35.003644,
+     135.748588
+    ],
+    "osm_name": "大宮",
+    "osm_kind": "station",
+    "dist_m": 4,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "",
+    "jp": "烏丸",
+    "romaji": "Karasuma",
+    "exp": [
+     35.003674,
+     135.76059
+    ],
+    "osm": [
+     35.003686,
+     135.760452
+    ],
+    "osm_name": "烏丸",
+    "osm_kind": "station",
+    "dist_m": 13,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d11-1",
+  "line": "Metro Karasuma (Kioto)",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "K10",
+    "jp": "五条",
+    "romaji": "Gojō",
+    "exp": [
+     34.995434,
+     135.759718
+    ],
+    "osm": [
+     34.99494,
+     135.759714
+    ],
+    "osm_name": "五条",
+    "osm_kind": "station",
+    "dist_m": 55,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "K11",
+    "jp": "京都",
+    "romaji": "Kyoto",
+    "exp": [
+     34.985849,
+     135.758767
+    ],
+    "osm": [
+     34.98535,
+     135.758766
+    ],
+    "osm_name": "京都",
+    "osm_kind": "station",
+    "dist_m": 56,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d11-2",
+  "line": "JR Nara Line",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "",
+    "jp": "京都",
+    "romaji": "Kyoto",
+    "exp": [
+     34.985849,
+     135.758767
+    ],
+    "osm": [
+     34.98535,
+     135.758766
+    ],
+    "osm_name": "京都",
+    "osm_kind": "station",
+    "dist_m": 56,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "",
+    "jp": "東福寺",
+    "romaji": "Tōfukuji",
+    "exp": [
+     34.981365,
+     135.769927
+    ],
+    "osm": [
+     34.981262,
+     135.770021
+    ],
+    "osm_name": "東福寺",
+    "osm_kind": "station",
+    "dist_m": 14,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "",
+    "jp": "稲荷",
+    "romaji": "Inari",
+    "exp": [
+     34.966807,
+     135.77085
+    ],
+    "osm": [
+     34.966805,
+     135.77067
+    ],
+    "osm_name": "稲荷",
+    "osm_kind": "station",
+    "dist_m": 16,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d11-4",
+  "line": "Bus urbano de Kioto",
+  "exp_src": "n/a",
+  "stations": [
+   {
+    "i": 0,
+    "code": "",
+    "jp": "京都駅前",
+    "romaji": "Kyoto-eki-mae",
+    "status": "exists_no_pos",
+    "n_cands": 23
+   },
+   {
+    "i": 1,
+    "code": "",
+    "jp": "西大路七条",
+    "romaji": "Nishiōji-Shichijō",
+    "status": "exists_no_pos",
+    "n_cands": 5
+   },
+   {
+    "i": 2,
+    "code": "",
+    "jp": "西大路四条",
+    "romaji": "Nishiōji-Shijō",
+    "status": "exists_no_pos",
+    "n_cands": 6
+   },
+   {
+    "i": 3,
+    "code": "",
+    "jp": "円町",
+    "romaji": "Emmachi",
+    "status": "exists_no_pos",
+    "n_cands": 1
+   },
+   {
+    "i": 4,
+    "code": "",
+    "jp": "わら天神前",
+    "romaji": "Waratenjin-mae",
+    "status": "exists_no_pos",
+    "n_cands": 4
+   },
+   {
+    "i": 5,
+    "code": "",
+    "jp": "金閣寺道",
+    "romaji": "Kinkakuji-michi",
+    "status": "exists_no_pos",
+    "n_cands": 3
+   }
+  ]
+ },
+ {
+  "key": "d11-5",
+  "line": "Bus urbano de Kioto",
+  "exp_src": "n/a",
+  "stations": [
+   {
+    "i": 0,
+    "code": "",
+    "jp": "金閣寺道",
+    "romaji": "Kinkakuji-michi",
+    "status": "exists_no_pos",
+    "n_cands": 3
+   },
+   {
+    "i": 1,
+    "code": "",
+    "jp": "わら天神前",
+    "romaji": "Waratenjin-mae",
+    "status": "exists_no_pos",
+    "n_cands": 4
+   },
+   {
+    "i": 2,
+    "code": "",
+    "jp": "堀川丸太町",
+    "romaji": "Horikawa-Marutamachi",
+    "status": "exists_no_pos",
+    "n_cands": 4
+   },
+   {
+    "i": 3,
+    "code": "",
+    "jp": "二条城前",
+    "romaji": "Nijōjō-mae",
+    "status": "exists_no_pos",
+    "n_cands": 3
+   }
+  ]
+ },
+ {
+  "key": "d11-6",
+  "line": "Metro Tōzai (Kioto)",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "T14",
+    "jp": "二条城前",
+    "romaji": "Nijōjō-mae",
+    "exp": [
+     35.011908,
+     135.750471
+    ],
+    "osm": [
+     35.01189,
+     135.750281
+    ],
+    "osm_name": "二条城前",
+    "osm_kind": "station",
+    "dist_m": 17,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "T13",
+    "jp": "烏丸御池",
+    "romaji": "Karasuma-Oike",
+    "exp": [
+     35.009992,
+     135.759609
+    ],
+    "osm": [
+     35.010196,
+     135.759757
+    ],
+    "osm_name": "烏丸御池",
+    "osm_kind": "bus_stop",
+    "dist_m": 26,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "T12",
+    "jp": "京都市役所前",
+    "romaji": "Shiyakusho-mae",
+    "exp": [
+     35.010926,
+     135.769348
+    ],
+    "osm": [
+     35.010899,
+     135.76887
+    ],
+    "osm_name": "京都市役所前",
+    "osm_kind": "station",
+    "dist_m": 44,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "T11",
+    "jp": "三条京阪",
+    "romaji": "Sanjō-Keihan",
+    "exp": [
+     35.009259,
+     135.773917
+    ],
+    "osm": [
+     35.009291,
+     135.773985
+    ],
+    "osm_name": "三条京阪",
+    "osm_kind": "station",
+    "dist_m": 7,
+    "status": "ok"
+   },
+   {
+    "i": 4,
+    "code": "T10",
+    "jp": "東山",
+    "romaji": "Higashiyama",
+    "exp": [
+     35.009426,
+     135.779876
+    ],
+    "osm": [
+     35.009434,
+     135.779778
+    ],
+    "osm_name": "東山",
+    "osm_kind": "station",
+    "dist_m": 9,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d12-1",
+  "line": "Metro Karasuma (Kioto)",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "K10",
+    "jp": "五条",
+    "romaji": "Gojō",
+    "exp": [
+     34.995434,
+     135.759718
+    ],
+    "osm": [
+     34.99494,
+     135.759714
+    ],
+    "osm_name": "五条",
+    "osm_kind": "station",
+    "dist_m": 55,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "K11",
+    "jp": "京都",
+    "romaji": "Kyoto",
+    "exp": [
+     34.985849,
+     135.758767
+    ],
+    "osm": [
+     34.98535,
+     135.758766
+    ],
+    "osm_name": "京都",
+    "osm_kind": "station",
+    "dist_m": 56,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d12-2",
+  "line": "Shinkansen",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "",
+    "jp": "京都",
+    "romaji": "Kyoto",
+    "exp": [
+     34.985849,
+     135.758767
+    ],
+    "osm": [
+     34.98535,
+     135.758766
+    ],
+    "osm_name": "京都",
+    "osm_kind": "station",
+    "dist_m": 56,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "",
+    "jp": "名古屋",
+    "romaji": "Nagoya",
+    "exp": [
+     35.170915,
+     136.881537
+    ],
+    "osm": [
+     35.170729,
+     136.881843
+    ],
+    "osm_name": "名古屋",
+    "osm_kind": "station",
+    "dist_m": 35,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "",
+    "jp": "新横浜",
+    "romaji": "Shin-Yokohama",
+    "exp": [
+     35.507658,
+     139.617555
+    ],
+    "osm": [
+     35.507228,
+     139.617422
+    ],
+    "osm_name": "新横浜",
+    "osm_kind": "station",
+    "dist_m": 49,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "",
+    "jp": "品川",
+    "romaji": "Shinagawa",
+    "exp": [
+     35.628471,
+     139.73876
+    ],
+    "osm": [
+     35.628697,
+     139.739129
+    ],
+    "osm_name": "品川",
+    "osm_kind": "station",
+    "dist_m": 42,
+    "status": "ok"
+   },
+   {
+    "i": 4,
+    "code": "",
+    "jp": "東京",
+    "romaji": "Tokyo",
+    "exp": [
+     35.6813,
+     139.767066
+    ],
+    "osm": [
+     35.681255,
+     139.766706
+    ],
+    "osm_name": "東京",
+    "osm_kind": "station",
+    "dist_m": 33,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d12-3",
+  "line": "JR Chūō Line (rápida)",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "JC01",
+    "jp": "東京",
+    "romaji": "Tokyo",
+    "exp": [
+     35.6777,
+     139.764615
+    ],
+    "osm": [
+     35.677678,
+     139.765101
+    ],
+    "osm_name": "東京",
+    "osm_kind": "station",
+    "dist_m": 44,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "JC02",
+    "jp": "神田",
+    "romaji": "Kanda",
+    "exp": [
+     35.694473,
+     139.770698
+    ],
+    "osm": [
+     35.693715,
+     139.77089
+    ],
+    "osm_name": "神田",
+    "osm_kind": "station",
+    "dist_m": 86,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "JC03",
+    "jp": "御茶ノ水",
+    "romaji": "Ochanomizu",
+    "exp": [
+     35.699717,
+     139.76444
+    ],
+    "osm": [
+     35.69961,
+     139.764949
+    ],
+    "osm_name": "御茶ノ水",
+    "osm_kind": "station",
+    "dist_m": 47,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "JC04",
+    "jp": "四ツ谷",
+    "romaji": "Yotsuya",
+    "exp": [
+     35.686205,
+     139.729482
+    ],
+    "osm": [
+     35.685598,
+     139.729501
+    ],
+    "osm_name": "四ツ谷",
+    "osm_kind": "station",
+    "dist_m": 68,
+    "status": "ok"
+   },
+   {
+    "i": 4,
+    "code": "JC05",
+    "jp": "新宿",
+    "romaji": "Shinjuku",
+    "exp": [
+     35.688726,
+     139.698762
+    ],
+    "osm": [
+     35.688364,
+     139.699075
+    ],
+    "osm_name": "新宿",
+    "osm_kind": "station",
+    "dist_m": 49,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d13-1",
+  "line": "JR Chūō Line (rápida)",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "JC05",
+    "jp": "新宿",
+    "romaji": "Shinjuku",
+    "exp": [
+     35.688726,
+     139.698762
+    ],
+    "osm": [
+     35.688364,
+     139.699075
+    ],
+    "osm_name": "新宿",
+    "osm_kind": "station",
+    "dist_m": 49,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "JC04",
+    "jp": "四ツ谷",
+    "romaji": "Yotsuya",
+    "exp": [
+     35.686205,
+     139.729482
+    ],
+    "osm": [
+     35.685598,
+     139.729501
+    ],
+    "osm_name": "四ツ谷",
+    "osm_kind": "station",
+    "dist_m": 68,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "JC03",
+    "jp": "御茶ノ水",
+    "romaji": "Ochanomizu",
+    "exp": [
+     35.699717,
+     139.76444
+    ],
+    "osm": [
+     35.69961,
+     139.764949
+    ],
+    "osm_name": "御茶ノ水",
+    "osm_kind": "station",
+    "dist_m": 47,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "JC02",
+    "jp": "神田",
+    "romaji": "Kanda",
+    "exp": [
+     35.694473,
+     139.770698
+    ],
+    "osm": [
+     35.693715,
+     139.77089
+    ],
+    "osm_name": "神田",
+    "osm_kind": "station",
+    "dist_m": 86,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d13-2",
+  "line": "Metro Ginza Line",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "G13",
+    "jp": "神田",
+    "romaji": "Kanda",
+    "exp": [
+     35.694473,
+     139.770698
+    ],
+    "osm": [
+     35.693715,
+     139.77089
+    ],
+    "osm_name": "神田",
+    "osm_kind": "station",
+    "dist_m": 86,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "G14",
+    "jp": "末広町",
+    "romaji": "Suehirochō",
+    "exp": [
+     35.702936,
+     139.771679
+    ],
+    "osm": [
+     35.702936,
+     139.771679
+    ],
+    "osm_name": "末広町",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "G15",
+    "jp": "上野広小路",
+    "romaji": "Ueno-Hirokōji",
+    "exp": [
+     35.707879,
+     139.772986
+    ],
+    "osm": [
+     35.707833,
+     139.772991
+    ],
+    "osm_name": "上野広小路",
+    "osm_kind": "station",
+    "dist_m": 5,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "G16",
+    "jp": "上野",
+    "romaji": "Ueno",
+    "exp": [
+     35.714167,
+     139.777409
+    ],
+    "osm": [
+     35.713413,
+     139.776542
+    ],
+    "osm_name": "上野",
+    "osm_kind": "station",
+    "dist_m": 115,
+    "status": "ok"
+   },
+   {
+    "i": 4,
+    "code": "G17",
+    "jp": "稲荷町",
+    "romaji": "Inarichō",
+    "exp": [
+     35.711387,
+     139.782685
+    ],
+    "osm": [
+     35.711387,
+     139.782685
+    ],
+    "osm_name": "稲荷町",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 5,
+    "code": "G18",
+    "jp": "田原町",
+    "romaji": "Tawaramachi",
+    "exp": [
+     35.709883,
+     139.790733
+    ],
+    "osm": [
+     35.709836,
+     139.790755
+    ],
+    "osm_name": "田原町",
+    "osm_kind": "station",
+    "dist_m": 6,
+    "status": "ok"
+   },
+   {
+    "i": 6,
+    "code": "G19",
+    "jp": "浅草",
+    "romaji": "Asakusa",
+    "exp": [
+     35.709867,
+     139.797168
+    ],
+    "osm": [
+     35.708959,
+     139.796567
+    ],
+    "osm_name": "浅草",
+    "osm_kind": "station",
+    "dist_m": 115,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d13-6",
+  "line": "Tobu Skytree Line",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "TS01",
+    "jp": "浅草",
+    "romaji": "Asakusa",
+    "exp": [
+     35.709867,
+     139.797168
+    ],
+    "osm": [
+     35.708959,
+     139.796567
+    ],
+    "osm_name": "浅草",
+    "osm_kind": "station",
+    "dist_m": 115,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "TS02",
+    "jp": "とうきょうスカイツリー",
+    "romaji": "Tokyo Skytree",
+    "exp": [
+     35.709744,
+     139.80849
+    ],
+    "osm": [
+     35.710692,
+     139.811014
+    ],
+    "osm_name": "とうきょうスカイツリー",
+    "osm_kind": "station",
+    "dist_m": 251,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d13-7",
+  "line": "Toei Asakusa Line",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "A20",
+    "jp": "押上",
+    "romaji": "Oshiage",
+    "exp": [
+     35.710332,
+     139.813297
+    ],
+    "osm": [
+     35.710591,
+     139.813207
+    ],
+    "osm_name": "押上駅",
+    "osm_kind": "bus_stop",
+    "dist_m": 30,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "A19",
+    "jp": "本所吾妻橋",
+    "romaji": "Honjo-Azumabashi",
+    "exp": [
+     35.708561,
+     139.804349
+    ],
+    "osm": [
+     35.708561,
+     139.804349
+    ],
+    "osm_name": "本所吾妻橋",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "A18",
+    "jp": "浅草",
+    "romaji": "Asakusa",
+    "exp": [
+     35.709867,
+     139.797168
+    ],
+    "osm": [
+     35.708959,
+     139.796567
+    ],
+    "osm_name": "浅草",
+    "osm_kind": "station",
+    "dist_m": 115,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d13-8",
+  "line": "Metro Ginza Line",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "G19",
+    "jp": "浅草",
+    "romaji": "Asakusa",
+    "exp": [
+     35.709867,
+     139.797168
+    ],
+    "osm": [
+     35.708959,
+     139.796567
+    ],
+    "osm_name": "浅草",
+    "osm_kind": "station",
+    "dist_m": 115,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "G18",
+    "jp": "田原町",
+    "romaji": "Tawaramachi",
+    "exp": [
+     35.709883,
+     139.790733
+    ],
+    "osm": [
+     35.709836,
+     139.790755
+    ],
+    "osm_name": "田原町",
+    "osm_kind": "station",
+    "dist_m": 6,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "G17",
+    "jp": "稲荷町",
+    "romaji": "Inarichō",
+    "exp": [
+     35.711387,
+     139.782685
+    ],
+    "osm": [
+     35.711387,
+     139.782685
+    ],
+    "osm_name": "稲荷町",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "G16",
+    "jp": "上野",
+    "romaji": "Ueno",
+    "exp": [
+     35.714167,
+     139.777409
+    ],
+    "osm": [
+     35.713413,
+     139.776542
+    ],
+    "osm_name": "上野",
+    "osm_kind": "station",
+    "dist_m": 115,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d13-12",
+  "line": "JR Yamanote Line",
+  "exp_src": "n/a",
+  "stations": [
+   {
+    "i": 0,
+    "code": "JY05",
+    "jp": "上野",
+    "romaji": "Ueno",
+    "status": "exists_no_pos",
+    "n_cands": 4
+   },
+   {
+    "i": 1,
+    "code": "JY06",
+    "jp": "鶯谷",
+    "romaji": "Uguisudani",
+    "status": "exists_no_pos",
+    "n_cands": 1
+   },
+   {
+    "i": 2,
+    "code": "JY07",
+    "jp": "日暮里",
+    "romaji": "Nippori",
+    "status": "exists_no_pos",
+    "n_cands": 3
+   },
+   {
+    "i": 3,
+    "code": "JY08",
+    "jp": "西日暮里",
+    "romaji": "Nishi-Nippori",
+    "status": "exists_no_pos",
+    "n_cands": 3
+   },
+   {
+    "i": 4,
+    "code": "JY09",
+    "jp": "田端",
+    "romaji": "Tabata",
+    "status": "exists_no_pos",
+    "n_cands": 1
+   },
+   {
+    "i": 5,
+    "code": "JY10",
+    "jp": "駒込",
+    "romaji": "Komagome",
+    "status": "exists_no_pos",
+    "n_cands": 2
+   },
+   {
+    "i": 6,
+    "code": "JY11",
+    "jp": "巣鴨",
+    "romaji": "Sugamo",
+    "status": "exists_no_pos",
+    "n_cands": 2
+   },
+   {
+    "i": 7,
+    "code": "JY12",
+    "jp": "大塚",
+    "romaji": "Ōtsuka",
+    "status": "exists_no_pos",
+    "n_cands": 3
+   },
+   {
+    "i": 8,
+    "code": "JY13",
+    "jp": "池袋",
+    "romaji": "Ikebukuro",
+    "status": "exists_no_pos",
+    "n_cands": 6
+   },
+   {
+    "i": 9,
+    "code": "JY14",
+    "jp": "目白",
+    "romaji": "Mejiro",
+    "status": "exists_no_pos",
+    "n_cands": 1
+   },
+   {
+    "i": 10,
+    "code": "JY15",
+    "jp": "高田馬場",
+    "romaji": "Takadanobaba",
+    "status": "exists_no_pos",
+    "n_cands": 3
+   },
+   {
+    "i": 11,
+    "code": "JY16",
+    "jp": "新大久保",
+    "romaji": "Shin-Ōkubo",
+    "status": "exists_no_pos",
+    "n_cands": 1
+   },
+   {
+    "i": 12,
+    "code": "JY17",
+    "jp": "新宿",
+    "romaji": "Shinjuku",
+    "status": "exists_no_pos",
+    "n_cands": 5
+   }
+  ]
+ },
+ {
+  "key": "d14-1",
+  "line": "JR Chūō Line (rápida)",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "JC05",
+    "jp": "新宿",
+    "romaji": "Shinjuku",
+    "exp": [
+     35.688726,
+     139.698762
+    ],
+    "osm": [
+     35.688364,
+     139.699075
+    ],
+    "osm_name": "新宿",
+    "osm_kind": "station",
+    "dist_m": 49,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "JC04",
+    "jp": "四ツ谷",
+    "romaji": "Yotsuya",
+    "exp": [
+     35.686205,
+     139.729482
+    ],
+    "osm": [
+     35.685598,
+     139.729501
+    ],
+    "osm_name": "四ツ谷",
+    "osm_kind": "station",
+    "dist_m": 68,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "JC03",
+    "jp": "御茶ノ水",
+    "romaji": "Ochanomizu",
+    "exp": [
+     35.699717,
+     139.76444
+    ],
+    "osm": [
+     35.69961,
+     139.764949
+    ],
+    "osm_name": "御茶ノ水",
+    "osm_kind": "station",
+    "dist_m": 47,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "JC02",
+    "jp": "神田",
+    "romaji": "Kanda",
+    "exp": [
+     35.694473,
+     139.770698
+    ],
+    "osm": [
+     35.693715,
+     139.77089
+    ],
+    "osm_name": "神田",
+    "osm_kind": "station",
+    "dist_m": 86,
+    "status": "ok"
+   },
+   {
+    "i": 4,
+    "code": "JC01",
+    "jp": "東京",
+    "romaji": "Tokyo",
+    "exp": [
+     35.6777,
+     139.764615
+    ],
+    "osm": [
+     35.677678,
+     139.765101
+    ],
+    "osm_name": "東京",
+    "osm_kind": "station",
+    "dist_m": 44,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d14-3",
+  "line": "JR Chūō Line (rápida)",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "JC01",
+    "jp": "東京",
+    "romaji": "Tokyo",
+    "exp": [
+     35.6777,
+     139.764615
+    ],
+    "osm": [
+     35.677678,
+     139.765101
+    ],
+    "osm_name": "東京",
+    "osm_kind": "station",
+    "dist_m": 44,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "JC02",
+    "jp": "神田",
+    "romaji": "Kanda",
+    "exp": [
+     35.694473,
+     139.770698
+    ],
+    "osm": [
+     35.693715,
+     139.77089
+    ],
+    "osm_name": "神田",
+    "osm_kind": "station",
+    "dist_m": 86,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "JC03",
+    "jp": "御茶ノ水",
+    "romaji": "Ochanomizu",
+    "exp": [
+     35.699717,
+     139.76444
+    ],
+    "osm": [
+     35.69961,
+     139.764949
+    ],
+    "osm_name": "御茶ノ水",
+    "osm_kind": "station",
+    "dist_m": 47,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "JC04",
+    "jp": "四ツ谷",
+    "romaji": "Yotsuya",
+    "exp": [
+     35.686205,
+     139.729482
+    ],
+    "osm": [
+     35.685598,
+     139.729501
+    ],
+    "osm_name": "四ツ谷",
+    "osm_kind": "station",
+    "dist_m": 68,
+    "status": "ok"
+   },
+   {
+    "i": 4,
+    "code": "JC05",
+    "jp": "新宿",
+    "romaji": "Shinjuku",
+    "exp": [
+     35.688726,
+     139.698762
+    ],
+    "osm": [
+     35.688364,
+     139.699075
+    ],
+    "osm_name": "新宿",
+    "osm_kind": "station",
+    "dist_m": 49,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d15-1",
+  "line": "JR Chūō Line (rápida)",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "JC05",
+    "jp": "新宿",
+    "romaji": "Shinjuku",
+    "exp": [
+     35.688726,
+     139.698762
+    ],
+    "osm": [
+     35.688364,
+     139.699075
+    ],
+    "osm_name": "新宿",
+    "osm_kind": "station",
+    "dist_m": 49,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "JC04",
+    "jp": "四ツ谷",
+    "romaji": "Yotsuya",
+    "exp": [
+     35.686205,
+     139.729482
+    ],
+    "osm": [
+     35.685598,
+     139.729501
+    ],
+    "osm_name": "四ツ谷",
+    "osm_kind": "station",
+    "dist_m": 68,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "JC03",
+    "jp": "御茶ノ水",
+    "romaji": "Ochanomizu",
+    "exp": [
+     35.699717,
+     139.76444
+    ],
+    "osm": [
+     35.69961,
+     139.764949
+    ],
+    "osm_name": "御茶ノ水",
+    "osm_kind": "station",
+    "dist_m": 47,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "JC02",
+    "jp": "神田",
+    "romaji": "Kanda",
+    "exp": [
+     35.694473,
+     139.770698
+    ],
+    "osm": [
+     35.693715,
+     139.77089
+    ],
+    "osm_name": "神田",
+    "osm_kind": "station",
+    "dist_m": 86,
+    "status": "ok"
+   },
+   {
+    "i": 4,
+    "code": "JC01",
+    "jp": "東京",
+    "romaji": "Tokyo",
+    "exp": [
+     35.6777,
+     139.764615
+    ],
+    "osm": [
+     35.677678,
+     139.765101
+    ],
+    "osm_name": "東京",
+    "osm_kind": "station",
+    "dist_m": 44,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d15-2",
+  "line": "JR Keiyo Line",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "JE01",
+    "jp": "東京",
+    "romaji": "Tokyo",
+    "exp": [
+     35.6777,
+     139.764615
+    ],
+    "osm": [
+     35.677678,
+     139.765101
+    ],
+    "osm_name": "東京",
+    "osm_kind": "station",
+    "dist_m": 44,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "JE02",
+    "jp": "八丁堀",
+    "romaji": "Hatchōbori",
+    "exp": [
+     35.674006,
+     139.776469
+    ],
+    "osm": [
+     35.674006,
+     139.776469
+    ],
+    "osm_name": "八丁堀駅",
+    "osm_kind": "bus_stop",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "JE03",
+    "jp": "越中島",
+    "romaji": "Etchūjima",
+    "exp": [
+     35.668191,
+     139.792284
+    ],
+    "osm": [
+     35.667906,
+     139.792609
+    ],
+    "osm_name": "越中島",
+    "osm_kind": "station",
+    "dist_m": 43,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "JE04",
+    "jp": "潮見",
+    "romaji": "Shiomi",
+    "exp": [
+     35.658703,
+     139.817251
+    ],
+    "osm": [
+     35.658924,
+     139.817197
+    ],
+    "osm_name": "潮見",
+    "osm_kind": "station",
+    "dist_m": 25,
+    "status": "ok"
+   },
+   {
+    "i": 4,
+    "code": "JE05",
+    "jp": "新木場",
+    "romaji": "Shin-Kiba",
+    "exp": [
+     35.645085,
+     139.826463
+    ],
+    "osm": [
+     35.645905,
+     139.82666
+    ],
+    "osm_name": "新木場",
+    "osm_kind": "station",
+    "dist_m": 93,
+    "status": "ok"
+   },
+   {
+    "i": 5,
+    "code": "JE06",
+    "jp": "葛西臨海公園",
+    "romaji": "Kasai-Rinkai-Kōen",
+    "exp": [
+     35.644679,
+     139.860845
+    ],
+    "osm": [
+     35.644407,
+     139.861599
+    ],
+    "osm_name": "葛西臨海公園",
+    "osm_kind": "station",
+    "dist_m": 75,
+    "status": "ok"
+   },
+   {
+    "i": 6,
+    "code": "JE07",
+    "jp": "舞浜",
+    "romaji": "Maihama",
+    "exp": [
+     35.616744,
+     139.776085
+    ],
+    "osm": [
+     35.635631,
+     139.882719
+    ],
+    "osm_name": "舞浜駅",
+    "osm_kind": "bus_stop",
+    "dist_m": 9864,
+    "status": "far"
+   }
+  ]
+ },
+ {
+  "key": "d15-3",
+  "line": "JR Yamanote Line",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "JY17",
+    "jp": "新宿",
+    "romaji": "Shinjuku",
+    "exp": [
+     35.688726,
+     139.698762
+    ],
+    "osm": [
+     35.688364,
+     139.699075
+    ],
+    "osm_name": "新宿",
+    "osm_kind": "station",
+    "dist_m": 49,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "JY18",
+    "jp": "代々木",
+    "romaji": "Yoyogi",
+    "exp": [
+     35.683033,
+     139.702056
+    ],
+    "osm": [
+     35.683569,
+     139.701597
+    ],
+    "osm_name": "代々木",
+    "osm_kind": "station",
+    "dist_m": 73,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "JY19",
+    "jp": "原宿",
+    "romaji": "Harajuku",
+    "exp": [
+     35.67009,
+     139.702466
+    ],
+    "osm": [
+     35.670215,
+     139.702427
+    ],
+    "osm_name": "原宿",
+    "osm_kind": "station",
+    "dist_m": 14,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d15-6",
+  "line": "JR Yamanote Line",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "JY19",
+    "jp": "原宿",
+    "romaji": "Harajuku",
+    "exp": [
+     35.67009,
+     139.702466
+    ],
+    "osm": [
+     35.670215,
+     139.702427
+    ],
+    "osm_name": "原宿",
+    "osm_kind": "station",
+    "dist_m": 14,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "JY20",
+    "jp": "渋谷",
+    "romaji": "Shibuya",
+    "exp": [
+     35.659011,
+     139.702497
+    ],
+    "osm": [
+     35.658999,
+     139.702445
+    ],
+    "osm_name": "渋谷",
+    "osm_kind": "station",
+    "dist_m": 5,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d15-8",
+  "line": "JR Yamanote Line",
+  "exp_src": "n/a",
+  "stations": [
+   {
+    "i": 0,
+    "code": "JY20",
+    "jp": "渋谷",
+    "romaji": "Shibuya",
+    "status": "exists_no_pos",
+    "n_cands": 26
+   },
+   {
+    "i": 1,
+    "code": "JY19",
+    "jp": "原宿",
+    "romaji": "Harajuku",
+    "status": "exists_no_pos",
+    "n_cands": 1
+   },
+   {
+    "i": 2,
+    "code": "JY18",
+    "jp": "代々木",
+    "romaji": "Yoyogi",
+    "status": "exists_no_pos",
+    "n_cands": 3
+   },
+   {
+    "i": 3,
+    "code": "JY17",
+    "jp": "新宿",
+    "romaji": "Shinjuku",
+    "status": "exists_no_pos",
+    "n_cands": 5
+   }
+  ]
+ },
+ {
+  "key": "d16-1",
+  "line": "JR Shōnan-Shinjuku Line",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "",
+    "jp": "新宿",
+    "romaji": "Shinjuku",
+    "exp": [
+     35.688726,
+     139.698762
+    ],
+    "osm": [
+     35.688364,
+     139.699075
+    ],
+    "osm_name": "新宿",
+    "osm_kind": "station",
+    "dist_m": 49,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "",
+    "jp": "渋谷",
+    "romaji": "Shibuya",
+    "exp": [
+     35.659011,
+     139.702497
+    ],
+    "osm": [
+     35.658999,
+     139.702445
+    ],
+    "osm_name": "渋谷",
+    "osm_kind": "station",
+    "dist_m": 5,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "",
+    "jp": "恵比寿",
+    "romaji": "Ebisu",
+    "exp": [
+     35.646245,
+     139.707823
+    ],
+    "osm": [
+     35.646974,
+     139.708646
+    ],
+    "osm_name": "恵比寿",
+    "osm_kind": "station",
+    "dist_m": 110,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "",
+    "jp": "大崎",
+    "romaji": "Ōsaki",
+    "exp": [
+     35.619464,
+     139.729254
+    ],
+    "osm": [
+     35.619464,
+     139.729254
+    ],
+    "osm_name": "大崎駅",
+    "osm_kind": "bus_stop",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 4,
+    "code": "",
+    "jp": "西大井",
+    "romaji": "Nishi-Ōi",
+    "exp": [
+     35.60178,
+     139.721995
+    ],
+    "osm": [
+     35.60178,
+     139.721995
+    ],
+    "osm_name": "西大井駅",
+    "osm_kind": "bus_stop",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 5,
+    "code": "",
+    "jp": "武蔵小杉",
+    "romaji": "Musashi-Kosugi",
+    "exp": [
+     35.619905,
+     139.703567
+    ],
+    "osm": [
+     35.576624,
+     139.660717
+    ],
+    "osm_name": "武蔵小杉",
+    "osm_kind": "station",
+    "dist_m": 6178,
+    "status": "far"
+   },
+   {
+    "i": 6,
+    "code": "",
+    "jp": "横浜",
+    "romaji": "Yokohama",
+    "exp": [
+     35.628527,
+     139.742672
+    ],
+    "osm": [
+     35.466207,
+     139.623195
+    ],
+    "osm_name": "横浜",
+    "osm_kind": "station",
+    "dist_m": 21038,
+    "status": "far"
+   },
+   {
+    "i": 7,
+    "code": "",
+    "jp": "保土ケ谷",
+    "romaji": "Hodogaya",
+    "exp": [
+     35.446689,
+     139.599702
+    ],
+    "status": "ok",
+    "osm": [
+     35.446689,
+     139.599702
+    ],
+    "osm_name": "保土ヶ谷",
+    "osm_kind": "station",
+    "dist_m": 0
+   },
+   {
+    "i": 8,
+    "code": "",
+    "jp": "東戸塚",
+    "romaji": "Higashi-Totsuka",
+    "exp": [
+     35.695362,
+     139.841711
+    ],
+    "osm": [
+     35.430361,
+     139.556762
+    ],
+    "osm_name": "東戸塚",
+    "osm_kind": "station",
+    "dist_m": 39149,
+    "status": "far"
+   },
+   {
+    "i": 9,
+    "code": "",
+    "jp": "戸塚",
+    "romaji": "Totsuka",
+    "exp": [
+     35.716965,
+     139.694456
+    ],
+    "osm": [
+     35.401106,
+     139.535079
+    ],
+    "osm_name": "戸塚",
+    "osm_kind": "station",
+    "dist_m": 37966,
+    "status": "far"
+   },
+   {
+    "i": 10,
+    "code": "",
+    "jp": "大船",
+    "romaji": "Ōfuna",
+    "exp": [
+     35.689501,
+     139.848863
+    ],
+    "osm": [
+     35.354309,
+     139.531432
+    ],
+    "osm_name": "大船",
+    "osm_kind": "station",
+    "dist_m": 47058,
+    "status": "far"
+   },
+   {
+    "i": 11,
+    "code": "",
+    "jp": "北鎌倉",
+    "romaji": "Kita-Kamakura",
+    "exp": [
+     35.337,
+     139.5465
+    ],
+    "osm": [
+     35.337313,
+     139.545264
+    ],
+    "osm_name": "北鎌倉",
+    "osm_kind": "station",
+    "dist_m": 117,
+    "status": "ok"
+   },
+   {
+    "i": 12,
+    "code": "",
+    "jp": "鎌倉",
+    "romaji": "Kamakura",
+    "exp": [
+     35.319,
+     139.5502
+    ],
+    "osm": [
+     35.319119,
+     139.550429
+    ],
+    "osm_name": "鎌倉",
+    "osm_kind": "station",
+    "dist_m": 25,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d16-2",
+  "line": "Enoden",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "EN15",
+    "jp": "鎌倉",
+    "romaji": "Kamakura",
+    "exp": [
+     35.319,
+     139.5502
+    ],
+    "osm": [
+     35.319119,
+     139.550429
+    ],
+    "osm_name": "鎌倉",
+    "osm_kind": "station",
+    "dist_m": 25,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "EN14",
+    "jp": "和田塚",
+    "romaji": "Wadazuka",
+    "exp": [
+     35.3156,
+     139.5445
+    ],
+    "osm": [
+     35.31371,
+     139.5455
+    ],
+    "osm_name": "和田塚",
+    "osm_kind": "station",
+    "dist_m": 229,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "EN13",
+    "jp": "由比ヶ浜",
+    "romaji": "Yuigahama",
+    "exp": [
+     35.3122,
+     139.5396
+    ],
+    "osm": [
+     35.312772,
+     139.541364
+    ],
+    "osm_name": "由比ヶ浜",
+    "osm_kind": "station",
+    "dist_m": 172,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "EN12",
+    "jp": "長谷",
+    "romaji": "Hase",
+    "exp": [
+     35.3125,
+     139.5332
+    ],
+    "osm": [
+     35.311292,
+     139.535867
+    ],
+    "osm_name": "長谷",
+    "osm_kind": "station",
+    "dist_m": 277,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d16-4",
+  "line": "Yurikamome",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "U01",
+    "jp": "新橋",
+    "romaji": "Shimbashi",
+    "exp": [
+     35.667144,
+     139.759614
+    ],
+    "osm": [
+     35.667281,
+     139.75921
+    ],
+    "osm_name": "新橋",
+    "osm_kind": "bus_stop",
+    "dist_m": 40,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "U02",
+    "jp": "汐留",
+    "romaji": "Shiodome",
+    "exp": [
+     35.663238,
+     139.760272
+    ],
+    "osm": [
+     35.663238,
+     139.760272
+    ],
+    "osm_name": "汐留",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "U03",
+    "jp": "竹芝",
+    "romaji": "Takeshiba",
+    "exp": [
+     35.653974,
+     139.761907
+    ],
+    "osm": [
+     35.653974,
+     139.761907
+    ],
+    "osm_name": "竹芝",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "U04",
+    "jp": "日の出",
+    "romaji": "Hinode",
+    "exp": [
+     35.649189,
+     139.7591
+    ],
+    "osm": [
+     35.649189,
+     139.7591
+    ],
+    "osm_name": "日の出",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 4,
+    "code": "U05",
+    "jp": "芝浦ふ頭",
+    "romaji": "Shibaura-Futō",
+    "exp": [
+     35.641738,
+     139.757772
+    ],
+    "osm": [
+     35.641738,
+     139.757772
+    ],
+    "osm_name": "芝浦ふ頭",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 5,
+    "code": "U06",
+    "jp": "お台場海浜公園",
+    "romaji": "Odaiba-Kaihin-Kōen",
+    "exp": [
+     35.62974,
+     139.778178
+    ],
+    "osm": [
+     35.629872,
+     139.778739
+    ],
+    "osm_name": "お台場海浜公園",
+    "osm_kind": "station",
+    "dist_m": 53,
+    "status": "ok"
+   },
+   {
+    "i": 6,
+    "code": "U07",
+    "jp": "台場",
+    "romaji": "Daiba",
+    "exp": [
+     35.626388,
+     139.772453
+    ],
+    "osm": [
+     35.625902,
+     139.771422
+    ],
+    "osm_name": "台場",
+    "osm_kind": "station",
+    "dist_m": 108,
+    "status": "ok"
+   },
+   {
+    "i": 7,
+    "code": "U08",
+    "jp": "東京国際クルーズターミナル",
+    "romaji": "Cruise Terminal",
+    "exp": [
+     35.621401,
+     139.773081
+    ],
+    "osm": [
+     35.621401,
+     139.773081
+    ],
+    "osm_name": "東京国際クルーズターミナル",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 8,
+    "code": "U09",
+    "jp": "テレコムセンター",
+    "romaji": "Telecom Center",
+    "exp": [
+     35.618158,
+     139.778704
+    ],
+    "osm": [
+     35.617566,
+     139.779444
+    ],
+    "osm_name": "テレコムセンター",
+    "osm_kind": "station",
+    "dist_m": 94,
+    "status": "ok"
+   },
+   {
+    "i": 9,
+    "code": "U10",
+    "jp": "青海",
+    "romaji": "Aomi",
+    "exp": [
+     35.624754,
+     139.7813
+    ],
+    "osm": [
+     35.624754,
+     139.7813
+    ],
+    "osm_name": "青海",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 10,
+    "code": "U11",
+    "jp": "東京ビッグサイト",
+    "romaji": "Big Sight",
+    "exp": [
+     35.630197,
+     139.79137
+    ],
+    "osm": [
+     35.630197,
+     139.79137
+    ],
+    "osm_name": "東京ビッグサイト",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 11,
+    "code": "U12",
+    "jp": "有明",
+    "romaji": "Ariake",
+    "exp": [
+     35.641511,
+     139.796789
+    ],
+    "osm": [
+     35.634556,
+     139.793256
+    ],
+    "osm_name": "有明",
+    "osm_kind": "station",
+    "dist_m": 837,
+    "status": "far"
+   },
+   {
+    "i": 12,
+    "code": "U13",
+    "jp": "有明テニスの森",
+    "romaji": "Ariake Tennis",
+    "exp": [
+     35.640103,
+     139.788792
+    ],
+    "osm": [
+     35.640103,
+     139.788792
+    ],
+    "osm_name": "有明テニスの森",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 13,
+    "code": "U14",
+    "jp": "市場前",
+    "romaji": "Shijō-mae",
+    "exp": [
+     35.645771,
+     139.785799
+    ],
+    "osm": [
+     35.645771,
+     139.785799
+    ],
+    "osm_name": "市場前",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 14,
+    "code": "U15",
+    "jp": "新豊洲",
+    "romaji": "Shin-Toyosu",
+    "exp": [
+     35.648518,
+     139.789614
+    ],
+    "osm": [
+     35.64877,
+     139.790212
+    ],
+    "osm_name": "新豊洲",
+    "osm_kind": "station",
+    "dist_m": 61,
+    "status": "ok"
+   }
+  ],
+  "order_suspect_idx": [
+   12,
+   13
+  ]
+ },
+ {
+  "key": "d16-5",
+  "line": "JR Chūō Line (rápida)",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "JB19",
+    "jp": "秋葉原",
+    "romaji": "Akihabara",
+    "exp": [
+     35.698383,
+     139.773072
+    ],
+    "osm": [
+     35.698361,
+     139.773122
+    ],
+    "osm_name": "秋葉原",
+    "osm_kind": "station",
+    "dist_m": 5,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "JB18",
+    "jp": "御茶ノ水",
+    "romaji": "Ochanomizu",
+    "exp": [
+     35.699717,
+     139.76444
+    ],
+    "osm": [
+     35.69961,
+     139.764949
+    ],
+    "osm_name": "御茶ノ水",
+    "osm_kind": "station",
+    "dist_m": 47,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "JB17",
+    "jp": "水道橋",
+    "romaji": "Suidōbashi",
+    "exp": [
+     35.702048,
+     139.753502
+    ],
+    "osm": [
+     35.702042,
+     139.753636
+    ],
+    "osm_name": "水道橋",
+    "osm_kind": "station",
+    "dist_m": 12,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "JB16",
+    "jp": "飯田橋",
+    "romaji": "Iidabashi",
+    "exp": [
+     35.702084,
+     139.745023
+    ],
+    "osm": [
+     35.701714,
+     139.745994
+    ],
+    "osm_name": "飯田橋",
+    "osm_kind": "station",
+    "dist_m": 97,
+    "status": "ok"
+   },
+   {
+    "i": 4,
+    "code": "JB15",
+    "jp": "市ケ谷",
+    "romaji": "Ichigaya",
+    "exp": [
+     35.691392,
+     139.736818
+    ],
+    "osm": [
+     35.691392,
+     139.736818
+    ],
+    "osm_name": "市ケ谷駅",
+    "osm_kind": "bus_stop",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 5,
+    "code": "JB14",
+    "jp": "四ツ谷",
+    "romaji": "Yotsuya",
+    "exp": [
+     35.686205,
+     139.729482
+    ],
+    "osm": [
+     35.685598,
+     139.729501
+    ],
+    "osm_name": "四ツ谷",
+    "osm_kind": "station",
+    "dist_m": 68,
+    "status": "ok"
+   },
+   {
+    "i": 6,
+    "code": "JB13",
+    "jp": "信濃町",
+    "romaji": "Shinanomachi",
+    "exp": [
+     35.680024,
+     139.720495
+    ],
+    "osm": [
+     35.680024,
+     139.720495
+    ],
+    "osm_name": "信濃町",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 7,
+    "code": "JB12",
+    "jp": "千駄ケ谷",
+    "romaji": "Sendagaya",
+    "exp": [
+     35.681083,
+     139.711118
+    ],
+    "osm": [
+     35.681266,
+     139.711331
+    ],
+    "osm_name": "千駄ケ谷",
+    "osm_kind": "station",
+    "dist_m": 28,
+    "status": "ok"
+   },
+   {
+    "i": 8,
+    "code": "JB11",
+    "jp": "代々木",
+    "romaji": "Yoyogi",
+    "exp": [
+     35.683033,
+     139.702056
+    ],
+    "osm": [
+     35.683569,
+     139.701597
+    ],
+    "osm_name": "代々木",
+    "osm_kind": "station",
+    "dist_m": 73,
+    "status": "ok"
+   },
+   {
+    "i": 9,
+    "code": "JB10",
+    "jp": "新宿",
+    "romaji": "Shinjuku",
+    "exp": [
+     35.688726,
+     139.698762
+    ],
+    "osm": [
+     35.688364,
+     139.699075
+    ],
+    "osm_name": "新宿",
+    "osm_kind": "station",
+    "dist_m": 49,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d17-1",
+  "line": "Metro Marunouchi Line",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "M08",
+    "jp": "新宿",
+    "romaji": "Shinjuku",
+    "exp": [
+     35.688726,
+     139.698762
+    ],
+    "osm": [
+     35.688364,
+     139.699075
+    ],
+    "osm_name": "新宿",
+    "osm_kind": "station",
+    "dist_m": 49,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "M09",
+    "jp": "新宿三丁目",
+    "romaji": "Shinjuku 3-chōme",
+    "exp": [
+     35.690882,
+     139.704882
+    ],
+    "osm": [
+     35.690736,
+     139.70476
+    ],
+    "osm_name": "新宿三丁目",
+    "osm_kind": "station",
+    "dist_m": 20,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "M10",
+    "jp": "新宿御苑前",
+    "romaji": "Shinjuku-Gyoemmae",
+    "exp": [
+     35.68857,
+     139.710854
+    ],
+    "osm": [
+     35.688573,
+     139.71074
+    ],
+    "osm_name": "新宿御苑前",
+    "osm_kind": "station",
+    "dist_m": 10,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "M11",
+    "jp": "四谷三丁目",
+    "romaji": "Yotsuya 3-chōme",
+    "exp": [
+     35.687747,
+     139.720172
+    ],
+    "osm": [
+     35.687988,
+     139.720575
+    ],
+    "osm_name": "四谷三丁目",
+    "osm_kind": "station",
+    "dist_m": 45,
+    "status": "ok"
+   },
+   {
+    "i": 4,
+    "code": "M12",
+    "jp": "四ツ谷",
+    "romaji": "Yotsuya",
+    "exp": [
+     35.686205,
+     139.729482
+    ],
+    "osm": [
+     35.685598,
+     139.729501
+    ],
+    "osm_name": "四ツ谷",
+    "osm_kind": "station",
+    "dist_m": 68,
+    "status": "ok"
+   },
+   {
+    "i": 5,
+    "code": "M13",
+    "jp": "赤坂見附",
+    "romaji": "Akasaka-Mitsuke",
+    "exp": [
+     35.676795,
+     139.737269
+    ],
+    "osm": [
+     35.676321,
+     139.737525
+    ],
+    "osm_name": "赤坂見附",
+    "osm_kind": "station",
+    "dist_m": 58,
+    "status": "ok"
+   },
+   {
+    "i": 6,
+    "code": "M14",
+    "jp": "国会議事堂前",
+    "romaji": "Kokkai-Gijidō-mae",
+    "exp": [
+     35.673896,
+     139.744963
+    ],
+    "osm": [
+     35.674549,
+     139.745553
+    ],
+    "osm_name": "国会議事堂前",
+    "osm_kind": "station",
+    "dist_m": 90,
+    "status": "ok"
+   },
+   {
+    "i": 7,
+    "code": "M15",
+    "jp": "霞ケ関",
+    "romaji": "Kasumigaseki",
+    "exp": [
+     35.673854,
+     139.751057
+    ],
+    "osm": [
+     35.673854,
+     139.751057
+    ],
+    "osm_name": "霞ケ関",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 8,
+    "code": "M16",
+    "jp": "銀座",
+    "romaji": "Ginza",
+    "exp": [
+     35.67185,
+     139.76405
+    ],
+    "osm": [
+     35.671768,
+     139.764105
+    ],
+    "osm_name": "銀座",
+    "osm_kind": "bus_stop",
+    "dist_m": 10,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d17-2",
+  "line": "Metro Hibiya Line",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "H09",
+    "jp": "銀座",
+    "romaji": "Ginza",
+    "exp": [
+     35.67185,
+     139.76405
+    ],
+    "osm": [
+     35.671768,
+     139.764105
+    ],
+    "osm_name": "銀座",
+    "osm_kind": "bus_stop",
+    "dist_m": 10,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "H10",
+    "jp": "東銀座",
+    "romaji": "Higashi-Ginza",
+    "exp": [
+     35.670913,
+     139.768029
+    ],
+    "osm": [
+     35.669819,
+     139.767258
+    ],
+    "osm_name": "東銀座",
+    "osm_kind": "station",
+    "dist_m": 140,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "H11",
+    "jp": "築地",
+    "romaji": "Tsukiji",
+    "exp": [
+     35.668085,
+     139.772592
+    ],
+    "osm": [
+     35.668085,
+     139.772592
+    ],
+    "osm_name": "築地",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d17-6",
+  "line": "Metro Hibiya Line",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "H11",
+    "jp": "築地",
+    "romaji": "Tsukiji",
+    "exp": [
+     35.668085,
+     139.772592
+    ],
+    "osm": [
+     35.668085,
+     139.772592
+    ],
+    "osm_name": "築地",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "H10",
+    "jp": "東銀座",
+    "romaji": "Higashi-Ginza",
+    "exp": [
+     35.670913,
+     139.768029
+    ],
+    "osm": [
+     35.669819,
+     139.767258
+    ],
+    "osm_name": "東銀座",
+    "osm_kind": "station",
+    "dist_m": 140,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "H09",
+    "jp": "銀座",
+    "romaji": "Ginza",
+    "exp": [
+     35.67185,
+     139.76405
+    ],
+    "osm": [
+     35.671768,
+     139.764105
+    ],
+    "osm_name": "銀座",
+    "osm_kind": "bus_stop",
+    "dist_m": 10,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "H08",
+    "jp": "日比谷",
+    "romaji": "Hibiya",
+    "exp": [
+     35.674108,
+     139.761069
+    ],
+    "osm": [
+     35.674458,
+     139.760503
+    ],
+    "osm_name": "日比谷",
+    "osm_kind": "bus_stop",
+    "dist_m": 64,
+    "status": "ok"
+   },
+   {
+    "i": 4,
+    "code": "H07",
+    "jp": "霞ケ関",
+    "romaji": "Kasumigaseki",
+    "exp": [
+     35.673854,
+     139.751057
+    ],
+    "osm": [
+     35.673854,
+     139.751057
+    ],
+    "osm_name": "霞ケ関",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 5,
+    "code": "H06",
+    "jp": "虎ノ門ヒルズ",
+    "romaji": "Toranomon Hills",
+    "exp": [
+     35.667469,
+     139.747765
+    ],
+    "osm": [
+     35.667469,
+     139.747765
+    ],
+    "osm_name": "虎ノ門ヒルズ",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 6,
+    "code": "H05",
+    "jp": "神谷町",
+    "romaji": "Kamiyachō",
+    "exp": [
+     35.662964,
+     139.745048
+    ],
+    "osm": [
+     35.662964,
+     139.745048
+    ],
+    "osm_name": "神谷町",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d17-7",
+  "line": "Metro Hibiya Line",
+  "exp_src": "coords",
+  "stations": [
+   {
+    "i": 0,
+    "code": "H05",
+    "jp": "神谷町",
+    "romaji": "Kamiyachō",
+    "exp": [
+     35.662964,
+     139.745048
+    ],
+    "osm": [
+     35.662964,
+     139.745048
+    ],
+    "osm_name": "神谷町",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 1,
+    "code": "H06",
+    "jp": "虎ノ門ヒルズ",
+    "romaji": "Toranomon Hills",
+    "exp": [
+     35.667469,
+     139.747765
+    ],
+    "osm": [
+     35.667469,
+     139.747765
+    ],
+    "osm_name": "虎ノ門ヒルズ",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 2,
+    "code": "H07",
+    "jp": "霞ケ関",
+    "romaji": "Kasumigaseki",
+    "exp": [
+     35.673854,
+     139.751057
+    ],
+    "osm": [
+     35.673854,
+     139.751057
+    ],
+    "osm_name": "霞ケ関",
+    "osm_kind": "station",
+    "dist_m": 0,
+    "status": "ok"
+   },
+   {
+    "i": 3,
+    "code": "H08",
+    "jp": "日比谷",
+    "romaji": "Hibiya",
+    "exp": [
+     35.674108,
+     139.761069
+    ],
+    "osm": [
+     35.674458,
+     139.760503
+    ],
+    "osm_name": "日比谷",
+    "osm_kind": "bus_stop",
+    "dist_m": 64,
+    "status": "ok"
+   },
+   {
+    "i": 4,
+    "code": "H09",
+    "jp": "銀座",
+    "romaji": "Ginza",
+    "exp": [
+     35.67185,
+     139.76405
+    ],
+    "osm": [
+     35.671768,
+     139.764105
+    ],
+    "osm_name": "銀座",
+    "osm_kind": "bus_stop",
+    "dist_m": 10,
+    "status": "ok"
+   }
+  ]
+ },
+ {
+  "key": "d18-1",
+  "line": "Airport Limousine Bus",
+  "exp_src": "n/a",
+  "stations": [
+   {
+    "i": 0,
+    "code": "",
+    "jp": "バスタ新宿",
+    "romaji": "Busta Shinjuku",
+    "status": "exists_no_pos",
+    "n_cands": 12
+   },
+   {
+    "i": 1,
+    "code": "",
+    "jp": "羽田空港第3ターミナル",
+    "romaji": "Haneda T3",
+    "status": "exists_no_pos",
+    "n_cands": 2
+   }
+  ]
+ }
+]

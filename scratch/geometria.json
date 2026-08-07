@@ -1,0 +1,729 @@
+[
+ {
+  "key": "itami-monorail",
+  "mode": "train",
+  "line": "Osaka Monorail",
+  "issues": [],
+  "n_stations": 6,
+  "n_coords": 6,
+  "len_m": 7285,
+  "straight_m": 6881
+ },
+ {
+  "key": "yamada-hankyu",
+  "mode": "train",
+  "line": "Hankyu (Senri / Kyoto / Arashiyama)",
+  "issues": [],
+  "n_stations": 13,
+  "n_coords": 13,
+  "len_m": 14220,
+  "straight_m": 12565
+ },
+ {
+  "key": "metro-tanimachi",
+  "mode": "train",
+  "line": "Metro Tanimachi",
+  "issues": [],
+  "n_stations": 3,
+  "n_coords": 3,
+  "len_m": 1725,
+  "straight_m": 1724
+ },
+ {
+  "key": "metro-sennichimae",
+  "mode": "train",
+  "line": "Metro Sennichimae",
+  "issues": [],
+  "n_stations": 3,
+  "n_coords": 3,
+  "len_m": 1428,
+  "straight_m": 1428
+ },
+ {
+  "key": "metro-midosuji",
+  "mode": "train",
+  "line": "Metro Midosuji",
+  "issues": [],
+  "n_stations": 4,
+  "n_coords": 4,
+  "len_m": 2829,
+  "straight_m": 2799
+ },
+ {
+  "key": "d5-2",
+  "mode": "train",
+  "line": "Metro Midosuji",
+  "issues": [],
+  "n_stations": 5,
+  "n_coords": 5,
+  "len_m": 4635,
+  "straight_m": 4582
+ },
+ {
+  "key": "d5-3",
+  "mode": "train",
+  "line": "Shinkansen",
+  "issues": [],
+  "n_stations": 4,
+  "n_coords": 4,
+  "len_m": 280397,
+  "straight_m": 279472
+ },
+ {
+  "key": "d5-4",
+  "mode": "train",
+  "line": "JR San-yō Line (local)",
+  "issues": [
+   "stops(53) != stations(10)"
+  ],
+  "n_stations": 10,
+  "n_coords": 53,
+  "n_stops": 53,
+  "len_m": 21748,
+  "straight_m": 18473
+ },
+ {
+  "key": "d5-5",
+  "mode": "ferry",
+  "line": "Ferry JR a Miyajima",
+  "issues": [],
+  "n_stations": 2,
+  "n_coords": 2,
+  "len_m": 1709,
+  "straight_m": 1709
+ },
+ {
+  "key": "d5-6",
+  "mode": "ferry",
+  "line": "Ferry JR a Miyajima",
+  "issues": [],
+  "n_stations": 2,
+  "n_coords": 2,
+  "len_m": 1709,
+  "straight_m": 1709
+ },
+ {
+  "key": "d5-7",
+  "mode": "train",
+  "line": "JR San-yō Line (local)",
+  "issues": [],
+  "n_stations": 9,
+  "n_coords": 9,
+  "len_m": 20879,
+  "straight_m": 18473
+ },
+ {
+  "key": "d5-8",
+  "mode": "train",
+  "line": "Tranvía Hiroden",
+  "issues": [],
+  "n_stations": 9,
+  "n_coords": 9,
+  "len_m": 2403,
+  "straight_m": 1928
+ },
+ {
+  "key": "d5-10",
+  "mode": "train",
+  "line": "Tranvía Hiroden",
+  "issues": [],
+  "n_stations": 9,
+  "n_coords": 9,
+  "len_m": 2257,
+  "straight_m": 1752
+ },
+ {
+  "key": "d5-11",
+  "mode": "train",
+  "line": "Shinkansen",
+  "issues": [],
+  "n_stations": 4,
+  "n_coords": 4,
+  "len_m": 280397,
+  "straight_m": 279472
+ },
+ {
+  "key": "d5-12",
+  "mode": "train",
+  "line": "Metro Midosuji",
+  "issues": [
+   "SIN coords (no se puede validar geometría ni posiciones)"
+  ],
+  "n_stations": 5,
+  "n_coords": 0
+ },
+ {
+  "key": "d6-1",
+  "mode": "train",
+  "line": "Metro Sakaisuji",
+  "issues": [],
+  "n_stations": 2,
+  "n_coords": 2,
+  "len_m": 1098,
+  "straight_m": 1098
+ },
+ {
+  "key": "d6-2",
+  "mode": "train",
+  "line": "Metro Chūō (Osaka)",
+  "issues": [],
+  "n_stations": 5,
+  "n_coords": 5,
+  "len_m": 4435,
+  "straight_m": 4314
+ },
+ {
+  "key": "d6-3",
+  "mode": "train",
+  "line": "JR Osaka Loop Line",
+  "issues": [],
+  "n_stations": 2,
+  "n_coords": 2,
+  "len_m": 1440,
+  "straight_m": 1440
+ },
+ {
+  "key": "d6-4",
+  "mode": "train",
+  "line": "JR Yumesaki (ramal Universal)",
+  "issues": [],
+  "n_stations": 3,
+  "n_coords": 3,
+  "len_m": 2994,
+  "straight_m": 2993
+ },
+ {
+  "key": "d6-5",
+  "mode": "train",
+  "line": "JR Yumesaki (ramal Universal)",
+  "issues": [],
+  "n_stations": 3,
+  "n_coords": 3,
+  "len_m": 2994,
+  "straight_m": 2993
+ },
+ {
+  "key": "d6-6",
+  "mode": "train",
+  "line": "JR Osaka Loop Line",
+  "issues": [],
+  "n_stations": 2,
+  "n_coords": 2,
+  "len_m": 1440,
+  "straight_m": 1440
+ },
+ {
+  "key": "d6-7",
+  "mode": "train",
+  "line": "Metro Chūō (Osaka)",
+  "issues": [],
+  "n_stations": 5,
+  "n_coords": 5,
+  "len_m": 4435,
+  "straight_m": 4314
+ },
+ {
+  "key": "d6-8",
+  "mode": "train",
+  "line": "JR Osaka Loop Line",
+  "issues": [
+   "SIN coords (no se puede validar geometría ni posiciones)"
+  ],
+  "n_stations": 5,
+  "n_coords": 0
+ },
+ {
+  "key": "d7-1",
+  "mode": "train",
+  "line": "Metro Sakaisuji",
+  "issues": [],
+  "n_stations": 4,
+  "n_coords": 4,
+  "len_m": 2752,
+  "straight_m": 2750
+ },
+ {
+  "key": "d7-3",
+  "mode": "train",
+  "line": "Kintetsu Nara Line",
+  "issues": [],
+  "n_stations": 7,
+  "n_coords": 7,
+  "len_m": 29898,
+  "straight_m": 29459
+ },
+ {
+  "key": "d7-9",
+  "mode": "train",
+  "line": "Kintetsu Nara Line",
+  "issues": [],
+  "n_stations": 7,
+  "n_coords": 7,
+  "len_m": 29898,
+  "straight_m": 29459
+ },
+ {
+  "key": "d7-10",
+  "mode": "train",
+  "line": "Metro Sakaisuji",
+  "issues": [],
+  "n_stations": 4,
+  "n_coords": 4,
+  "len_m": 2752,
+  "straight_m": 2750
+ },
+ {
+  "key": "d8-1",
+  "mode": "train",
+  "line": "Metro Sakaisuji",
+  "issues": [],
+  "n_stations": 5,
+  "n_coords": 5,
+  "len_m": 4014,
+  "straight_m": 4011
+ },
+ {
+  "key": "d8-3",
+  "mode": "train",
+  "line": "Metro Midosuji",
+  "issues": [],
+  "n_stations": 7,
+  "n_coords": 7,
+  "len_m": 5998,
+  "straight_m": 5134
+ },
+ {
+  "key": "d8-5",
+  "mode": "train",
+  "line": "Metro Midosuji",
+  "issues": [],
+  "n_stations": 2,
+  "n_coords": 2,
+  "len_m": 1440,
+  "straight_m": 1440
+ },
+ {
+  "key": "d8-6",
+  "mode": "train",
+  "line": "HARUKA Limited Express",
+  "issues": [
+   "segmentos >30 km en modo local: [(1, 36797)]"
+  ],
+  "n_stations": 3,
+  "n_coords": 3,
+  "len_m": 39962,
+  "straight_m": 39236
+ },
+ {
+  "key": "d8-7",
+  "mode": "train",
+  "line": "Metro Karasuma (Kioto)",
+  "issues": [],
+  "n_stations": 2,
+  "n_coords": 2,
+  "len_m": 1069,
+  "straight_m": 1069
+ },
+ {
+  "key": "d9-3",
+  "mode": "bus",
+  "line": "Bus urbano de Kioto",
+  "issues": [
+   "SIN coords (no se puede validar geometría ni posiciones)"
+  ],
+  "n_stations": 7,
+  "n_coords": 0
+ },
+ {
+  "key": "d9-4",
+  "mode": "train",
+  "line": "Bus urbano de Kioto",
+  "issues": [
+   "SIN coords (no se puede validar geometría ni posiciones)"
+  ],
+  "n_stations": 3,
+  "n_coords": 0
+ },
+ {
+  "key": "d9-5",
+  "mode": "train",
+  "line": "Metro Karasuma (Kioto)",
+  "issues": [],
+  "n_stations": 2,
+  "n_coords": 2,
+  "len_m": 1069,
+  "straight_m": 1069
+ },
+ {
+  "key": "d10-1",
+  "mode": "train",
+  "line": "Metro Karasuma (Kioto)",
+  "issues": [],
+  "n_stations": 2,
+  "n_coords": 2,
+  "len_m": 775,
+  "straight_m": 775
+ },
+ {
+  "key": "d10-2",
+  "mode": "train",
+  "line": "Hankyu (Senri / Kyoto / Arashiyama)",
+  "issues": [],
+  "n_stations": 5,
+  "n_coords": 5,
+  "len_m": 6336,
+  "straight_m": 5879
+ },
+ {
+  "key": "d10-3",
+  "mode": "train",
+  "line": "Hankyu (Senri / Kyoto / Arashiyama)",
+  "issues": [],
+  "n_stations": 4,
+  "n_coords": 4,
+  "len_m": 4613,
+  "straight_m": 4612
+ },
+ {
+  "key": "d10-6",
+  "mode": "train",
+  "line": "Bus urbano de Kioto",
+  "issues": [
+   "SIN coords (no se puede validar geometría ni posiciones)"
+  ],
+  "n_stations": 2,
+  "n_coords": 0
+ },
+ {
+  "key": "d10-7",
+  "mode": "train",
+  "line": "Randen (tranvía de Arashiyama)",
+  "issues": [],
+  "n_stations": 13,
+  "n_coords": 13,
+  "len_m": 7118,
+  "straight_m": 6591
+ },
+ {
+  "key": "d10-8",
+  "mode": "train",
+  "line": "Hankyu (Senri / Kyoto / Arashiyama)",
+  "issues": [],
+  "n_stations": 2,
+  "n_coords": 2,
+  "len_m": 1097,
+  "straight_m": 1097
+ },
+ {
+  "key": "d11-1",
+  "mode": "train",
+  "line": "Metro Karasuma (Kioto)",
+  "issues": [],
+  "n_stations": 2,
+  "n_coords": 2,
+  "len_m": 1069,
+  "straight_m": 1069
+ },
+ {
+  "key": "d11-2",
+  "mode": "train",
+  "line": "JR Nara Line",
+  "issues": [],
+  "n_stations": 3,
+  "n_coords": 3,
+  "len_m": 2753,
+  "straight_m": 2386
+ },
+ {
+  "key": "d11-4",
+  "mode": "train",
+  "line": "Bus urbano de Kioto",
+  "issues": [
+   "SIN coords (no se puede validar geometría ni posiciones)"
+  ],
+  "n_stations": 6,
+  "n_coords": 0
+ },
+ {
+  "key": "d11-5",
+  "mode": "train",
+  "line": "Bus urbano de Kioto",
+  "issues": [
+   "SIN coords (no se puede validar geometría ni posiciones)"
+  ],
+  "n_stations": 4,
+  "n_coords": 0
+ },
+ {
+  "key": "d11-6",
+  "mode": "train",
+  "line": "Metro Tōzai (Kioto)",
+  "issues": [],
+  "n_stations": 5,
+  "n_coords": 5,
+  "len_m": 2751,
+  "straight_m": 2692
+ },
+ {
+  "key": "d12-1",
+  "mode": "train",
+  "line": "Metro Karasuma (Kioto)",
+  "issues": [],
+  "n_stations": 2,
+  "n_coords": 2,
+  "len_m": 1069,
+  "straight_m": 1069
+ },
+ {
+  "key": "d12-2",
+  "mode": "train",
+  "line": "Shinkansen",
+  "issues": [],
+  "n_stations": 5,
+  "n_coords": 5,
+  "len_m": 378942,
+  "straight_m": 371706
+ },
+ {
+  "key": "d12-3",
+  "mode": "train",
+  "line": "JR Chūō Line (rápida)",
+  "issues": [],
+  "n_stations": 5,
+  "n_coords": 5,
+  "len_m": 9041,
+  "straight_m": 6073
+ },
+ {
+  "key": "d13-1",
+  "mode": "train",
+  "line": "JR Chūō Line (rápida)",
+  "issues": [],
+  "n_stations": 4,
+  "n_coords": 4,
+  "len_m": 7097,
+  "straight_m": 6528
+ },
+ {
+  "key": "d13-2",
+  "mode": "train",
+  "line": "Metro Ginza Line",
+  "issues": [],
+  "n_stations": 7,
+  "n_coords": 7,
+  "len_m": 4207,
+  "straight_m": 2940
+ },
+ {
+  "key": "d13-6",
+  "mode": "train",
+  "line": "Tobu Skytree Line",
+  "issues": [],
+  "n_stations": 2,
+  "n_coords": 2,
+  "len_m": 1022,
+  "straight_m": 1022
+ },
+ {
+  "key": "d13-7",
+  "mode": "train",
+  "line": "Toei Asakusa Line",
+  "issues": [],
+  "n_stations": 3,
+  "n_coords": 3,
+  "len_m": 1496,
+  "straight_m": 1457
+ },
+ {
+  "key": "d13-8",
+  "mode": "train",
+  "line": "Metro Ginza Line",
+  "issues": [],
+  "n_stations": 4,
+  "n_coords": 4,
+  "len_m": 1894,
+  "straight_m": 1847
+ },
+ {
+  "key": "d13-12",
+  "mode": "train",
+  "line": "JR Yamanote Line",
+  "issues": [
+   "SIN coords (no se puede validar geometría ni posiciones)"
+  ],
+  "n_stations": 13,
+  "n_coords": 0
+ },
+ {
+  "key": "d14-1",
+  "mode": "train",
+  "line": "JR Chūō Line (rápida)",
+  "issues": [],
+  "n_stations": 5,
+  "n_coords": 5,
+  "len_m": 9041,
+  "straight_m": 6073
+ },
+ {
+  "key": "d14-3",
+  "mode": "train",
+  "line": "JR Chūō Line (rápida)",
+  "issues": [],
+  "n_stations": 5,
+  "n_coords": 5,
+  "len_m": 9041,
+  "straight_m": 6073
+ },
+ {
+  "key": "d15-1",
+  "mode": "train",
+  "line": "JR Chūō Line (rápida)",
+  "issues": [],
+  "n_stations": 5,
+  "n_coords": 5,
+  "len_m": 9041,
+  "straight_m": 6073
+ },
+ {
+  "key": "d15-2",
+  "mode": "train",
+  "line": "JR Keiyo Line",
+  "issues": [
+   "ratio largo/recta = 2.67 (posible desvío enorme)",
+   "zigzag: giro >120° en vértices [(5, 157)]"
+  ],
+  "n_stations": 7,
+  "n_coords": 7,
+  "len_m": 18306,
+  "straight_m": 6857
+ },
+ {
+  "key": "d15-3",
+  "mode": "train",
+  "line": "JR Yamanote Line",
+  "issues": [],
+  "n_stations": 3,
+  "n_coords": 3,
+  "len_m": 2139,
+  "straight_m": 2099
+ },
+ {
+  "key": "d15-6",
+  "mode": "train",
+  "line": "JR Yamanote Line",
+  "issues": [],
+  "n_stations": 2,
+  "n_coords": 2,
+  "len_m": 1232,
+  "straight_m": 1232
+ },
+ {
+  "key": "d15-8",
+  "mode": "train",
+  "line": "JR Yamanote Line",
+  "issues": [
+   "SIN coords (no se puede validar geometría ni posiciones)"
+  ],
+  "n_stations": 4,
+  "n_coords": 0
+ },
+ {
+  "key": "d16-1",
+  "mode": "train",
+  "line": "JR Shōnan-Shinjuku Line",
+  "issues": [
+   "ratio largo/recta = 3.55 (posible desvío enorme)",
+   "retrocesos >500 m contra el rumbo general en idx [(5, 1400), (6, 3407), (8, 33068), (9, 31225), (10, 32649)]",
+   "zigzag: giro >120° en vértices [(4, 122), (6, 138), (7, 174), (9, 178)]",
+   "segmentos >30 km en modo local: [(7, 35266), (10, 47805)]"
+  ],
+  "n_stations": 13,
+  "n_coords": 13,
+  "len_m": 153611,
+  "straight_m": 43255
+ },
+ {
+  "key": "d16-2",
+  "mode": "train",
+  "line": "Enoden",
+  "issues": [],
+  "n_stations": 4,
+  "n_coords": 4,
+  "len_m": 1806,
+  "straight_m": 1703
+ },
+ {
+  "key": "d16-4",
+  "mode": "train",
+  "line": "Yurikamome",
+  "issues": [
+   "ratio largo/recta = 3.55 (posible desvío enorme)",
+   "retrocesos >500 m contra el rumbo general en idx [(12, 854), (13, 1451), (14, 1363)]",
+   "zigzag: giro >120° en vértices [(11, 123)]"
+  ],
+  "n_stations": 15,
+  "n_coords": 15,
+  "len_m": 12099,
+  "straight_m": 3411
+ },
+ {
+  "key": "d16-5",
+  "mode": "train",
+  "line": "JR Chūō Line (rápida)",
+  "issues": [],
+  "n_stations": 10,
+  "n_coords": 10,
+  "len_m": 8324,
+  "straight_m": 6796
+ },
+ {
+  "key": "d17-1",
+  "mode": "train",
+  "line": "Metro Marunouchi Line",
+  "issues": [],
+  "n_stations": 9,
+  "n_coords": 9,
+  "len_m": 6677,
+  "straight_m": 6188
+ },
+ {
+  "key": "d17-2",
+  "mode": "train",
+  "line": "Metro Hibiya Line",
+  "issues": [],
+  "n_stations": 3,
+  "n_coords": 3,
+  "len_m": 893,
+  "straight_m": 878
+ },
+ {
+  "key": "d17-6",
+  "mode": "train",
+  "line": "Metro Hibiya Line",
+  "issues": [],
+  "n_stations": 7,
+  "n_coords": 7,
+  "len_m": 3493,
+  "straight_m": 2553
+ },
+ {
+  "key": "d17-7",
+  "mode": "train",
+  "line": "Metro Hibiya Line",
+  "issues": [],
+  "n_stations": 5,
+  "n_coords": 5,
+  "len_m": 2601,
+  "straight_m": 1981
+ },
+ {
+  "key": "d18-1",
+  "mode": "train",
+  "line": "Airport Limousine Bus",
+  "issues": [
+   "SIN coords (no se puede validar geometría ni posiciones)"
+  ],
+  "n_stations": 2,
+  "n_coords": 0
+ }
+]

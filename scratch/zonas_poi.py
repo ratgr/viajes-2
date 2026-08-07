@@ -49,6 +49,9 @@ ZONAS = {
     "gion-shirakawa-tatsumibashi": ("白川南通|白川筋", 250, 180, 14),
     "tsutenkaku-hondori": ("通天閣本通", 250, 200, 12),
     "shinsekai-ichiba": ("新世界市場", 200, 130, 12),
+    "kuromon-ichiba": ("黒門市場", 250, 300, 12),
+    "tenjinbashisuji": ("天神橋筋商店街|天神橋筋[一二三四五六]丁目商店街", 300, 300, 12),
+    "camino-del-filosofo": ("哲学の道", 300, 420, 15),
 }
 # sin way OSM confiable: rectángulos a mano (centro, largo m, ancho m, rumbo°)
 MANUAL = {
