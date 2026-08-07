@@ -13,9 +13,13 @@ import math
 import os
 import re
 import shutil
+import subprocess
+import sys
 
 import yaml
 
+import common
+import contract
 from common import ASSETS, trip_paths
 
 # estado del viaje activo (lo fija init)
@@ -54,6 +58,7 @@ MODE_ICON = {"train": "🚇", "walk": "🚶", "monorail": "🚝", "flight": "✈
 VEH_JP = {"tren": "電車", "bus": "バス", "barco": "船"}
 VEH_RO = {"tren": "densha", "bus": "basu", "barco": "fune"}
 REF_RE = re.compile(r"@\[(.+?)\]\((.+?)\)")
+HHMM_RE = re.compile(r"^(\d{1,2}):(\d{2})$")   # hora 'H:MM' / 'HH:MM'
 
 
 
@@ -78,7 +83,7 @@ def dmin(s):
 
 def add_min(hhmm, mins):
     """'21:45' + 10 → '21:55'."""
-    m = re.match(r"^(\d{1,2}):(\d{2})$", str(hhmm or "").strip())
+    m = HHMM_RE.match(str(hhmm or "").strip())
     if not m:
         return ""
     total = (int(m.group(1)) * 60 + int(m.group(2)) + int(mins or 0)) % (24 * 60)
@@ -87,7 +92,7 @@ def add_min(hhmm, mins):
 
 def hm_min(hhmm):
     """'07:15' → 435 · otra cosa → None."""
-    m = re.match(r"^(\d{1,2}):(\d{2})$", str(hhmm or "").strip())
+    m = HHMM_RE.match(str(hhmm or "").strip())
     return int(m.group(1)) * 60 + int(m.group(2)) if m else None
 
 
@@ -141,17 +146,9 @@ def round_walk(mins):
 
 
 def parse_pts(raw, ctx=""):
-    """lista de (lat,lng) del formato 'lat,lng lat,lng …' — o None si está
-    malformado (un dato roto es un DIAGNÓSTICO, no un build muerto)."""
-    try:
-        pts = []
-        for tok in str(raw).split():
-            la, lo = tok.split(",")
-            pts.append((float(la), float(lo)))
-        return pts or None
-    except ValueError:
-        DIAGNOSTICS.append(f"{ctx}: gps/coords malformadas «{str(raw)[:48]}»")
-        return None
+    """envoltura de common.parse_pts: aquí un dato roto es un DIAGNÓSTICO,
+    no un build muerto (la lógica de parseo vive en common)."""
+    return common.parse_pts(raw, ctx, on_error=DIAGNOSTICS.append)
 
 
 def walk_calc(coords_str, ctx=""):
@@ -253,7 +250,7 @@ def derive_schedule(steps, ctx=""):
         end_exp = hm_min(s.get("time-to"))
         raw_dur = s.get("duration")
         flex = parse_flex(raw_dur)                        # se estira a lo que haya
-        has_dur = raw_dur not in (None, 0, "0") and flex is None
+        has_dur = raw_dur not in contract.SKIP_DUR and flex is None
         fo = {"begin": beg, "beg_exp": beg is not None, "beg_derived": False,
               "dur": dmin(raw_dur) if has_dur else None, "dur_exp": has_dur,
               "flex": flex is not None,
@@ -402,7 +399,7 @@ def md(s, refs=None):
         if tr.get("color"):
             cls = "line-chip" if tr.get("chip") else "line-chip dot"
             chip = f'<i class="{cls}" style="--lc:{tr["color"]}">{html.escape(tr.get("chip", ""))}</i>'
-        return f'<a class="modal-link" href="#m-{key}">{chip}{alt}</a>'
+        return f'<a class="modal-link" href="#{contract.MODAL_PREFIX}{key}">{chip}{alt}</a>'
 
     s = REF_RE.sub(_ref, s)
     s = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", s)
@@ -430,10 +427,10 @@ def row_text(n, refs, sc=None):
     sc = sc or {}
     parts = []
     if n.get("title"):
-        title = str(n["title"]).replace("*", "")   # defensa; migrate_yaml ya los quita
+        title = contract.clean_title(n["title"], strip=False)
         show = n.get("title-show")
         if show:
-            shown = md(str(show).replace("*", ""), refs)
+            shown = md(contract.clean_title(show, strip=False), refs)
             base = html.escape(title, quote=True)
             parts.append(f'<b class="title" data-value="{base}">{mode_icon(n)}{shown}</b>')
         else:
@@ -447,8 +444,8 @@ def row_text(n, refs, sc=None):
     raw_dur = n.get("duration")
     flex = parse_flex(raw_dur) if raw_dur is not None else None
     dur_show = n.get("duration-show")
-    sep = '<span class="sep"> - </span>' if parts else ""
-    if dur_show and raw_dur not in (None, 0, "0"):
+    sep = f'<span class="sep">{contract.SEP}</span>' if parts else ""
+    if dur_show and raw_dur not in contract.SKIP_DUR:
         base = html.escape(str(raw_dur), quote=True)
         parts.append(f'<span class="duration" data-value="{base}">{sep}{html.escape(str(dur_show))}</span>')
     elif flex is not None:
@@ -464,13 +461,13 @@ def row_text(n, refs, sc=None):
         else:
             val = fmt_dur(sc["dur"]) + "+" if sc.get("dur") else "flex"
         parts.append(f'<span class="duration" data-derived="duration">{sep}{val}</span>')
-    elif raw_dur not in (None, 0, "0"):
+    elif raw_dur not in contract.SKIP_DUR:
         parts.append(f'<span class="duration">{sep}{html.escape(str(raw_dur))}</span>')
     elif sc.get("dur") and sc.get("dur_derived"):
         tilde = "~" if sc.get("approx") else ""
         parts.append(f'<span class="duration" data-derived="duration">{sep}{tilde}{fmt_dur(sc["dur"])}</span>')
     if n.get("note"):
-        sep = '<span class="sep"> - </span>' if parts else ""
+        sep = f'<span class="sep">{contract.SEP}</span>' if parts else ""
         show = n.get("note-show")
         if show:
             base = html.escape(str(n["note"]).strip(), quote=True)
@@ -486,7 +483,7 @@ def time_cell(n, sc=None):
     sc = sc or {}
     t = str(n.get("time-from") or "")
     cls = "time fixed" if n.get("fixed") else "time"
-    dt = f' datetime="{t}"' if re.match(r"^\d{1,2}:\d{2}$", t) else ""
+    dt = f' datetime="{t}"' if HHMM_RE.match(t) else ""
     inner = html.escape(t)
     if not t and sc.get("start_derived"):
         inner = f'<span class="from" data-derived="from">{fmt_hm(sc["start"])}</span>'
@@ -494,9 +491,9 @@ def time_cell(n, sc=None):
     # rompía el round-trip con grafías tipo '9:05') y SIEMPRE se emite,
     # aunque no haya inicio del cual colgarlo
     if n.get("time-to") is not None:
-        inner += f'<span class="to">–{html.escape(str(n["time-to"]))}</span>'   # explícito: verde
+        inner += f'<span class="to">{contract.TIME_TO_DASH}{html.escape(str(n["time-to"]))}</span>'   # explícito: verde
     elif sc.get("end") is not None and inner:
-        inner += f'<span class="to" data-derived="to">–{fmt_hm(sc["end"])}</span>'
+        inner += f'<span class="to" data-derived="to">{contract.TIME_TO_DASH}{fmt_hm(sc["end"])}</span>'
     if sc.get("conflict"):
         inner += (f'<span class="warn" data-derived="conflict" '
                   f'title="{html.escape(sc["conflict"])}">⚠️</span>')
@@ -527,7 +524,7 @@ def resto_link(opt, refs):
     nombre = html.escape(PLACES.get(key, {}).get("name", key or "?"))
     if key:
         refs.add(key)
-    lk = f'<a class="modal-link" href="#m-{key}">{nombre}</a>' if key else nombre
+    lk = f'<a class="modal-link" href="#{contract.MODAL_PREFIX}{key}">{nombre}</a>' if key else nombre
     precio = opt.get("price")
     return lk + (f' <span class="price">{html.escape(str(precio))}</span>' if precio else "")
 
@@ -541,7 +538,7 @@ def render_options(node, refs, ctx=""):
         if not isinstance(o, dict):
             continue
         if "steps" in o:
-            plan_title = str(o.get("title", "")).replace("*", "")
+            plan_title = contract.clean_title(o.get("title", ""), strip=False)
             title = md(plan_title, refs)
             sched = derive_schedule(o["steps"], f'{ctx} plan «{plan_title[:24]}»')
             check_teleports(o["steps"], sched, f'{ctx} plan «{plan_title[:24]}»')
@@ -554,7 +551,7 @@ def render_options(node, refs, ctx=""):
             # itinerario fluye inline; el mapa las apila una por línea
             inner = '<span class="sep"> · </span>'.join(
                 f'<span class="option">{render_option(x, refs)}</span>' for x in o.get("options", []))
-            items.append(f'<li data-tier="{label}"{extra}><b>{label}</b>{inner}</li>')
+            items.append(f'<li data-kind="tier" data-tier="{label}"{extra}><b>{label}</b>{inner}</li>')
     return '<ul class="options">' + "".join(items) + "</ul>"
 
 
@@ -577,9 +574,9 @@ def render_li(n, refs, row_id=None, sc=None, ctx=""):
         attrs += f' data-mode="{html.escape(str(n["mode"]))}"'
     if n.get("select-only"):
         attrs += " data-select-only"
-    flex_m = FLEX_RE.match(str(n.get("duration") or "").strip())
-    if flex_m and str(n.get("duration") or "").strip().startswith("flex"):
-        inner = re.sub(r"[\s()]", "", str(n["duration"]).strip()[4:])
+    dur_str = str(n.get("duration") or "").strip()
+    if FLEX_RE.match(dur_str):
+        inner = contract.norm_flex(dur_str[4:])   # el spec, sin 'flex'
         attrs += f' data-flex="{inner}"' if inner else " data-flex"
     if sc and sc.get("free"):
         attrs += f' data-free="{sc["free"]}"'   # hueco libre tras el paso (derivado)
@@ -595,7 +592,7 @@ def render_day(day, refs, num):
     fecha = fecha.isoformat() if hasattr(fecha, "isoformat") else str(fecha)
     head = (f'<header class="day-head"><h3>{titulo}</h3>'
             f'<span class="note">{note}</span>'
-            f'<span class="anchor">Ancla: {ancla}</span></header>')
+            f'<span class="anchor">{contract.ANCHOR_LABEL}{ancla}</span></header>')
     # TODOS los pasos van al DOM (hidden-summary incluidos, ocultos por CSS):
     # la fila rNN es EXACTAMENTE el paso N del YAML
     sched = derive_schedule(day.get("steps", []), f"d{num}")
@@ -629,7 +626,7 @@ def render_place_modal(key, pl):
     if pl.get("maps"):
         out.append(f'<a class="modal-btn" href="{html.escape(pl["maps"])}" target="_blank" rel="noopener">Abrir en Maps ↗</a>')
     inner = "\n  ".join(out)
-    return f'<div class="modal" id="m-{key}">\n  {inner}\n</div>'
+    return f'<div class="modal" id="{contract.MODAL_PREFIX}{key}">\n  {inner}\n</div>'
 
 
 def render_line_modal(key, ident, ride=None, guia=None, horario=None):
@@ -708,7 +705,7 @@ def render_line_modal(key, ident, ride=None, guia=None, horario=None):
         tail += f"<br><br>{md(texto)}"
     h.append(f'<p class="recognize">{tail}</p>')   # en un elemento: el corte del popup lo puede ocultar
     inner = "\n  ".join(h)
-    return f'<div class="modal" id="m-{key}" style="--lc:{color}">\n  {inner}\n</div>'
+    return f'<div class="modal" id="{contract.MODAL_PREFIX}{key}" style="--lc:{color}">\n  {inner}\n</div>'
 
 
 def render_modal(key):
@@ -728,7 +725,7 @@ def render_modal(key):
         return render_line_modal(key, ident, ride, tr.get("guide"), horario)
     if key in LINES:
         return render_line_modal(key, LINES[key])
-    return f'<div class="modal" id="m-{key}"><h3>{html.escape(key)}</h3></div>'
+    return f'<div class="modal" id="{contract.MODAL_PREFIX}{key}"><h3>{html.escape(key)}</h3></div>'
 
 # ---------------------------------------------------------------- ensamblado
 def build_page(trip, template_name, out_name, extra=None):
@@ -755,11 +752,29 @@ def build_page(trip, template_name, out_name, extra=None):
     os.makedirs(pages_dir, exist_ok=True)
     with open(os.path.join(pages_dir, out_name), "w", encoding="utf-8") as f:
         f.write(page)
-    # el release es autocontenido: css/js compartidos se copian junto a la página
+    # el release es autocontenido: css/js compartidos (y vendor/, p.ej.
+    # Leaflet local — sin CDN la página sirve de verdad viajando) se copian
+    # junto a la página
     for asset in os.listdir(ASSETS):
-        shutil.copyfile(os.path.join(ASSETS, asset), os.path.join(pages_dir, asset))
+        src = os.path.join(ASSETS, asset)
+        if os.path.isdir(src):
+            shutil.copytree(src, os.path.join(pages_dir, asset), dirs_exist_ok=True)
+        else:
+            shutil.copyfile(src, os.path.join(pages_dir, asset))
     print(f"pages/{trip}/{out_name} · {len(DAYS)} días · {len(refs.order)} modales · {len(page) // 1024} KB")
     if DIAGNOSTICS:
         print(f"⚠️ horario incompleto en el YAML ({len(DIAGNOSTICS)} pasos):")
         for d in DIAGNOSTICS:
             print("  ·", d)
+
+
+def build_and_verify(trip, template_name, out_name, extra=None):
+    """build_page + verify_roundtrip.py en subproceso (aislado a propósito:
+    el verificador relee YAML y HTML desde cero, sin el estado de este
+    módulo); imprime su veredicto y regresa el código de salida."""
+    build_page(trip, template_name, out_name, extra=extra)
+    r = subprocess.run([sys.executable, os.path.join(common.BUILD, "verify_roundtrip.py"),
+                        trip, out_name],
+                       capture_output=True, text=True, encoding="utf-8")
+    print(r.stdout.strip() or r.stderr.strip())
+    return r.returncode

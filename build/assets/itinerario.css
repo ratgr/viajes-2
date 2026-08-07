@@ -79,6 +79,11 @@ a { color: var(--shu); }
 .options > li[data-tier="Ai"] > b:first-child { color: var(--ai); }
 .options > li[data-tier="Shu"] { background: var(--shu-soft); border: none; }
 .options > li[data-tier="Shu"] > b:first-child { color: var(--shu); }
+/* respaldo por POSICIÓN para viajes cuyos tiers no se llamen Take/Ai/Shu
+   (mismo resultado en este viaje; los selectores por nombre mandan) */
+.options > li[data-tier]:nth-of-type(1):not([data-tier="Take"]):not([data-tier="Ai"]):not([data-tier="Shu"]) { background: var(--matcha-soft); border: none; }
+.options > li[data-tier]:nth-of-type(2):not([data-tier="Take"]):not([data-tier="Ai"]):not([data-tier="Shu"]) { background: var(--ai-soft); border: none; }
+.options > li[data-tier]:nth-of-type(3):not([data-tier="Take"]):not([data-tier="Ai"]):not([data-tier="Shu"]) { background: var(--shu-soft); border: none; }
 /* planes anidados: tarjetas grandes, acento por posición */
 .options:has(> li > .steps) { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-top: 8px; }
 .options > li:has(> .steps) { font-size: inherit; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px 8px; }

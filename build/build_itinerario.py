@@ -15,25 +15,16 @@ Estructura del repo (los scripts de build/ sirven para cualquier viaje):
 El render vive en render.py (compartido con el mapa). El HTML es una
 proyección 1:1 del YAML — verify_roundtrip.py lo comprueba en cada build.
 """
-import os
-import subprocess
 import sys
 
 import render
 from common import resolve_trip
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-BUILD = os.path.dirname(os.path.abspath(__file__))
 
 
 def main():
-    trip = resolve_trip(sys.argv)
-    render.build_page(trip, "plantilla.html", "itinerario.html")
-    r = subprocess.run([sys.executable, os.path.join(BUILD, "verify_roundtrip.py"),
-                        trip, "itinerario.html"],
-                       capture_output=True, text=True, encoding="utf-8")
-    print(r.stdout.strip() or r.stderr.strip())
-    return r.returncode
+    return render.build_and_verify(resolve_trip(sys.argv), "plantilla.html", "itinerario.html")
 
 
 if __name__ == "__main__":

@@ -10,12 +10,12 @@ Fuera de alcance (solo-mapa o derivado): coords/color de transits, y los
 bloques data-derived de los modales (horario, frase, SUBIR/BAJAR, icono).
 """
 import os
-import re
 import sys
 from html.parser import HTMLParser
 
 import yaml
 
+import contract
 from common import resolve_trip, trip_paths
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -101,7 +101,7 @@ def to_md(children):
         elif c.tag == "i" and "line-chip" in c.cls():
             continue
         elif c.tag == "a" and "modal-link" in c.cls():
-            key = (c.attrs.get("href") or "")[3:]     # '#m-xxx' → 'xxx'
+            key = contract.modal_key(c.attrs.get("href")) or ""
             out.append(f"@[{to_md(c.children)}]({key})")
         elif c.tag == "b":
             out.append("**" + to_md(c.children) + "**")
@@ -136,7 +136,7 @@ def parse_step(li):
             d["time-from"] = tt
         to = first(t.children, "span", "to")
         if to is not None and "data-derived" not in to.attrs:
-            d["time-to"] = text_of(to).lstrip("–").strip()
+            d["time-to"] = text_of(to).lstrip(contract.TIME_TO_DASH).strip()
         if "fixed" in t.cls():
             d["fixed"] = True
     body = first(li.children, "div", "body")
@@ -157,13 +157,14 @@ def parse_step(li):
             if "data-value" in c.attrs:
                 dur = c.attrs["data-value"]
                 if dur.startswith("flex"):
-                    dur = re.sub(r"\s+", "", dur)
+                    spec = contract.norm_flex(dur[4:])
+                    dur = f"flex({spec})" if spec else "flex"
                 d["duration"] = dur
                 d["duration-show"] = text_plain(c).strip()
             else:
                 d["duration"] = text_plain(c).strip()
         elif c.tag == "span" and "note" in c.cls():
-            note_md = re.sub(r"^\s*-\s", "", to_md(c.children)).strip()
+            note_md = contract.SEP_STRIP_RE.sub("", to_md(c.children)).strip()
             if "data-value" in c.attrs:
                 d["note"] = c.attrs["data-value"]
                 d["note-show"] = note_md
@@ -188,7 +189,7 @@ def parse_option_span(c):
         e["steps"] = [parse_step(x) for x in nodes(ul.children, "li")]
     else:
         a = first(c.children, "a", "modal-link")
-        e["location"] = (a.attrs.get("href") or "")[3:] if a else ""
+        e["location"] = (contract.modal_key(a.attrs.get("href")) or "") if a else ""
         if price_el is not None:
             e["price"] = text_of(price_el).strip()
     return e
@@ -230,7 +231,7 @@ def parse_days(html_text):
         days.append({
             "title": text_of(h3).strip() if h3 else "",
             "note": text_of(note).strip() if note else "",
-            "anchor": re.sub(r"^Ancla:\s*", "", text_of(ancla).strip()) if ancla else "",
+            "anchor": contract.ANCHOR_STRIP_RE.sub("", text_of(ancla).strip()) if ancla else "",
             "date": s.attrs.get("data-fecha", ""),
             "steps": [parse_step(li) for li in nodes(steps_ul.children, "li")],
         })
@@ -238,9 +239,6 @@ def parse_days(html_text):
 
 
 # ---------------------------------------------------------------- YAML → pasos
-SKIP_DUR = (None, 0, "0")
-
-
 def norm_step(s):
     d = {}
     if s.get("location"):
@@ -259,18 +257,19 @@ def norm_step(s):
         d["time-to"] = str(s["time-to"])
     if s.get("fixed"):
         d["fixed"] = True
-    if s.get("duration") not in SKIP_DUR:
+    if s.get("duration") not in contract.SKIP_DUR:
         dur = str(s["duration"]).strip()
         if dur.startswith("flex"):
-            dur = re.sub(r"\s+", "", dur)   # flex( 30 - 60 ) ≡ flex(30-60)
+            spec = contract.norm_flex(dur[4:])   # flex( 30 - 60 ) ≡ flex(30-60)
+            dur = f"flex({spec})" if spec else "flex"
         d["duration"] = dur
     if s.get("title"):
-        d["title"] = str(s["title"]).replace("*", "").strip()
+        d["title"] = contract.clean_title(s["title"])
     if s.get("note"):
         d["note"] = str(s["note"]).strip()
     # convención *-show (lo mostrado; el campo base sigue siendo el dato)
     if s.get("title-show"):
-        d["title-show"] = str(s["title-show"]).replace("*", "").strip()
+        d["title-show"] = contract.clean_title(s["title-show"])
     if s.get("note-show"):
         d["note-show"] = str(s["note-show"]).strip()
     if s.get("duration-show"):
@@ -281,7 +280,7 @@ def norm_step(s):
 
 
 def norm_opt(o):
-    title = str(o.get("title", "")).replace("*", "").strip()
+    title = contract.clean_title(o.get("title", ""))
     if "steps" in o:
         d = {"title": title, "steps": [norm_step(x) for x in o["steps"] if isinstance(x, dict)]}
     else:

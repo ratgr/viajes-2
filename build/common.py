@@ -10,6 +10,36 @@ BUILD = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(BUILD)
 ASSETS = os.path.join(BUILD, "assets")
 
+# estilo de la casa para escribir YAML (default_flow_style va por parámetro)
+DUMP = dict(allow_unicode=True, sort_keys=False, width=100000)
+
+
+def dump_yaml(data, flow=None):
+    """data → texto YAML con el estilo de la casa (flow → default_flow_style)."""
+    return yaml.dump(data, default_flow_style=flow, **DUMP)
+
+
+def save_yaml(path, data, flow=None):
+    """escribe data como YAML en path con el estilo de la casa."""
+    with open(path, "w", encoding="utf-8") as f:
+        yaml.dump(data, f, default_flow_style=flow, **DUMP)
+
+
+def parse_pts(raw, ctx="", on_error=None):
+    """lista de (lat,lng) del formato 'lat,lng lat,lng …' — o None si está
+    malformado. El aviso sale por on_error(msg): la política de qué hacer con
+    un dato roto (diagnóstico, log, silencio) es del que llama."""
+    try:
+        pts = []
+        for tok in str(raw).split():
+            la, lo = tok.split(",")
+            pts.append((float(la), float(lo)))
+        return pts or None
+    except ValueError:
+        if on_error:
+            on_error(f"{ctx}: gps/coords malformadas «{str(raw)[:48]}»")
+        return None
+
 
 def resolve_trip(argv):
     """nombre del viaje: argv[1], o el único directorio dentro de src/."""

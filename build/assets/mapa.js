@@ -6,6 +6,8 @@
   'use strict';
 
   // ---------- mapa base (tiles Positron, como el mapa viejo) ----------
+  // acento del tema RESUELTO (light-dark) para halos/marcadores del mapa
+  var SHU = (getComputedStyle(document.documentElement).getPropertyValue('--shu') || '').trim() || '#b23a2a';
   var map = null;
   if (window.L && document.getElementById('map')) {
     map = L.map('map', { zoomControl: true }).setView([35.0, 135.6], 6);
@@ -31,18 +33,40 @@
     m.indeterminate = on > 0 && on < cks.length;
   }
 
+  // abrir SOLO ese día (exclusivo): los demás se pliegan
+  function openOnly(day) {
+    days.forEach(function (d) { d.classList.toggle('open', d === day); });
+  }
+
+  // casilla .ck al frente de una fila (prender/apagar su capa)
+  function addCk(li) {
+    var ck = document.createElement('input');
+    ck.type = 'checkbox';
+    ck.className = 'ck';
+    li.insertBefore(ck, li.firstChild);
+    return ck;
+  }
+  // caret plegable ▼: se inserta en host antes de before; su click corre
+  // onClick y NO burbujea (plegar no elige ni selecciona)
+  function makeCaret(cls, host, before, onClick) {
+    var c = document.createElement('span');
+    c.className = cls;
+    c.textContent = '▼';
+    host.insertBefore(c, before);
+    c.addEventListener('click', function (e) {
+      e.stopPropagation();
+      onClick();
+    });
+    return c;
+  }
+
   days.forEach(function (day) {
     var head = day.querySelector('.day-head');
     var rows = Array.prototype.slice.call(
       day.querySelectorAll(':scope > ul.steps > li'));   // incluye los solo-mapa
 
     // casilla por fila (prender/apagar su capa cuando existan capas)
-    rows.forEach(function (li) {
-      var ck = document.createElement('input');
-      ck.type = 'checkbox';
-      ck.className = 'ck';
-      li.insertBefore(ck, li.firstChild);
-    });
+    rows.forEach(addCk);
 
     // cabecera: maestro + caret
     var master = document.createElement('input');
@@ -62,24 +86,14 @@
     // el maestro prende TODO el día, incluidos los sub-pasos de las opciones
     // (aunque estén ocultas/plegadas: su geometría también cuenta)
     master.addEventListener('change', function () {
-      Array.prototype.forEach.call(day.querySelectorAll('.ck:not(.ck-day)'), function (ck) {
-        ck.checked = master.checked;
-      });
-      master.indeterminate = false;
+      // setDayChecked recalcula el maestro: deja indeterminate en falso
+      setDayChecked(day, master.checked);
       if (master.checked) day.classList.add('open');
     });
     // tri-estado ante CUALQUIER cambio de casilla dentro del día
     day.addEventListener('change', function (e) {
       if (e.target === master || !e.target.classList.contains('ck')) return;
       updateMaster(day);
-    });
-  });
-
-  // chip de día = día EXCLUSIVO: abre ese, colapsa los demás
-  document.querySelectorAll('.day-nav a[href^="#d"]').forEach(function (a) {
-    a.addEventListener('click', function () {
-      var id = a.getAttribute('href').slice(1);
-      days.forEach(function (d) { d.classList.toggle('open', d.id === id); });
     });
   });
 
@@ -122,352 +136,52 @@
   try {
     GEO = JSON.parse(document.getElementById('geo').textContent);
   } catch (e) { /* sin geometría: los links caen al dialog */ }
-  var store = document.getElementById('modal-store').content;
-  var selRow = null;
-  var tempLayer = null;   // geometría resaltada de la selección (transit)
-
-  function modalHtml(key) {
-    var src = store.getElementById('m-' + key);
-    return src ? src.outerHTML : '';
-  }
-  // un LUGAR puede aparecer en varios días (las rutas son únicas): la tarjeta
-  // lleva una pieza por día, colapsada a «día + una línea»; la del día
-  // seleccionado (sección abierta) o la fila clickeada llega expandida
-  function dayPieces(key, activeRowId) {
-    var rows = document.querySelectorAll('.panel .steps > li[data-location="' + key + '"]');
-    if (!rows.length) return '';
-    var out = ['<div class="uses">'];
-    rows.forEach(function (li) {
-      var day = li.closest('section.day');
-      var label = day ? (day.querySelector('h3').textContent.split('·')[0].trim()) : '';
-      var time = li.querySelector('time');
-      var title = li.querySelector('.title');
-      var note = li.querySelector('.note');
-      var open = (day && day.classList.contains('open')) || li.id === activeRowId;
-      out.push('<details class="use"' + (open ? ' open' : '') + '>' +
-        '<summary><b>' + label + '</b><span class="use-line">' +
-        (time ? time.textContent + ' · ' : '') + (title ? title.textContent : '') +
-        '</span></summary>' +
-        (note ? '<div class="use-note">' + note.innerHTML + '</div>' : '') +
-        '</details>');
-    });
-    out.push('</div>');
-    return out.join('');
-  }
-  function selectRow(li) {
-    if (selRow) selRow.classList.remove('sel');
-    selRow = li;
-    if (li) li.classList.add('sel');
-  }
-  // el DÓNDE ESTAMOS vive en el hash (#m-clave@fila · #@fila · #dN) para que
-  // una recarga (p.ej. tras rebuild) vuelva al mismo punto; la visibilidad
-  // de casillas NO se codifica (recarga = default)
-  function updateHash(mKey, rowId) {
-    var h = (mKey ? 'm-' + mKey : '') + (rowId ? '@' + rowId : '');
-    if (h) history.replaceState(null, '', '#' + h);
-  }
-  function openDayOf(li) {
-    var day = li.closest('section.day');
-    if (day) days.forEach(function (d) { d.classList.toggle('open', d === day); });
-  }
-  function clearTemp() {
-    if (tempLayer && map) { map.removeLayer(tempLayer); tempLayer = null; }
+  // vista inicial = caja del viaje completo (viene del build; el setView de
+  // arriba queda de respaldo para GEO vacío)
+  if (map && GEO.bbox) {
+    map.fitBounds([[GEO.bbox[0], GEO.bbox[1]], [GEO.bbox[2], GEO.bbox[3]]],
+      { padding: [40, 40] });
   }
 
-  // halo de SELECCIÓN: resalta en el mapa la geometría de lo elegido en la
-  // barra (línea gorda translúcida / disco brillante), debajo de las capas
-  var haloLayer = null;
-  function clearHalo() {
-    if (haloLayer && map) { map.removeLayer(haloLayer); haloLayer = null; }
+  // ---------- primitivas GEO ----------
+  // geometría de una clave: lugar (loc) y/o transporte (tr); tr solo llega
+  // si trae coords NO vacías — el par de lookups + chequeo vive aquí una vez
+  function geoOf(key) {
+    var tr = GEO.transits[key];
+    return {
+      loc: GEO.locations[key],
+      tr: tr && tr.coords.length ? tr : null
+    };
   }
-  // FOCO genérico: cualquier nivel de la barra (fila, elección, grupo, día)
-  // encuadra TODA la geometría contenida en su subárbol
-  function keysUnder(el) {
-    var keys = [];
-    var own = el.dataset && (el.dataset.location || el.dataset.transit);
-    if (own) keys.push(own);
-    el.querySelectorAll('[data-location],[data-transit]').forEach(function (e2) {
-      var k = e2.dataset.location || e2.dataset.transit;
-      if (k && keys.indexOf(k) < 0) keys.push(k);
-    });
-    return keys;
+  // encuadre de una clave: punto o traza → L.latLngBounds (null sin geometría)
+  function keyBounds(key) {
+    var g = geoOf(key);
+    if (g.loc) return L.latLngBounds([g.loc]);
+    if (g.tr) return L.latLngBounds(g.tr.coords);
+    return null;
   }
-  function boundsForKeys(keys) {
+  // estilo de línea de un transporte: caminata = fina y punteada, resto sólida
+  function lineStyle(tr) {
+    var walk = tr && tr.mode === 'walk';
+    return {
+      color: tr && tr.color,
+      weight: walk ? 3 : 5,
+      dashArray: walk ? '4 7' : null
+    };
+  }
+  // encuadre de una capa Leaflet (con o sin getBounds)
+  function layerBounds(l) {
+    return l.getBounds ? l.getBounds() : L.latLngBounds([l.getLatLng()]);
+  }
+  // unión de encuadres: toBounds(item) → L.latLngBounds|null por elemento
+  function boundsUnion(items, toBounds) {
     var bounds = null;
-    keys.forEach(function (key) {
-      var loc = GEO.locations[key];
-      var tr = GEO.transits[key];
-      var b = null;
-      if (loc) b = L.latLngBounds([loc]);
-      else if (tr && tr.coords.length) b = L.latLngBounds(tr.coords);
+    items.forEach(function (it) {
+      var b = toBounds(it);
       if (b) bounds = bounds ? bounds.extend(b) : L.latLngBounds(b.getSouthWest(), b.getNorthEast());
     });
     return bounds;
   }
-  function focusKeys(keys) {
-    if (!map || !keys.length) return;
-    var b = boundsForKeys(keys);
-    if (b && b.isValid()) map.flyToBounds(b.pad(.2), { duration: .5 });
-  }
-  function haloFor(keys) {
-    clearHalo();
-    if (!map) return;
-    var parts = [];
-    keys.forEach(function (key) {
-      var loc = GEO.locations[key];
-      var tr = GEO.transits[key];
-      if (loc) {
-        parts.push(L.circleMarker(loc, {
-          radius: 14, color: '#b23a2a', weight: 0, fillColor: '#b23a2a',
-          fillOpacity: .3, interactive: false
-        }));
-      } else if (tr && tr.coords.length) {
-        parts.push(L.polyline(tr.coords, {
-          color: tr.color, weight: 13, opacity: .35,
-          lineCap: 'round', lineJoin: 'round', interactive: false
-        }));
-      }
-    });
-    if (parts.length) {
-      haloLayer = L.layerGroup(parts).addTo(map);
-      parts.forEach(function (p) { if (p.bringToBack) p.bringToBack(); });
-    }
-  }
-
-  // ---------- grupos de options: colapsables y seleccionables ----------
-  // elegir un grupo (plan o tier) enciende TODA su geometría de un golpe
-  var selGroupEl = null;
-  function groupKeys(g) {
-    var keys = [];
-    g.querySelectorAll('[data-location],[data-transit]').forEach(function (el) {
-      var k = el.dataset.location || el.dataset.transit;
-      if (k && keys.indexOf(k) < 0) keys.push(k);
-    });
-    g.querySelectorAll('a.modal-link').forEach(function (a) {
-      var h = a.getAttribute('href') || '';
-      if (h.indexOf('#m-') === 0 && keys.indexOf(h.slice(3)) < 0) keys.push(h.slice(3));
-    });
-    return keys;
-  }
-  function showGroupGeometry(g) {
-    if (!map) return;
-    clearTemp();
-    haloFor(groupKeys(g));
-    var layers = [];
-    groupKeys(g).forEach(function (key) {
-      var loc = GEO.locations[key];
-      var tr = GEO.transits[key];
-      if (loc) {
-        layers.push(L.circleMarker(loc, {
-          radius: 7, color: '#fff', weight: 2, fillColor: '#b23a2a', fillOpacity: 1
-        }).bindTooltip(key));
-      } else if (tr && tr.coords.length) {
-        layers.push(L.polyline(tr.coords, {
-          color: tr.color, weight: tr.mode === 'walk' ? 3 : 5, opacity: .9,
-          dashArray: tr.mode === 'walk' ? '4 7' : null
-        }));
-      }
-    });
-    if (!layers.length) return;
-    tempLayer = L.layerGroup(layers).addTo(map);
-    var bounds = null;
-    layers.forEach(function (l) {
-      var b = l.getBounds ? l.getBounds() : L.latLngBounds([l.getLatLng()]);
-      bounds = bounds ? bounds.extend(b) : L.latLngBounds(b.getSouthWest(), b.getNorthEast());
-    });
-    map.flyToBounds(bounds.pad(.2), { duration: .5 });
-  }
-  function selectGroup(g) {
-    if (selGroupEl) selGroupEl.classList.remove('sel-group');
-    selGroupEl = g;
-    g.classList.add('sel-group');
-    showGroupGeometry(g);
-  }
-  // la FILA principal de una elección también se pliega: su caret colapsa
-  // el conjunto de options completo
-  document.querySelectorAll('.panel .steps > li').forEach(function (li) {
-    var opts = li.querySelector(':scope > .body > ul.options');
-    var title = li.querySelector('.title');
-    if (!opts || !title) return;
-    var caret = document.createElement('span');
-    caret.className = 'group-caret row-caret';
-    caret.textContent = '▼';
-    title.insertBefore(caret, title.firstChild);
-    caret.addEventListener('click', function (e) {
-      e.stopPropagation();
-      li.classList.toggle('opts-closed');
-    });
-  });
-
-  // cada ul.options es un CONJUNTO DE ELECCIÓN: sus grupos llevan radio
-  // (mutuamente excluyentes); elegir uno marca la opción y enciende su geometría
-  document.querySelectorAll('.panel .options').forEach(function (set, si) {
-    // ojo del conjunto: 👁 = fantasma de los no elegidos · 🙈 = solo el elegido
-    // (vive en la FILA padre, no dentro de las opciones)
-    var eye = document.createElement('button');
-    eye.type = 'button';
-    eye.className = 'eye-toggle';
-    eye.textContent = '👁';
-    eye.title = 'Los no elegidos: fantasma (👁) u ocultos (🙈)';
-    set.classList.add('eye-ghost');
-    var host = set.closest('li') || set;
-    host.appendChild(eye);
-    eye.addEventListener('click', function (e) {
-      e.stopPropagation();
-      var hide = set.classList.toggle('eye-hide');
-      set.classList.toggle('eye-ghost', !hide);
-      eye.textContent = hide ? '🙈' : '👁';
-    });
-    // sub-filas de planes: casilla propia, individualmente seleccionables
-    set.querySelectorAll('.steps > li').forEach(function (li) {
-      if (li.querySelector(':scope > .ck')) return;
-      var ck = document.createElement('input');
-      ck.type = 'checkbox';
-      ck.className = 'ck';
-      li.insertBefore(ck, li.firstChild);
-    });
-    set.querySelectorAll(':scope > li').forEach(function (g) {
-      var label = g.querySelector(':scope > b');
-      if (!label) return;
-      var caret = document.createElement('span');
-      caret.className = 'group-caret';
-      caret.textContent = '▼';
-      label.insertBefore(caret, label.firstChild);
-      caret.addEventListener('click', function (e) {
-        e.stopPropagation();          // colapsar NO elige
-        g.classList.toggle('closed');
-      });
-      var isPlan = !!g.querySelector(':scope > ul.steps');
-      if (isPlan) {
-        // plan: la elección es el GRUPO (sus sub-pasos son su itinerario)
-        var radio = document.createElement('input');
-        radio.type = 'radio';
-        radio.name = 'choice-' + si;
-        radio.className = 'group-choice';
-        label.insertBefore(radio, caret);
-        label.addEventListener('click', function (e) {
-          e.stopPropagation();
-          radio.checked = true;
-          selectGroup(g);
-          closePanelIfNarrow();
-        });
-      } else {
-        // elección anidada (tiers): la elección real es CADA opción de abajo —
-        // el radio va en el nivel inferior, compartido por TODO el conjunto
-        label.addEventListener('click', function (e) {
-          e.stopPropagation();
-          selectGroup(g);             // ver la geometría del tier completo
-          closePanelIfNarrow();
-        });
-        g.querySelectorAll(':scope > .option').forEach(function (opt) {
-          var r = document.createElement('input');
-          r.type = 'radio';
-          r.name = 'choice-' + si;
-          r.className = 'option-choice';
-          opt.insertBefore(r, opt.firstChild);
-          r.addEventListener('change', function () {
-            var a = opt.querySelector('a.modal-link');
-            var key = a && (a.getAttribute('href') || '').slice(3);
-            if (key) showOnMap(key, a.textContent);
-          });
-          // pliegue propio de la opción: colapsa sus sub-pasos (ida/lugar/regreso)
-          var sub = opt.querySelector(':scope > ul.steps');
-          if (sub) {
-            var oc = document.createElement('span');
-            oc.className = 'group-caret option-caret';
-            oc.textContent = '▼';
-            opt.insertBefore(oc, r.nextSibling);
-            opt.classList.add('closed');   // plegada por defecto
-            oc.addEventListener('click', function (e) {
-              e.stopPropagation();
-              opt.classList.toggle('closed');
-            });
-          }
-        });
-      }
-    });
-    // por defecto la PRIMERA opción del conjunto queda elegida (sin volar ahí)
-    if (!set.querySelector('.group-choice:checked, .option-choice:checked')) {
-      var first = set.querySelector('.group-choice, .option-choice');
-      if (first) first.checked = true;
-    }
-  });
-  // popup con la tarjeta COMPLETA (en teléfono es la única vista); si es alta
-  // se colapsa tras «Ver más» y expandida scrollea con tope de 40% de pantalla
-  function openCardPopup(latlng, content) {
-    // autoPan APAGADO: cada apertura viene con su propio vuelo explícito y
-    // el paneo automático del popup peleaba con la animación en curso
-    var pop = L.popup({ maxWidth: 320, autoPan: false })
-      .setLatLng(latlng)
-      .setContent('<div class="popup-card">' + content + '</div>')
-      .openOn(map);
-    // OJO: nada de pop.update() tras mutar el DOM — re-renderiza el contenido
-    // desde el string original y borra la clase y el botón
-    var root = pop.getElement ? pop.getElement() : null;
-    var el = root && root.querySelector('.popup-card');
-    var card = el && el.querySelector('.modal');
-    if (card && card.scrollHeight > window.innerHeight * 0.4) {
-      el.classList.add('collapsed');
-      var btn = document.createElement('button');
-      btn.className = 'see-more';
-      btn.textContent = 'Ver más ↓';
-      btn.addEventListener('click', function () {
-        var collapsed = el.classList.toggle('collapsed');
-        btn.textContent = collapsed ? 'Ver más ↓' : 'Ver menos ↑';
-      });
-      el.appendChild(btn);
-    }
-    return pop;
-  }
-  var lastShownKey = null;   // repetir click en lo YA elegido acerca el zoom
-  function showOnMap(key, fallbackTitle, activeRowId, zoomOpt) {
-    if (!map) return false;
-    var content = modalHtml(key) ||
-      '<div class="modal"><h3>' + (fallbackTitle || key) + '</h3></div>';
-    var loc = GEO.locations[key];
-    var tr = GEO.transits[key];
-    var repeat = key === lastShownKey && !zoomOpt;
-    lastShownKey = key;
-    clearTemp();
-    haloFor([key]);
-    if (loc) {
-      // repetido: acercar SIEMPRE por encima del nivel normal de lugar —
-      // si venimos de un encuadre lejano, +2 podía quedar MÁS lejos que 15
-      var z = repeat ? Math.min(19, Math.max(map.getZoom() + 2, 16))
-                     : (zoomOpt || Math.max(map.getZoom(), 15));
-      map.flyTo(loc, z, { duration: .5 });
-      openCardPopup(loc, content + dayPieces(key, activeRowId));
-      return true;
-    }
-    if (tr && tr.coords.length) {
-      tempLayer = transitGroup(key, tr, tr.coords).addTo(map);
-      if (repeat) {
-        map.flyToBounds(tempLayer.getBounds().pad(.02), { duration: .5 });
-      } else if (zoomOpt) {
-        map.flyTo(tempLayer.getBounds().getCenter(), zoomOpt, { duration: .5 });
-      } else {
-        map.flyToBounds(tempLayer.getBounds().pad(.25), { duration: .5 });
-      }
-      openCardPopup(tr.coords[Math.floor(tr.coords.length / 2)], content);
-      return true;
-    }
-    return false;
-  }
-  function rowOf(el) {
-    var li = el.closest('li');
-    while (li && !(li.parentElement && li.parentElement.classList.contains('steps'))) {
-      li = li.parentElement ? li.parentElement.closest('li') : null;
-    }
-    return li;
-  }
-
-  // ---------- capas vivas: la CASILLA manda ----------
-  // solo las filas/sub-filas MARCADAS dibujan su geometría (el maestro del
-  // día marca todo el día); abrir/plegar solo organiza la barra
-  var liveLayers = {};    // clave → capa Leaflet
-  var autoLayers = {};    // id de fila → conector automático (transit sin geometría)
-  var seqLabels = {};     // clave de lugar → '1' / '2·5' (cronología del día)
-
   // rumbo de pantalla a→b en grados CSS (horario, 0° = este)
   function segAngle(a, b) {
     var dx = (b[1] - a[1]) * Math.cos(a[0] * Math.PI / 180);
@@ -514,9 +228,9 @@
   // los vértices, como en los rieles) un punto con nombre por estación
   function transitGroup(key, tr, coords) {
     var g = L.featureGroup();
+    var s = lineStyle(tr);
     var line = L.polyline(coords, {
-      color: tr.color, weight: tr.mode === 'walk' ? 3 : 5, opacity: .85,
-      dashArray: tr.mode === 'walk' ? '4 7' : null
+      color: s.color, weight: s.weight, opacity: .85, dashArray: s.dashArray
     });
     // línea de IMPACTO invisible y gorda: las punteadas casi no se atinan
     g.addLayer(L.polyline(coords, { weight: 16, opacity: 0.001, interactive: true }));
@@ -534,6 +248,7 @@
     g._decos.concat(g._dots).forEach(function (d) { g.addLayer(d); });
     return g;
   }
+  // insignia numerada de un lugar (seqLabels vive en la sección de capas)
   function locIcon(key, ghost) {
     var label = seqLabels[key] || '';
     var w = label.length > 2 ? 10 + label.length * 8 : 22;
@@ -542,13 +257,409 @@
       html: label, iconSize: label ? [w, 22] : [16, 16]
     });
   }
+
+  var store = document.getElementById('modal-store').content;
+  var selRow = null;
+  var tempLayer = null;   // geometría resaltada de la selección (transit)
+
+  function modalHtml(key) {
+    var src = store.getElementById('m-' + key);
+    return src ? src.outerHTML : '';
+  }
+  // un LUGAR puede aparecer en varios días (las rutas son únicas): la tarjeta
+  // lleva una pieza por día, colapsada a «día + una línea»; la del día
+  // seleccionado (sección abierta) o la fila clickeada llega expandida
+  function dayPieces(key, activeRowId) {
+    var rows = document.querySelectorAll('.panel .steps > li[data-location="' + key + '"]');
+    if (!rows.length) return '';
+    var out = ['<div class="uses">'];
+    rows.forEach(function (li) {
+      var day = li.closest('section.day');
+      var label = day ? (day.querySelector('h3').textContent.split('·')[0].trim()) : '';
+      var time = li.querySelector('time');
+      var title = li.querySelector('.title');
+      var note = li.querySelector('.note');
+      var open = (day && day.classList.contains('open')) || li.id === activeRowId;
+      out.push('<details class="use"' + (open ? ' open' : '') + '>' +
+        '<summary><b>' + label + '</b><span class="use-line">' +
+        (time ? time.textContent + ' · ' : '') + (title ? title.textContent : '') +
+        '</span></summary>' +
+        (note ? '<div class="use-note">' + note.innerHTML + '</div>' : '') +
+        '</details>');
+    });
+    out.push('</div>');
+    return out.join('');
+  }
+  function selectRow(li) {
+    if (selRow) selRow.classList.remove('sel');
+    selRow = li;
+    if (li) li.classList.add('sel');
+  }
+  // el DÓNDE ESTAMOS vive en el hash (#m-clave@fila · #@fila · #dN) para que
+  // una recarga (p.ej. tras rebuild) vuelva al mismo punto; la visibilidad
+  // de casillas NO se codifica (recarga = default)
+  function updateHash(mKey, rowId) {
+    var h = (mKey ? 'm-' + mKey : '') + (rowId ? '@' + rowId : '');
+    if (h) history.replaceState(null, '', '#' + h);
+  }
+  function openDayOf(li) {
+    var day = li.closest('section.day');
+    if (day) openOnly(day);
+  }
+  function clearTemp() {
+    if (tempLayer && map) { map.removeLayer(tempLayer); tempLayer = null; }
+  }
+
+  // halo de SELECCIÓN: resalta en el mapa la geometría de lo elegido en la
+  // barra (línea gorda translúcida / disco brillante), debajo de las capas
+  var haloLayer = null;
+  function clearHalo() {
+    if (haloLayer && map) { map.removeLayer(haloLayer); haloLayer = null; }
+  }
+  function boundsForKeys(keys) {
+    return boundsUnion(keys, keyBounds);
+  }
+  function focusKeys(keys) {
+    if (!map || !keys.length) return;
+    var b = boundsForKeys(keys);
+    if (b && b.isValid()) map.flyToBounds(b.pad(.2), { duration: .5 });
+  }
+  function haloFor(keys) {
+    clearHalo();
+    if (!map) return;
+    var parts = [];
+    keys.forEach(function (key) {
+      var g = geoOf(key);
+      if (g.loc) {
+        parts.push(L.circleMarker(g.loc, {
+          radius: 14, color: SHU, weight: 0, fillColor: SHU,
+          fillOpacity: .3, interactive: false
+        }));
+      } else if (g.tr) {
+        parts.push(L.polyline(g.tr.coords, {
+          color: g.tr.color, weight: 13, opacity: .35,
+          lineCap: 'round', lineJoin: 'round', interactive: false
+        }));
+      }
+    });
+    if (parts.length) {
+      haloLayer = L.layerGroup(parts).addTo(map);
+      parts.forEach(function (p) { if (p.bringToBack) p.bringToBack(); });
+    }
+  }
+
+  // ---------- modelo de rutas elegidas (choice-path) ----------
+  // cada ul.options es un conjunto de ELECCIÓN (radios mutuamente excluyentes,
+  // anidables); aquí vive todo lo que razona sobre qué rama está elegida
+  var SEL_CHOICE = '.option-choice, .group-choice';
+  var SEL_CHOICE_ON = '.option-choice:checked, .group-choice:checked';
+  // itera los conjuntos .options ANCESTROS de el, de adentro hacia afuera;
+  // fn(set, node) recibe el conjunto y el nodo interior por el que llegamos;
+  // si fn devuelve false se corta el recorrido (y eachChoiceSet devuelve false)
+  function eachChoiceSet(el, fn) {
+    var node = el;
+    for (var set = node.closest('.options'); set;
+         set = set.parentElement && set.parentElement.closest('.options')) {
+      if (fn(set, node) === false) return false;
+      node = set;
+    }
+    return true;
+  }
+  // contenedor (opción u li de grupo) DENTRO de set del que cuelga node
+  function chosenContainer(set, node) {
+    var opt = node.closest('.option');
+    if (opt && opt.closest('.options') === set) return opt;
+    var li = node;
+    while (li && li.parentElement !== set) li = li.parentElement;
+    return li;
+  }
+  // ¿el está en la RUTA elegida? (todas sus elecciones ancestras lo contienen)
+  function onChosenPath(el) {
+    return eachChoiceSet(el, function (set, node) {
+      var chosen = set.querySelector(SEL_CHOICE_ON);
+      if (chosen) {
+        var cont = chosenContainer(set, node);
+        if (!cont || !cont.contains(chosen)) return false;
+      }
+    });
+  }
+  // ¿el2 está en la MISMA rama de opciones que el? Un paso dentro de una
+  // opción NO es vecino de los pasos de OTRA opción del mismo conjunto: su
+  // ruta automática debe brincar al siguiente paso real, no a la opción de
+  // al lado. (el2 fuera de todo conjunto siempre es válido.)
+  function sameBranch(el, el2) {
+    return eachChoiceSet(el2, function (set, node) {
+      if (!set.contains(el)) return false;                    // otra opción/conjunto
+      if (chosenContainer(set, el) !== chosenContainer(set, node)) return false;
+    });
+  }
+  // estado fantasma: elemento marcado dentro de una opción NO elegida —
+  // con 👁 su geometría se dibuja atenuada; con 🙈 va en línea GORDA tenue
+  // (sigue visible: distinta, no borrada). Recorre TODOS los conjuntos
+  // ancestros (vía eachChoiceSet, como onChosenPath/sameBranch): en
+  // elecciones anidadas manda el peor estado de cualquier nivel.
+  function ghostState(el) {
+    var worst = 'full';
+    eachChoiceSet(el, function (set, node) {
+      var chosen = set.querySelector(SEL_CHOICE_ON);
+      if (chosen) {
+        var cont = chosenContainer(set, node);
+        if (cont && !cont.contains(chosen)) {
+          if (set.classList.contains('eye-hide')) { worst = 'hidden'; return false; }
+          if (set.classList.contains('eye-ghost')) worst = 'ghost';
+        }
+      }
+    });
+    return worst;
+  }
+  // clave de un link a modal: href '#m-clave' → 'clave' (o null si no aplica)
+  function modalKey(a) {
+    var h = a.getAttribute('href') || '';
+    return h.indexOf('#m-') === 0 ? h.slice(3) : null;
+  }
+  // FOCO genérico: cualquier nivel de la barra (fila, elección, grupo, día)
+  // encuadra TODA la geometría contenida en su subárbol; con withLinks también
+  // cuentan las claves solo REFERENCIADAS por links a modal (grupos de options)
+  function keysUnder(el, withLinks) {
+    var keys = [];
+    var own = el.dataset && (el.dataset.location || el.dataset.transit);
+    if (own) keys.push(own);
+    el.querySelectorAll('[data-location],[data-transit]').forEach(function (e2) {
+      var k = e2.dataset.location || e2.dataset.transit;
+      if (k && keys.indexOf(k) < 0) keys.push(k);
+    });
+    if (withLinks) {
+      el.querySelectorAll('a.modal-link').forEach(function (a) {
+        var k = modalKey(a);
+        if (k && keys.indexOf(k) < 0) keys.push(k);
+      });
+    }
+    return keys;
+  }
+
+  // ---------- grupos de options: colapsables y seleccionables ----------
+  // elegir un grupo (plan o tier) enciende TODA su geometría de un golpe
+  var selGroupEl = null;
+  function showGroupGeometry(g) {
+    if (!map) return;
+    clearTemp();
+    var keys = keysUnder(g, true);
+    haloFor(keys);
+    var layers = [];
+    keys.forEach(function (key) {
+      var geo = geoOf(key);
+      if (geo.loc) {
+        layers.push(L.circleMarker(geo.loc, {
+          radius: 7, color: '#fff', weight: 2, fillColor: SHU, fillOpacity: 1
+        }).bindTooltip(key));
+      } else if (geo.tr) {
+        var s = lineStyle(geo.tr);
+        layers.push(L.polyline(geo.tr.coords, {
+          color: s.color, weight: s.weight, opacity: .9, dashArray: s.dashArray
+        }));
+      }
+    });
+    if (!layers.length) return;
+    tempLayer = L.layerGroup(layers).addTo(map);
+    map.flyToBounds(boundsUnion(layers, layerBounds).pad(.2), { duration: .5 });
+  }
+  function selectGroup(g) {
+    if (selGroupEl) selGroupEl.classList.remove('sel-group');
+    selGroupEl = g;
+    g.classList.add('sel-group');
+    showGroupGeometry(g);
+  }
+  // la FILA principal de una elección también se pliega: su caret colapsa
+  // el conjunto de options completo
+  document.querySelectorAll('.panel .steps > li').forEach(function (li) {
+    var opts = li.querySelector(':scope > .body > ul.options');
+    var title = li.querySelector('.title');
+    if (!opts || !title) return;
+    makeCaret('group-caret row-caret', title, title.firstChild, function () {
+      li.classList.toggle('opts-closed');
+    });
+  });
+
+  // cada ul.options es un CONJUNTO DE ELECCIÓN: sus grupos llevan radio
+  // (mutuamente excluyentes); elegir uno marca la opción y enciende su geometría
+  document.querySelectorAll('.panel .options').forEach(function (set, si) {
+    // ojo del conjunto: 👁 = fantasma de los no elegidos · 🙈 = solo el elegido
+    // (vive en la FILA padre, no dentro de las opciones)
+    var eye = document.createElement('button');
+    eye.type = 'button';
+    eye.className = 'eye-toggle';
+    eye.textContent = '👁';
+    eye.title = 'Los no elegidos: fantasma (👁) u ocultos (🙈)';
+    set.classList.add('eye-ghost');
+    var host = set.closest('li') || set;
+    host.appendChild(eye);
+    eye.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var hide = set.classList.toggle('eye-hide');
+      set.classList.toggle('eye-ghost', !hide);
+      eye.textContent = hide ? '🙈' : '👁';
+    });
+    // sub-filas de planes: casilla propia, individualmente seleccionables
+    set.querySelectorAll('.steps > li').forEach(function (li) {
+      if (li.querySelector(':scope > .ck')) return;
+      addCk(li);
+    });
+    set.querySelectorAll(':scope > li').forEach(function (g) {
+      var label = g.querySelector(':scope > b');
+      if (!label) return;
+      var caret = makeCaret('group-caret', label, label.firstChild, function () {
+        g.classList.toggle('closed');          // colapsar NO elige
+      });
+      // el renderer declara la topología (data-kind); la forma DOM es respaldo
+      var isPlan = g.dataset.kind ? g.dataset.kind === 'plan' : !!g.querySelector(':scope > ul.steps');
+      if (isPlan) {
+        // plan: la elección es el GRUPO (sus sub-pasos son su itinerario)
+        var radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = 'choice-' + si;
+        radio.className = 'group-choice';
+        label.insertBefore(radio, caret);
+        label.addEventListener('click', function (e) {
+          e.stopPropagation();
+          radio.checked = true;
+          selectGroup(g);
+          closePanelIfNarrow();
+        });
+      } else {
+        // elección anidada (tiers): la elección real es CADA opción de abajo —
+        // el radio va en el nivel inferior, compartido por TODO el conjunto
+        label.addEventListener('click', function (e) {
+          e.stopPropagation();
+          selectGroup(g);             // ver la geometría del tier completo
+          closePanelIfNarrow();
+        });
+        g.querySelectorAll(':scope > .option').forEach(function (opt) {
+          var r = document.createElement('input');
+          r.type = 'radio';
+          r.name = 'choice-' + si;
+          r.className = 'option-choice';
+          opt.insertBefore(r, opt.firstChild);
+          r.addEventListener('change', function () {
+            var a = opt.querySelector('a.modal-link');
+            var key = a && modalKey(a);
+            if (key) showOnMap(key, a.textContent);
+          });
+          // pliegue propio de la opción: colapsa sus sub-pasos (ida/lugar/regreso)
+          var sub = opt.querySelector(':scope > ul.steps');
+          if (sub) {
+            makeCaret('group-caret option-caret', opt, r.nextSibling, function () {
+              opt.classList.toggle('closed');
+            });
+            opt.classList.add('closed');   // plegada por defecto
+          }
+        });
+      }
+    });
+    // por defecto la PRIMERA opción del conjunto queda elegida (sin volar ahí)
+    if (!set.querySelector(SEL_CHOICE_ON)) {
+      var first = set.querySelector(SEL_CHOICE);
+      if (first) first.checked = true;
+    }
+  });
+  // popup con la tarjeta COMPLETA (en teléfono es la única vista); si es alta
+  // se colapsa tras «Ver más» y expandida scrollea con tope de 40% de pantalla
+  function openCardPopup(latlng, content) {
+    // autoPan APAGADO: cada apertura viene con su propio vuelo explícito y
+    // el paneo automático del popup peleaba con la animación en curso
+    var pop = L.popup({ maxWidth: 320, autoPan: false })
+      .setLatLng(latlng)
+      .setContent('<div class="popup-card">' + content + '</div>')
+      .openOn(map);
+    // OJO: nada de pop.update() tras mutar el DOM — re-renderiza el contenido
+    // desde el string original y borra la clase y el botón
+    var root = pop.getElement ? pop.getElement() : null;
+    var el = root && root.querySelector('.popup-card');
+    var card = el && el.querySelector('.modal');
+    if (card && card.scrollHeight > window.innerHeight * 0.4) {
+      el.classList.add('collapsed');
+      var btn = document.createElement('button');
+      btn.className = 'see-more';
+      btn.textContent = 'Ver más ↓';
+      btn.addEventListener('click', function () {
+        var collapsed = el.classList.toggle('collapsed');
+        btn.textContent = collapsed ? 'Ver más ↓' : 'Ver menos ↑';
+      });
+      el.appendChild(btn);
+    }
+    return pop;
+  }
+  var lastShownKey = null;   // repetir click en lo YA elegido acerca el zoom
+  // el caminador encuadra la GEOMETRÍA COMPLETA del paso con un tope de
+  // acercamiento (regla del usuario: nada de promedios de zoom)
+  var ST_MAX_ZOOM = 16;
+  function showOnMap(key, fallbackTitle, activeRowId, fit) {
+    if (!map) return false;
+    var content = modalHtml(key) ||
+      '<div class="modal"><h3>' + (fallbackTitle || key) + '</h3></div>';
+    var g = geoOf(key);
+    var loc = g.loc, tr = g.tr;
+    var repeat = key === lastShownKey && !fit;
+    lastShownKey = key;
+    clearTemp();
+    haloFor([key]);
+    if (loc) {
+      // repetido: acercar SIEMPRE por encima del nivel normal de lugar —
+      // si venimos de un encuadre lejano, +2 podía quedar MÁS lejos que 15
+      var z = repeat ? Math.min(19, Math.max(map.getZoom() + 2, 16))
+                     : fit ? ST_MAX_ZOOM : Math.max(map.getZoom(), 15);
+      map.flyTo(loc, z, { duration: .5 });
+      openCardPopup(loc, content + dayPieces(key, activeRowId));
+      return true;
+    }
+    if (tr) {
+      tempLayer = transitGroup(key, tr, tr.coords).addTo(map);
+      if (repeat) {
+        map.flyToBounds(tempLayer.getBounds().pad(.02), { duration: .5 });
+      } else {
+        map.flyToBounds(tempLayer.getBounds().pad(.25),
+          { duration: .5, maxZoom: fit ? ST_MAX_ZOOM : 18 });
+      }
+      openCardPopup(tr.coords[Math.floor(tr.coords.length / 2)], content);
+      return true;
+    }
+    return false;
+  }
+  function rowOf(el) {
+    var li = el.closest('li');
+    while (li && !(li.parentElement && li.parentElement.classList.contains('steps'))) {
+      li = li.parentElement ? li.parentElement.closest('li') : null;
+    }
+    return li;
+  }
+
+  // ---------- capas vivas: la CASILLA manda ----------
+  // solo las filas/sub-filas MARCADAS dibujan su geometría (el maestro del
+  // día marca todo el día); abrir/plegar solo organiza la barra
+  var liveLayers = {};    // clave → capa Leaflet
+  var autoLayers = {};    // id de fila → conector automático (transit sin geometría)
+  var seqLabels = {};     // clave de lugar → '1' / '2·5' (cronología del día)
+
+  // tabla de estilos por estado: opacidad de línea (line) y de marcadores
+  // (mark), y cuánto ENGORDAR la línea oculta (widen) — sigue visible: distinta
+  var STYLE = {
+    full:   { line: .85, mark: 1,   widen: 0 },
+    ghost:  { line: .25, mark: .25, widen: 0 },
+    hidden: { line: .12, mark: .12, widen: 7 }
+  };
+  // misma estructura para los conectores automáticos (sus propios números)
+  var AUTO_STYLE = {
+    full:   { line: .7, mark: .8, weight: 2.5 },
+    ghost:  { line: .2, mark: .2, weight: 2.5 },
+    hidden: { line: .1, mark: .1, weight: 9 }
+  };
+
   function makeLayer(key) {
-    var loc = GEO.locations[key];
-    var tr = GEO.transits[key];
+    var g = geoOf(key);
+    var loc = g.loc, tr = g.tr;
     var ly = null;
     if (loc) {
       ly = L.marker(loc, { icon: locIcon(key, false) });
-    } else if (tr && tr.coords.length) {
+    } else if (tr) {
       ly = transitGroup(key, tr, tr.coords);
     }
     if (ly) {
@@ -589,66 +700,47 @@
     stMode = null;
     stRender();
   }
-  // estado fantasma: elemento marcado dentro de una opción NO elegida —
-  // con 👁 su geometría se dibuja atenuada; con 🙈 va en línea GORDA tenue
-  // (sigue visible: distinta, no borrada). Recorre TODOS los conjuntos
-  // ancestros (como onChosenPath/sameBranch): en elecciones anidadas manda
-  // el peor estado de cualquier nivel.
-  function ghostState(el) {
-    var worst = 'full';
-    var node = el;
-    for (var set = node.closest('.options'); set;
-         set = set.parentElement && set.parentElement.closest('.options')) {
-      var chosen = set.querySelector('.option-choice:checked, .group-choice:checked');
-      if (chosen) {
-        var cont = chosenContainer(set, node);
-        if (cont && !cont.contains(chosen)) {
-          if (set.classList.contains('eye-hide')) return 'hidden';
-          if (set.classList.contains('eye-ghost')) worst = 'ghost';
-        }
-      }
-      node = set;
-    }
-    return worst;
-  }
   var ST_RANK = { full: 3, ghost: 2, hidden: 1 };
   function applyLayerState(key, st) {
     var ly = liveLayers[key];
     if (!ly) return;
-    var lineOp = st === 'full' ? .85 : st === 'ghost' ? .25 : .12;
-    var markOp = st === 'full' ? 1 : st === 'ghost' ? .25 : .12;
+    var s = STYLE[st];
     if (ly._line) {                       // grupo de transporte
-      var w = GEO.transits[key] && GEO.transits[key].mode === 'walk' ? 3 : 5;
-      ly._line.setStyle({ opacity: lineOp, weight: st === 'hidden' ? w + 7 : w });
-      ly._decos.forEach(function (d) { d.setOpacity(markOp); });
-      ly._dots.forEach(function (d) { d.setStyle({ opacity: markOp, fillOpacity: markOp }); });
+      var w = lineStyle(GEO.transits[key]).weight;
+      ly._line.setStyle({ opacity: s.line, weight: w + s.widen });
+      ly._decos.forEach(function (d) { d.setOpacity(s.mark); });
+      ly._dots.forEach(function (d) { d.setStyle({ opacity: s.mark, fillOpacity: s.mark }); });
     } else if (ly.setIcon) {              // marcador de lugar (insignia numerada)
       ly.setIcon(locIcon(key, st !== 'full'));
     }
-  }
-  // ¿el2 está en la MISMA rama de opciones que el? Un paso dentro de una
-  // opción NO es vecino de los pasos de OTRA opción del mismo conjunto: su
-  // ruta automática debe brincar al siguiente paso real, no a la opción de
-  // al lado. (el2 fuera de todo conjunto siempre es válido.)
-  function sameBranch(el, el2) {
-    var node = el2;
-    for (var set = node.closest('.options'); set;
-         set = set.parentElement && set.parentElement.closest('.options')) {
-      if (!set.contains(el)) return false;                    // otra opción/conjunto
-      if (chosenContainer(set, el) !== chosenContainer(set, node)) return false;
-      node = set;
-    }
-    return true;
   }
   // punto de anclaje de una fila con geometría: lugar → su gps;
   // transporte → su último/primer vértice (según sea el previo o el siguiente)
   function anchorPoint(el, end) {
     var key = el.dataset.location || el.dataset.transit;
-    var loc = GEO.locations[key];
-    if (loc) return loc;
-    var tr = GEO.transits[key];
-    if (tr && tr.coords.length) return end ? tr.coords[tr.coords.length - 1] : tr.coords[0];
+    var g = geoOf(key);
+    if (g.loc) return g.loc;
+    if (g.tr) return end ? g.tr.coords[g.tr.coords.length - 1] : g.tr.coords[0];
     return null;
+  }
+  // anclas VECINAS de list[i] dentro de su misma rama: prev = último punto del
+  // paso previo con geometría, next = primer punto del siguiente; con
+  // sameDayOnly el rastreo se corta al cruzar de día (conectores automáticos)
+  function neighborAnchors(list, i, sameDayOnly) {
+    var el = list[i];
+    var day = sameDayOnly ? el.closest('section.day') : null;
+    var prev = null, next = null, j;
+    for (j = i - 1; j >= 0 && !prev; j--) {
+      if (sameDayOnly && list[j].closest('section.day') !== day) break;
+      if (!sameBranch(el, list[j])) continue;      // no anclar en OTRA opción
+      prev = anchorPoint(list[j], true);
+    }
+    for (j = i + 1; j < list.length && !next; j++) {
+      if (sameDayOnly && list[j].closest('section.day') !== day) break;
+      if (!sameBranch(el, list[j])) continue;
+      next = anchorPoint(list[j], false);
+    }
+    return { prev: prev, next: next };
   }
   function syncLayers() {
     if (!map) return;
@@ -672,19 +764,8 @@
       if (!el.dataset.transit) return;
       // transporte SIN geometría (referencia sin cumplir) = conector automático:
       // une el punto previo con el siguiente dentro del mismo día
-      var day = el.closest('section.day');
-      var a = null, b = null, j;
-      for (j = i - 1; j >= 0 && !a; j--) {
-        if (els[j].closest('section.day') !== day) break;
-        if (!sameBranch(el, els[j])) continue;      // no anclar en OTRA opción
-        a = anchorPoint(els[j], true);
-      }
-      for (j = i + 1; j < els.length && !b; j++) {
-        if (els[j].closest('section.day') !== day) break;
-        if (!sameBranch(el, els[j])) continue;
-        b = anchorPoint(els[j], false);
-      }
-      if (a && b) autos['auto-' + i + '-' + key] = { a: a, b: b, st: st };
+      var na = neighborAnchors(els, i, true);
+      if (na.prev && na.next) autos['auto-' + i + '-' + key] = { a: na.prev, b: na.next, st: st };
     });
     // cronología del día: numerar los LUGARES plenos en orden del documento
     seqLabels = {};
@@ -733,17 +814,14 @@
         g._decos.forEach(function (d) { g.addLayer(d); });
         autoLayers[id] = g.addTo(map);
       }
-      var op = sp.st === 'full' ? .7 : sp.st === 'ghost' ? .2 : .1;
-      autoLayers[id]._line.setStyle({ opacity: op, weight: sp.st === 'hidden' ? 9 : 2.5 });
-      autoLayers[id]._decos.forEach(function (d) { d.setOpacity(sp.st === 'full' ? .8 : op); });
+      var s = AUTO_STYLE[sp.st];
+      autoLayers[id]._line.setStyle({ opacity: s.line, weight: s.weight });
+      autoLayers[id]._decos.forEach(function (d) { d.setOpacity(s.mark); });
     });
   }
   function fitToLayers() {
-    var bounds = null;
-    Object.keys(liveLayers).forEach(function (k) {
-      var l = liveLayers[k];
-      var b = l.getBounds ? l.getBounds() : L.latLngBounds([l.getLatLng()]);
-      bounds = bounds ? bounds.extend(b) : L.latLngBounds(b.getSouthWest(), b.getNorthEast());
+    var bounds = boundsUnion(Object.keys(liveLayers), function (k) {
+      return layerBounds(liveLayers[k]);
     });
     if (bounds && bounds.isValid()) map.flyToBounds(bounds.pad(.15), { duration: .5 });
   }
@@ -752,13 +830,15 @@
     clearTimeout(syncT);
     syncT = setTimeout(syncLayers, 120);
   }
-  document.querySelector('.panel').addEventListener('click', schedSync);
-  document.querySelector('.panel').addEventListener('change', schedSync);
-  // chips de día: tras el cambio exclusivo, sincronizar y encuadrar el día
+  panel.addEventListener('click', schedSync);
+  panel.addEventListener('change', schedSync);
+  // chip de día = día EXCLUSIVO: abre ese y colapsa los demás; después del
+  // cambio, sincronizar capas y encuadrar el día
   document.querySelectorAll('.day-nav a[href^="#d"]').forEach(function (a) {
     a.addEventListener('click', function () {
-      clearHalo();
       var sec = document.getElementById((a.getAttribute('href') || '').slice(1));
+      openOnly(sec);
+      clearHalo();
       setTimeout(function () {
         syncLayers();
         if (sec) focusKeys(keysUnder(sec)); else fitToLayers();
@@ -786,43 +866,28 @@
   var stMode = null;        // conjunto .options mostrando elección, o null
   var stJumpOpen = true;
 
-  function chosenContainer(set, node) {
-    var opt = node.closest('.option');
-    if (opt && opt.closest('.options') === set) return opt;
-    var li = node;
-    while (li && li.parentElement !== set) li = li.parentElement;
-    return li;
-  }
-  function onChosenPath(el) {
-    var node = el;
-    for (var set = node.closest('.options'); set;
-         set = set.parentElement && set.parentElement.closest('.options')) {
-      var chosen = set.querySelector('.option-choice:checked, .group-choice:checked');
-      if (chosen) {
-        var cont = chosenContainer(set, node);
-        if (!cont || !cont.contains(chosen)) return false;
-      }
-      node = set;
-    }
-    return true;
-  }
   function nextConcrete(i, dir) {
     for (var j = i + dir; j >= 0 && j < stEls.length; j += dir) {
       if (onChosenPath(stEls[j])) return j;
     }
     return -1;
   }
+  // texto plano de una etiqueta: espacios colapsados; con stripCaret también
+  // se quita el caret de plegado de la barra si vino dentro del elemento
+  function labelText(s, stripCaret) {
+    s = s.replace(/\s+/g, ' ');
+    if (stripCaret) s = s.replace(/^[▼▾▸▶ ]+/, '');
+    return s.trim();
+  }
   function stTitle(el) {
     var t = el.querySelector('.title') || el.querySelector('a.modal-link');
-    return (t ? t.textContent : (el.dataset.location || el.dataset.transit))
-      .replace(/\s+/g, ' ').trim();
+    return labelText(t ? t.textContent : (el.dataset.location || el.dataset.transit));
   }
   function optLabel(cont) {
     var a = cont.querySelector('a.modal-link');
     var b = cont.querySelector('b');
     var s = (a && a.textContent) || (b && b.textContent) || cont.textContent;
-    // fuera el caret de plegado de la barra si vino dentro del <b>
-    return s.replace(/\s+/g, ' ').replace(/^[▼▾▸▶ ]+/, '').trim().slice(0, 42);
+    return labelText(s, true).slice(0, 42);
   }
 
   var stBar = document.createElement('div');
@@ -836,23 +901,15 @@
     '<button class="st-jump-toggle" type="button">saltar a ▾</button>' +
     '<div class="st-jump-body"></div></div>';
   document.getElementById('map').appendChild(stBar);
-  // parar TODO lo de ratón: un click en la barra que burbujee hasta Leaflet
+  // parar TODO lo de ratón: un click en una barra que burbujee hasta Leaflet
   // CIERRA el popup recién abierto por ese mismo click
-  ['pointerdown', 'mousedown', 'mouseup', 'click', 'touchstart', 'dblclick', 'wheel'].forEach(function (ev) {
-    stBar.addEventListener(ev, function (e) { e.stopPropagation(); });
-  });
-
-  // zoom esperado de un elemento: lugar = 16; línea = el que la encuadra
-  function expectedZoomFor(el) {
-    if (!el || !map) return map ? map.getZoom() : 14;
-    var key = el.dataset.location || el.dataset.transit;
-    if (GEO.locations[key]) return 16;
-    var tr = GEO.transits[key];
-    if (tr && tr.coords.length) {
-      return Math.min(16, map.getBoundsZoom(L.latLngBounds(tr.coords).pad(.25)));
-    }
-    return map.getZoom();
+  function swallowEvents(el) {
+    ['pointerdown', 'mousedown', 'mouseup', 'click', 'touchstart', 'dblclick', 'wheel'].forEach(function (ev) {
+      el.addEventListener(ev, function (e) { e.stopPropagation(); });
+    });
   }
+  swallowEvents(stBar);
+
   function stGoTo(i) {
     // cruzar de día con el caminador — como sea que pase (‹ ›, día ‹ ›,
     // saltar a opción) — OCULTA el día ACTIVO (no el del stepper: pueden
@@ -873,40 +930,24 @@
     if (li.id) updateHash(null, li.id);   // el hash sigue al caminador
     li.scrollIntoView({ block: 'center' });
     var key = el.dataset.location || el.dataset.transit;
-    // suavizar el zoom entre pasos (regla del usuario): promedio aritmético
-    // de (2 × zoom nuevo + zoom actual + zoom esperado del paso siguiente) / 4
-    var blend = null;
-    if (map) {
-      var nxI = nextConcrete(i, 1);
-      var zNew = expectedZoomFor(el);
-      var zNext = nxI >= 0 ? expectedZoomFor(stEls[nxI]) : zNew;
-      blend = Math.round((2 * zNew + map.getZoom() + zNext) / 4 * 2) / 2;
-    }
-    if (!showOnMap(key, stTitle(el), li.id, blend)) {
-      // sin geometría (conector automático): encuadrar sus puntos vecinos y
-      // abrir su tarjeta ahí mismo (el popup SIEMPRE acompaña al paso)
-      var pts = [], j, p;
-      for (j = i - 1; j >= 0; j--) {
-        if (!sameBranch(el, stEls[j])) continue;
-        p = anchorPoint(stEls[j], true);
-        if (p) { pts.push(p); break; }
-      }
-      for (j = i + 1; j < stEls.length; j++) {
-        if (!sameBranch(el, stEls[j])) continue;
-        p = anchorPoint(stEls[j], false);
-        if (p) { pts.push(p); break; }
-      }
+    if (!showOnMap(key, stTitle(el), li.id, true)) {
+      // sin geometría (conector automático): encuadrar sus puntos vecinos
+      // COMPLETOS (con el mismo tope de acercamiento) y abrir su tarjeta
+      var na = neighborAnchors(stEls, i, false);
+      var pts = [];
+      if (na.prev) pts.push(na.prev);
+      if (na.next) pts.push(na.next);
       if (pts.length && map) {
-        var c = L.latLngBounds(pts).getCenter();
-        map.flyTo(c, blend || map.getZoom(), { duration: .5 });
-        openCardPopup(c, modalHtml(key) ||
+        var b = L.latLngBounds(pts);
+        map.flyToBounds(b.pad(.25), { duration: .5, maxZoom: ST_MAX_ZOOM });
+        openCardPopup(b.getCenter(), modalHtml(key) ||
           '<div class="modal"><h3>' + stTitle(el) + '</h3></div>');
       }
     }
     stRender();
   }
   function enterOption(cont) {
-    var r = cont.querySelector('.option-choice, .group-choice');
+    var r = cont.querySelector(SEL_CHOICE);
     if (r && !r.checked) { r.checked = true; syncLayers(); }
     for (var j = 0; j < stEls.length; j++) {
       if (cont.contains(stEls[j])) { stGoTo(j); return; }
@@ -914,8 +955,8 @@
     // opción PLANA (sin sub-pasos concretos): mostrarla en el mapa vía su
     // referencia — antes el click marcaba el radio y no pasaba nada más
     var a = cont.querySelector('a.modal-link');
-    var href = a ? (a.getAttribute('href') || '') : '';
-    if (href.indexOf('#m-') === 0) showOnMap(href.slice(3), a.textContent);
+    var key = a && modalKey(a);
+    if (key) showOnMap(key, a.textContent);
     stMode = null;
     stRender();
   }
@@ -936,7 +977,7 @@
         b.textContent = label;
         if (li.dataset.tier) b.dataset.tier = li.dataset.tier;   // color del tier
         if (curEl && cont.contains(curEl)) b.classList.add('on');
-        var r = cont.querySelector('.option-choice, .group-choice');
+        var r = cont.querySelector(SEL_CHOICE);
         if (r && r.checked) b.classList.add('chosen');
         b.addEventListener('click', function () { enterOption(cont); });
         return b;
@@ -950,8 +991,7 @@
           var hs = document.createElement('span');
           hs.className = 'st-col-head';
           if (li.dataset.tier) hs.dataset.tier = li.dataset.tier;
-          hs.textContent = head.textContent.replace(/\s+/g, ' ')
-            .replace(/^[▼▾▸▶ ]+/, '').trim();
+          hs.textContent = labelText(head.textContent, true);
           col.appendChild(hs);
         }
         opts.forEach(function (o) { col.appendChild(mkBtn(o, optLabel(o))); });
@@ -1027,11 +1067,13 @@
     '<span class="ds-cur"></span>' +
     '<button class="ds-next" type="button">día ›</button>';
   document.getElementById('map').appendChild(dayBar);
-  ['pointerdown', 'mousedown', 'mouseup', 'click', 'touchstart', 'dblclick', 'wheel'].forEach(function (ev) {
-    dayBar.addEventListener(ev, function (e) { e.stopPropagation(); });
-  });
+  swallowEvents(dayBar);
   function dayIndexOf(el) {
     return el ? days.indexOf(el.closest('section.day')) : -1;
+  }
+  // día "actual" del stepper de día: el ACTIVO si lo hay; si no, el del paso
+  function curDayIdx() {
+    return activeDay >= 0 ? activeDay : dayIndexOf(stEls[stCur]);
   }
   function setDayChecked(day, on) {
     Array.prototype.forEach.call(day.querySelectorAll('.ck:not(.ck-day)'), function (c) {
@@ -1053,7 +1095,7 @@
     if (activeDay >= 0 && activeDay !== di) setDayChecked(days[activeDay], false);
     setDayChecked(days[di], true);
     activeDay = di;
-    days.forEach(function (d, i2) { d.classList.toggle('open', i2 === di); });
+    openOnly(days[di]);
     syncLayers();
     var j = firstConcreteOfDay(di);
     if (j >= 0) {
@@ -1066,18 +1108,18 @@
     }
   }
   function dsRender() {
-    var di = activeDay >= 0 ? activeDay : dayIndexOf(stEls[stCur]);
+    var di = curDayIdx();
     var h3 = di >= 0 ? days[di].querySelector('h3') : null;
     dayBar.querySelector('.ds-cur').textContent =
-      h3 ? h3.textContent.replace(/\s+/g, ' ').trim() : '—';
+      h3 ? labelText(h3.textContent) : '—';
     dayBar.querySelector('.ds-prev').disabled = di <= 0;
     dayBar.querySelector('.ds-next').disabled = di < 0 || di >= days.length - 1;
   }
   dayBar.querySelector('.ds-prev').addEventListener('click', function () {
-    goDay((activeDay >= 0 ? activeDay : dayIndexOf(stEls[stCur])) - 1);
+    goDay(curDayIdx() - 1);
   });
   dayBar.querySelector('.ds-next').addEventListener('click', function () {
-    goDay((activeDay >= 0 ? activeDay : dayIndexOf(stEls[stCur])) + 1);
+    goDay(curDayIdx() + 1);
   });
   stRender();
 
@@ -1129,9 +1171,8 @@
       }
       return;
     }
-    var href = link.getAttribute('href') || '';
-    if (href.indexOf('#m-') !== 0) return;
-    var key = href.slice(3);
+    var key = modalKey(link);
+    if (!key) return;
     var linkRow = rowOf(link);
     if (showOnMap(key, link.textContent, linkRow && linkRow.id)) {
       e.preventDefault();
@@ -1143,7 +1184,7 @@
   }, true);
 
   // click en la fila (fuera de casillas/links): seleccionar y mostrar su clave
-  document.querySelector('.panel').addEventListener('click', function (e) {
+  panel.addEventListener('click', function (e) {
     if (e.target.closest('input') || e.target.closest('.modal-link') ||
         e.target.closest('.day-head') || e.target.closest('.day-nav')) return;
     var li = rowOf(e.target);
@@ -1171,7 +1212,19 @@
   // ---------- modo dev (solo localhost): click en fila = editar su paso YAML;
   // guardar hace POST al dev_server, que reescribe src/<viaje>/viaje.yaml y
   // reconstruye — la fila dN-rMM ES days[N-1].steps[M-1] (proyección 1:1)
-  var TRIP = location.pathname.split('/').slice(-2, -1)[0] || '';
+  var TRIP = (GEO && GEO.trip) || location.pathname.split('/').slice(-2, -1)[0] || '';
+  // llamada al dev_server: sin body = GET tal cual; con body = POST JSON con
+  // trip incluido — siempre devuelve la promesa del JSON de respuesta
+  function api(path, body) {
+    if (body === undefined) {
+      return fetch(path).then(function (r) { return r.json(); });
+    }
+    return fetch(path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(Object.assign({ trip: TRIP }, body))
+    }).then(function (r) { return r.json(); });
+  }
   var devMode = false;
   var drawer = null;
   if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
@@ -1235,18 +1288,10 @@
         // del paso previo y el primero del siguiente (donde se referencia)
         for (var j = 0; j < stEls.length; j++) {
           if (stEls[j].dataset.transit !== key) continue;
-          var pts = [], a, p;
-          for (a = j - 1; a >= 0; a--) {
-            if (!sameBranch(stEls[j], stEls[a])) continue;
-            p = anchorPoint(stEls[a], true);
-            if (p) { pts.push([p[0], p[1]]); break; }
+          var na = neighborAnchors(stEls, j, false);
+          if (na.prev && na.next) {
+            return [[na.prev[0], na.prev[1]], [na.next[0], na.next[1]]];
           }
-          for (a = j + 1; a < stEls.length; a++) {
-            if (!sameBranch(stEls[j], stEls[a])) continue;
-            p = anchorPoint(stEls[a], false);
-            if (p) { pts.push([p[0], p[1]]); break; }
-          }
-          if (pts.length === 2) return pts;
           break;
         }
         var c = map.getCenter(), d = 0.002;
@@ -1334,7 +1379,7 @@
       if (li.dataset[k]) facts.push(k + ': ' + li.dataset[k]);
     });
     var t = li.querySelector('time');
-    if (t) facts.push('horario: ' + t.textContent.replace(/\s+/g, ' ').trim());
+    if (t) facts.push('horario: ' + labelText(t.textContent));
     var w = li.querySelector('.warn');
     if (w) facts.push('⚠️ ' + (w.getAttribute('title') || ''));
     drawer = document.createElement('div');
@@ -1361,6 +1406,16 @@
     document.body.appendChild(drawer);
     var ta = drawer.querySelector('.dev-step');
     var msg = drawer.querySelector('.dev-msg');
+    // rebuild compartido: reconstruye y, si salió bien, corre onOk (el botón
+    // recarga; mover/insertar pasos recoloca el hash antes de recargar)
+    function doRebuild(onOk) {
+      api('/api/rebuild', {})
+        .then(function (d) {
+          if (d.ok) onOk();
+          else msg.textContent = 'error: ' + d.error;
+        })
+        .catch(function (e) { msg.textContent = 'error: ' + e; });
+    }
 
     // lo REFERENCIADO por la fila (location/transit + @refs de los textos):
     // un botón por clave carga su YAML del catálogo para editarlo también
@@ -1368,8 +1423,8 @@
     if (li.dataset.location) refKeys.push(li.dataset.location);
     if (li.dataset.transit) refKeys.push(li.dataset.transit);
     li.querySelectorAll('.modal-link').forEach(function (a) {
-      var h = a.getAttribute('href') || '';
-      if (h.indexOf('#m-') === 0 && refKeys.indexOf(h.slice(3)) < 0) refKeys.push(h.slice(3));
+      var k = modalKey(a);
+      if (k && refKeys.indexOf(k) < 0) refKeys.push(k);
     });
     var refsBox = drawer.querySelector('.dev-refs');
     var entTa = drawer.querySelector('.dev-entity');
@@ -1405,8 +1460,7 @@
       b.addEventListener('click', function () {
         msg.textContent = '';
         var myReq = ++entReq;
-        fetch('/api/entity?trip=' + encodeURIComponent(TRIP) + '&key=' + encodeURIComponent(key))
-          .then(function (r) { return r.json(); })
+        api('/api/entity?trip=' + encodeURIComponent(TRIP) + '&key=' + encodeURIComponent(key))
           .then(function (d) {
             if (myReq !== entReq) return;   // ya se pidió otra referencia
             if (!d.ok) { msg.textContent = 'error: ' + d.error; return; }
@@ -1427,18 +1481,13 @@
     drawer.querySelector('.dev-save-entity').addEventListener('click', function () {
       if (!entCur) return;
       msg.textContent = 'guardando referencia…';
-      fetch('/api/entity', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ trip: TRIP, kind: entCur.kind, key: entCur.key, yaml: entTa.value })
-      }).then(function (r) { return r.json(); })
+      api('/api/entity', { kind: entCur.kind, key: entCur.key, yaml: entTa.value })
         .then(function (d) {
           msg.textContent = d.ok ? 'referencia guardada ✓ (pendiente rebuild)' : 'error: ' + d.error;
         })
         .catch(function (e) { msg.textContent = 'error: ' + e; });
     });
-    fetch('/api/step?trip=' + encodeURIComponent(TRIP) + '&day=' + m[1] + '&step=' + m[2])
-      .then(function (r) { return r.json(); })
+    api('/api/step?trip=' + encodeURIComponent(TRIP) + '&day=' + m[1] + '&step=' + m[2])
       .then(function (d) { ta.value = d.ok ? d.yaml : 'error: ' + d.error; })
       .catch(function (e) { ta.value = 'error: ' + e; });
     drawer.querySelector('.dev-close').addEventListener('click', closeDrawer);
@@ -1446,11 +1495,7 @@
     // reconstruye una vez y recarga — el hash #@fila nos regresa aquí mismo
     drawer.querySelector('.dev-save').addEventListener('click', function () {
       msg.textContent = 'guardando…';
-      fetch('/api/step', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ trip: TRIP, day: +m[1], step: +m[2], yaml: ta.value })
-      }).then(function (r) { return r.json(); })
+      api('/api/step', { day: +m[1], step: +m[2], yaml: ta.value })
         .then(function (d) {
           msg.textContent = d.ok ? 'guardado ✓ (pendiente rebuild)' : 'error: ' + d.error;
         })
@@ -1458,30 +1503,16 @@
     });
     drawer.querySelector('.dev-rebuild').addEventListener('click', function () {
       msg.textContent = 'rebuild…';
-      fetch('/api/rebuild', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ trip: TRIP })
-      }).then(function (r) { return r.json(); })
-        .then(function (d) {
-          if (d.ok) {
-            msg.textContent = 'rebuild ok — recargando…';
-            setTimeout(function () { location.reload(); }, 400);
-          } else {
-            msg.textContent = 'error: ' + d.error;
-          }
-        })
-        .catch(function (e) { msg.textContent = 'error: ' + e; });
+      doRebuild(function () {
+        msg.textContent = 'rebuild ok — recargando…';
+        setTimeout(function () { location.reload(); }, 400);
+      });
     });
     // insertar / mover pasos: el server reescribe days[].steps[] y al aceptar
     // se pregunta si recalcular (rebuild + recarga posicionada en el paso)
     function stepOp(path, body) {
       msg.textContent = '…';
-      fetch(path, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(Object.assign({ trip: TRIP, day: +m[1], step: +m[2] }, body))
-      }).then(function (r) { return r.json(); })
+      api(path, Object.assign({ day: +m[1], step: +m[2] }, body))
         .then(function (d) {
           if (!d.ok) { msg.textContent = 'error: ' + d.error; return; }
           // el paso EDITADO cambió de número: re-apuntar el cajón YA — si no,
@@ -1498,17 +1529,10 @@
             '  (days[' + (m[1] - 1) + '].steps[' + (mine - 1) + '])  — tras ' + path.slice(5);
           var target = 'd' + m[1] + '-r' + String(d.step).padStart(2, '0');
           if (window.confirm('Guardado. ¿Recalcular (rebuild) ahora?')) {
-            fetch('/api/rebuild', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ trip: TRIP })
-            }).then(function (r) { return r.json(); })
-              .then(function (d2) {
-                if (!d2.ok) { msg.textContent = 'error: ' + d2.error; return; }
-                location.hash = '#@' + target;
-                location.reload();
-              })
-              .catch(function (e) { msg.textContent = 'error: ' + e; });
+            doRebuild(function () {
+              location.hash = '#@' + target;
+              location.reload();
+            });
           } else {
             msg.textContent = 'guardado ✓ (pendiente rebuild; este cajón ya apunta a r' +
               String(mine).padStart(2, '0') + ')';
@@ -1544,7 +1568,7 @@
       if (!days.length) return;
       setDayChecked(days[0], true);
       activeDay = 0;
-      days.forEach(function (d, i2) { d.classList.toggle('open', i2 === 0); });
+      openOnly(days[0]);
       var j0 = firstConcreteOfDay(0);
       if (j0 >= 0) { stCur = j0; stRender(); }
       schedSync();

@@ -9,15 +9,12 @@ en el navegador — el HTML servido no cambia.
 Por ahora: barra lateral + mapa base. Las capas (marcadores/rutas) vienen después.
 """
 import json
-import os
-import subprocess
 import sys
 
 import render
 from common import resolve_trip
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-BUILD = os.path.dirname(os.path.abspath(__file__))
 
 
 def geo_tokens():
@@ -50,18 +47,23 @@ def geo_tokens():
                     for s in stations
                 ]
             transits[key] = entry
-    geo = {"locations": locs, "transits": transits}
+    # caja del viaje (vista inicial del mapa) + nombre del viaje (identidad
+    # para el modo dev, en vez de olfatear la URL)
+    pts = list(locs.values()) + [p for t in transits.values() for p in t["coords"]]
+    geo = {"locations": locs, "transits": transits, "trip": _TRIP[0]}
+    if pts:
+        geo["bbox"] = [min(p[0] for p in pts), min(p[1] for p in pts),
+                       max(p[0] for p in pts), max(p[1] for p in pts)]
     return {"<!--GEO-->": json.dumps(geo, ensure_ascii=False)}
 
 
+_TRIP = [""]   # fijado por main antes del build (geo_tokens corre dentro)
+
+
 def main():
-    trip = resolve_trip(sys.argv)
-    render.build_page(trip, "plantilla-mapa.html", "mapa.html", extra=geo_tokens)
-    r = subprocess.run([sys.executable, os.path.join(BUILD, "verify_roundtrip.py"),
-                        trip, "mapa.html"],
-                       capture_output=True, text=True, encoding="utf-8")
-    print(r.stdout.strip() or r.stderr.strip())
-    return r.returncode
+    _TRIP[0] = resolve_trip(sys.argv)
+    return render.build_and_verify(_TRIP[0], "plantilla-mapa.html", "mapa.html",
+                                   extra=geo_tokens)
 
 
 if __name__ == "__main__":

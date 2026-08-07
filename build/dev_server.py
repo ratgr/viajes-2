@@ -11,6 +11,10 @@ pasos del YAML directamente desde la página:
     GET  /api/entity?trip=X&key=K[&kind=]  YAML de la entidad referenciada
                                            (busca en places → transits → lines)
     POST /api/entity {trip,kind,key,yaml}  escribe la entidad en su catálogo
+    POST /api/step-insert {trip,day,step,where}  inserta un paso nuevo
+                                           antes/después de la fila dada
+    POST /api/step-move {trip,day,step,dir}      mueve el paso una posición
+                                           (dir=-1 sube, dir=1 baja)
     POST /api/rebuild {trip}               reconstruye pages/<trip>/
 
 La fila dN-rMM del HTML ES el paso M del día N del YAML (proyección 1:1),
@@ -30,13 +34,12 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 import yaml
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from common import ROOT
+from common import ROOT, dump_yaml
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 SERVE_DIR = os.path.dirname(ROOT)
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8791
-DUMP = dict(allow_unicode=True, sort_keys=False, default_flow_style=None, width=100000)
 CATALOGS = ("places", "transits", "lines")
 
 
@@ -66,7 +69,7 @@ def save(trip, data):
     tmp = path + ".tmp"
     with _YAML_LOCK:
         with open(tmp, "w", encoding="utf-8") as f:
-            yaml.dump(data, f, **DUMP)
+            f.write(dump_yaml(data))
         os.replace(tmp, path)
 
 
@@ -134,21 +137,17 @@ class Handler(SimpleHTTPRequestHandler):
         try:
             if u.path == "/api/step":
                 steps, i = step_at(load(q["trip"]), q["day"], q["step"])
-                self._json(200, {"ok": True,
-                                 "yaml": yaml.dump(steps[i], allow_unicode=True, sort_keys=False,
-                                                   default_flow_style=False, width=100000)})
+                self._json(200, {"ok": True, "yaml": dump_yaml(steps[i], flow=False)})
             elif u.path == "/api/entity":
                 Y = load(q["trip"])
                 key = q["key"]
                 kinds = [q["kind"]] if q.get("kind") in CATALOGS else CATALOGS
                 for kind in kinds:
                     if key in (Y.get(kind) or {}):
-                        # width enorme: coords debe quedar en UNA línea (el editor
-                        # de geometría del mapa la reescribe línea por línea)
+                        # width enorme (en DUMP): coords debe quedar en UNA línea (el
+                        # editor de geometría del mapa la reescribe línea por línea)
                         self._json(200, {"ok": True, "kind": kind,
-                                         "yaml": yaml.dump(Y[kind][key], allow_unicode=True,
-                                                           sort_keys=False, default_flow_style=False,
-                                                           width=100000)})
+                                         "yaml": dump_yaml(Y[kind][key], flow=False)})
                         return
                 self._json(404, {"error": f"'{key}' no está en {'/'.join(kinds)}"})
             else:

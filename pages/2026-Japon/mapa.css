@@ -121,17 +121,19 @@ body.show-free .panel .steps > li[data-free]::after { content: '⏳ ' attr(data-
 .popup-card .use .use-note { font-size: 12.5px; margin: 4px 0 2px 14px; }
 
 /* ---------- teléfono: el mapa es la vista; el panel se abre con ☰ ---------- */
-.panel-toggle { display: none; position: absolute; top: 46px; right: 10px; z-index: 1100; width: 40px; height: 40px; border: none; border-radius: 10px; background: var(--card); color: var(--ink); box-shadow: 0 2px 8px rgba(0,0,0,.28); font-size: 18px; cursor: pointer; }
+/* botones flotantes de la derecha: base común, cada uno solo fija su altura */
+.panel-toggle, .dev-toggle, .free-toggle { position: absolute; right: 10px; z-index: 1100; width: 40px; height: 40px; border: none; border-radius: 10px; background: var(--card); color: var(--ink); box-shadow: 0 2px 8px rgba(0,0,0,.28); font-size: 17px; cursor: pointer; }
+.panel-toggle { display: none; top: 46px; font-size: 18px; }
 @media (max-width: 820px) {
   .panel, .splitter { display: none; }
   .panel-toggle { display: block; }
-  body.panel-open .panel { display: block; position: absolute; top: 0; left: 0; bottom: 0; width: min(85vw, 380px) !important; max-width: none; z-index: 1050; box-shadow: 4px 0 18px rgba(0,0,0,.3); }
+  body.panel-open .panel { display: block; position: absolute; top: 0; left: 0; bottom: 0; width: min(85vw, 380px) !important; /* !important: le gana al width inline que deja el splitter */ max-width: none; z-index: 1050; box-shadow: 4px 0 18px rgba(0,0,0,.3); }
 }
 
 /* ---------- modo dev (solo localhost): editor de pasos YAML ---------- */
-.dev-toggle { display: block; position: absolute; top: 94px; right: 10px; z-index: 1100; width: 40px; height: 40px; border: none; border-radius: 10px; background: var(--card); color: var(--ink); box-shadow: 0 2px 8px rgba(0,0,0,.28); font-size: 17px; cursor: pointer; }
+.dev-toggle { top: 94px; }
 .dev-toggle.on { background: var(--shu); }
-.free-toggle { display: block; position: absolute; top: 142px; right: 10px; z-index: 1100; width: 40px; height: 40px; border: none; border-radius: 10px; background: var(--card); color: var(--ink); box-shadow: 0 2px 8px rgba(0,0,0,.28); font-size: 17px; cursor: pointer; }
+.free-toggle { top: 142px; }
 .free-toggle.on { background: var(--matcha); }
 .dev-drawer { position: absolute; right: 10px; bottom: 10px; z-index: 1300; width: min(520px, 92vw); background: var(--card); color: var(--ink); border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,.35); padding: 12px; }
 .dev-drawer .dev-info { font: 11px ui-monospace, Consolas, monospace; color: var(--ink-soft); white-space: pre-wrap; margin-bottom: 8px; }
@@ -149,7 +151,7 @@ body.show-free .panel .steps > li[data-free]::after { content: '⏳ ' attr(data-
 
 /* ---------- geometría viva: insignias, flechas, estaciones, editor ---------- */
 /* insignia de cronología: número de visita del día sobre el lugar */
-.seq-badge { background: #b23a2a; color: #fff; border: 2px solid #fff; border-radius: 11px; text-align: center; font: 700 12px/18px system-ui, sans-serif; box-shadow: 0 1px 4px rgba(0, 0, 0, .4); }
+.seq-badge { background: var(--shu); color: #fff; border: 2px solid #fff; border-radius: 11px; text-align: center; font: 700 12px/18px system-ui, sans-serif; box-shadow: 0 1px 4px rgba(0, 0, 0, .4); }
 .seq-badge.plain { border-radius: 50%; }             /* sin número: punto simple */
 .seq-badge.ghost { opacity: .3; }
 /* flechas de dirección sobre las líneas: el glifo gira sobre el CENTRO exacto
@@ -168,10 +170,13 @@ body.show-free .panel .steps > li[data-free]::after { content: '⏳ ' attr(data-
    El stepper de DÍA vive abajo, igual de suelto. */
 .stepper { position: absolute; top: 0; left: 0; right: 0; z-index: 1000; font-size: 12.5px; pointer-events: none; }
 .stepper .st-row { display: flex; align-items: center; gap: 8px; padding: 8px; }
-.stepper .st-prev, .stepper .st-next { pointer-events: auto; border: 1px solid var(--line); background: var(--card); border-radius: 50%; width: 34px; height: 34px; box-shadow: 0 2px 8px rgba(0, 0, 0, .22); font-size: 18px; line-height: 1; cursor: pointer; padding: 0; color: var(--shu); flex: 0 0 auto; }
+/* pastilla flotante común del caminador (ambas barras) */
+.stepper .st-prev, .stepper .st-next, .stepper .st-cur, .stepper .st-jump-toggle, .stepper .st-col-head,
+.day-stepper button, .day-stepper .ds-cur { pointer-events: auto; background: var(--card); border: 1px solid var(--line); border-radius: 999px; box-shadow: 0 2px 8px rgba(0, 0, 0, .22); }
+.stepper .st-prev, .stepper .st-next { border-radius: 50%; width: 34px; height: 34px; font-size: 18px; line-height: 1; cursor: pointer; padding: 0; color: var(--shu); flex: 0 0 auto; }
 .stepper button:disabled { opacity: .25; cursor: default; }
 .stepper .st-center { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; min-width: 0; }
-.stepper .st-cur { pointer-events: auto; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 5px 14px; box-shadow: 0 2px 8px rgba(0, 0, 0, .22); max-width: 60vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
+.stepper .st-cur { padding: 5px 14px; max-width: 60vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
 .stepper .st-opt { pointer-events: auto; border: 1px solid var(--line); background: var(--paper-2); color: var(--ink); border-radius: 999px; padding: 2px 10px; cursor: pointer; font-size: 12px; text-align: left; box-shadow: 0 1px 5px rgba(0, 0, 0, .18); }
 .stepper .st-opt.chosen { border-color: var(--shu); }
 .stepper .st-opt.on { border-color: var(--shu); color: var(--shu); font-weight: 700; }
@@ -183,17 +188,21 @@ body.show-free .panel .steps > li[data-free]::after { content: '⏳ ' attr(data-
 .stepper .st-col-head[data-tier="Ai"] { color: var(--ai); }
 .stepper .st-col-head[data-tier="Shu"] { color: var(--shu); }
 .stepper .st-opt.on[data-tier] { box-shadow: inset 0 0 0 1px currentColor; color: var(--shu); }
+/* respaldo por POSICIÓN para viajes cuyos tiers no se llamen Take/Ai/Shu */
+.stepper .st-col:nth-child(1) .st-opt:not([data-tier="Take"]):not([data-tier="Ai"]):not([data-tier="Shu"]) { background: var(--matcha-soft); border-color: var(--matcha); }
+.stepper .st-col:nth-child(2) .st-opt:not([data-tier="Take"]):not([data-tier="Ai"]):not([data-tier="Shu"]) { background: var(--ai-soft); border-color: var(--ai); }
+.stepper .st-col:nth-child(3) .st-opt:not([data-tier="Take"]):not([data-tier="Ai"]):not([data-tier="Shu"]) { background: var(--shu-soft); border-color: var(--shu); }
 .stepper .st-col { display: inline-flex; flex-direction: column; gap: 3px; vertical-align: top; }
-.stepper .st-col-head { pointer-events: auto; align-self: flex-start; background: var(--card); border-radius: 999px; padding: 1px 8px; box-shadow: 0 1px 5px rgba(0, 0, 0, .18); font-weight: 700; font-size: 11px; color: var(--ink-soft); }
+.stepper .st-col-head { align-self: flex-start; border: none; padding: 1px 8px; box-shadow: 0 1px 5px rgba(0, 0, 0, .18); font-weight: 700; font-size: 11px; color: var(--ink-soft); }
 .stepper .st-jump { padding: 0 10px 6px; }
-.stepper .st-jump-toggle { pointer-events: auto; border: 1px solid var(--line); background: var(--card); border-radius: 999px; padding: 2px 10px; box-shadow: 0 1px 5px rgba(0, 0, 0, .18); font-size: 11px; color: var(--ink-soft); cursor: pointer; display: block; margin: 0 auto; }
+.stepper .st-jump-toggle { padding: 2px 10px; box-shadow: 0 1px 5px rgba(0, 0, 0, .18); font-size: 11px; color: var(--ink-soft); cursor: pointer; display: block; margin: 0 auto; }
 .stepper .st-jump-body { margin-top: 5px; display: flex; gap: 6px; flex-wrap: wrap; align-items: flex-start; justify-content: center; }
 
 /* stepper de día: piezas sueltas abajo, sin barra */
 .day-stepper { position: absolute; bottom: 0; left: 0; right: 0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px; font-size: 12.5px; pointer-events: none; }
-.day-stepper button { pointer-events: auto; border: 1px solid var(--line); background: var(--card); border-radius: 999px; box-shadow: 0 2px 8px rgba(0, 0, 0, .22); color: var(--shu); font-size: 12.5px; font-weight: 700; cursor: pointer; padding: 5px 12px; flex: 0 0 auto; }
+.day-stepper button { color: var(--shu); font-size: 12.5px; font-weight: 700; cursor: pointer; padding: 5px 12px; flex: 0 0 auto; }
 .day-stepper button:disabled { opacity: .25; cursor: default; }
-.day-stepper .ds-cur { pointer-events: auto; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 5px 14px; box-shadow: 0 2px 8px rgba(0, 0, 0, .22); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.day-stepper .ds-cur { padding: 5px 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 
 /* el cromo de Leaflet solo libra la fila de pastillas de arriba/abajo */
 #map .leaflet-top .leaflet-control { margin-top: 52px; }

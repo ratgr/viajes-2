@@ -24,13 +24,12 @@ import sys
 import yaml
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "build"))
-from common import resolve_trip, trip_paths
+from common import resolve_trip, save_yaml, trip_paths
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 TRIP = resolve_trip(sys.argv)
 SRC_DIR, _p, _c = trip_paths(TRIP)
 PATH = os.path.join(SRC_DIR, "viaje.yaml")
-DUMP = dict(allow_unicode=True, sort_keys=False, default_flow_style=None, width=100000)
 
 Y = yaml.safe_load(open(PATH, encoding="utf-8"))
 TR = Y["transits"]
@@ -91,7 +90,7 @@ for k in FOREIGN:
         changed.append(f"coords extranjeras retiradas de {k} (pendiente de geometría)")
 
 if changed:
-    yaml.dump(Y, open(PATH, "w", encoding="utf-8"), **DUMP)
+    save_yaml(PATH, Y)
     print("\nCAMBIOS:")
     for c in changed:
         print(" ·", c)

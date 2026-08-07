@@ -19,7 +19,7 @@ import sys
 import yaml
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "build"))
-from common import ROOT, resolve_trip, trip_paths
+from common import ROOT, resolve_trip, save_yaml, trip_paths
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 TRIP = resolve_trip(sys.argv)
@@ -98,8 +98,7 @@ for day in Y.get("days", []):
     walk_steps(day.get("steps", []))
 Y = rename_keys(Y)   # claves ES → EN (después de las limpiezas, que leen 'time')
 
-yaml.dump(Y, open(DST, "w", encoding="utf-8"), allow_unicode=True,
-          sort_keys=False, default_flow_style=None, width=100000)
+save_yaml(DST, Y)
 print(f"viaje.yaml local ← {SRC}")
 print(f"  títulos sin asteriscos: {stats['ast']} · emojis de transporte quitados: {stats['emoji']}")
 print(f"  modes presentes: {sorted(modes)}")
