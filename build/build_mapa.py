@@ -209,7 +209,8 @@ def geo_tokens():
     # para el modo dev, en vez de olfatear la URL)
     pts = list(locs.values()) + [p for t in transits.values() for p in t["coords"]]
     geo = {"locations": locs, "transits": transits, "trip": _TRIP[0],
-           "anchors": anchors_tokens(), "edit": spans_tokens(_TRIP[0])}
+           "anchors": anchors_tokens(), "edit": spans_tokens(_TRIP[0]),
+           "buildSha": os.environ.get("GITHUB_SHA", "")}
     if pts:
         geo["bbox"] = [min(p[0] for p in pts), min(p[1] for p in pts),
                        max(p[0] for p in pts), max(p[1] for p in pts)]

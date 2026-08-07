@@ -219,3 +219,6 @@ body > .app-tabs a { pointer-events: auto; background: var(--card); box-shadow: 
 /* aviso de login por device flow */
 .dev-login { position: fixed; bottom: 54px; right: 10px; z-index: 1300; background: var(--card); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,.3); padding: 10px 14px; font-size: 13px; }
 .dev-login b { font-size: 16px; letter-spacing: 2px; color: var(--shu); }
+
+/* chip de estado del deploy (la página vigila su Action) */
+.deploy-chip { position: absolute; bottom: 46px; left: 50%; transform: translateX(-50%); z-index: 1200; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 999px; padding: 5px 14px; font-size: 12px; box-shadow: 0 2px 10px rgba(0,0,0,.25); cursor: pointer; }

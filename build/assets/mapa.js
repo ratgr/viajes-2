@@ -1088,6 +1088,46 @@
     }
   }
 
+  // ---------- chip de DEPLOY: la página vigila su propia Action ----------
+  // repo público: sin auth. 'publicando…' mientras corre; si el último run
+  // exitoso no es ESTE build, ofrece recargar (el SW trae la versión nueva).
+  (function deployWatch() {
+    var ed = GEO.edit || {};
+    var repo = ed.repo || 'ratgr/viajes-2';
+    var chip = document.createElement('button');
+    chip.className = 'deploy-chip';
+    chip.type = 'button';
+    chip.hidden = true;
+    document.body.appendChild(chip);
+    var reloadable = false;
+    chip.addEventListener('click', function () { if (reloadable) location.reload(); });
+    function check() {
+      if (document.hidden) return;
+      fetch('https://api.github.com/repos/' + repo + '/actions/runs?per_page=1')
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          var run = (d.workflow_runs || [])[0];
+          if (!run) { chip.hidden = true; return; }
+          if (run.status !== 'completed') {
+            chip.textContent = '🚀 publicando cambios…';
+            reloadable = false;
+            chip.hidden = false;
+          } else if (GEO.buildSha && run.conclusion === 'success' &&
+                     run.head_sha !== GEO.buildSha) {
+            chip.textContent = '✨ hay versión nueva — toca para recargar';
+            reloadable = true;
+            chip.hidden = false;
+          } else {
+            chip.hidden = true;
+          }
+        })
+        .catch(function () {});
+    }
+    check();
+    setInterval(check, 90000);
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
+  })();
+
   // ---------- STEPPER DE DÍA (barra inferior) ----------
   // ‹ día / día › saltan al PRIMER paso concreto del día vecino: apagan y
   // pliegan el día actual, prenden y muestran el nuevo completo
