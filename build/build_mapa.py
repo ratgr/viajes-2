@@ -204,6 +204,18 @@ def geo_tokens():
                 sp = render.parse_pts(stops, f"transits[{key}].stops")
                 if sp:
                     entry["stops"] = [[a, b] for a, b in sp]
+            # puntos de interés del tramo: claves de places (separadas por
+            # espacio) que se pintan JUNTO al trazo — pois: mirador tienda-x
+            pois = tr.get("pois")
+            if pois:
+                lst = []
+                for pk in str(pois).split():
+                    pt = render._place_pt(pk)
+                    if pt:
+                        lst.append([pt[0], pt[1], pk,
+                                    render.PLACES.get(pk, {}).get("name", pk)])
+                if lst:
+                    entry["pois"] = lst
             transits[key] = entry
     # caja del viaje (vista inicial del mapa) + nombre del viaje (identidad
     # para el modo dev, en vez de olfatear la URL)

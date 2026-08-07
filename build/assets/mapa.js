@@ -262,7 +262,20 @@
         g._dots.push(dot);
       });
     }
-    g._decos.concat(g._dots).forEach(function (d) { g.addLayer(d); });
+    // puntos de interés del tramo: puntitos ámbar con nombre, click = tarjeta
+    g._pois = [];
+    (tr.pois || []).forEach(function (p) {
+      var mk = L.circleMarker([p[0], p[1]], {
+        radius: 4.5, color: '#fff', weight: 1.5,
+        fillColor: '#c9a227', fillOpacity: 1, interactive: !inert
+      });
+      mk.bindTooltip(p[3], { direction: 'top', offset: [0, -5] });
+      if (!inert) {
+        mk.on('click', function () { showOnMap(p[2], p[3]); selectByKey(p[2]); });
+      }
+      g._pois.push(mk);
+    });
+    g._decos.concat(g._dots, g._pois).forEach(function (d) { g.addLayer(d); });
     return g;
   }
   // insignia numerada de un lugar (seqLabels vive en la sección de capas)
