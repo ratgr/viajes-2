@@ -212,3 +212,6 @@ body.show-free .panel .steps > li[data-free]::after { content: '⏳ ' attr(data-
 /* alta de referencias nuevas en el cajón dev */
 .dev-drawer .dev-newref { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); color: var(--ink); font: 12px ui-monospace, monospace; padding: 4px 8px; }
 .dev-drawer .dev-tpl-label { color: var(--ink-soft); font-size: 11px; align-self: center; }
+
+/* pestañas de la app en la barra del mapa */
+.panel .app-tabs { padding: 0 0 6px; }
