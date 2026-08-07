@@ -9,6 +9,7 @@ en el navegador — el HTML servido no cambia.
 Por ahora: barra lateral + mapa base. Las capas (marcadores/rutas) vienen después.
 """
 import json
+import os
 import sys
 
 import render
@@ -161,10 +162,93 @@ def geo_tokens():
 _TRIP = [""]   # fijado por main antes del build (geo_tokens corre dentro)
 
 
+def gen_pwa(trip):
+    """sw.js con PRECACHE de TODO el release (el sitio entero funciona sin
+    red: imágenes incluidas — Cache Storage, no localStorage: los archivos no
+    caben ahí). Los tiles del mapa van en caché de runtime (red primero).
+    Corre al final del build del mapa = último paso del pipeline."""
+    import hashlib
+    import json as _json
+    pages_dir = os.path.join(render_root(), "pages", trip)
+    files = []
+    for base, _dirs, fns in os.walk(pages_dir):
+        for fn in fns:
+            if fn == "sw.js":
+                continue
+            p = os.path.join(base, fn)
+            rel = os.path.relpath(p, pages_dir).replace(os.sep, "/")
+            files.append((rel, os.path.getsize(p)))
+    files.sort()
+    ver = hashlib.sha1(_json.dumps(files).encode()).hexdigest()[:12]
+    lista = _json.dumps(["./"] + [f for f, _s in files], ensure_ascii=False)
+    sw = """// generado por build_mapa.gen_pwa — NO editar a mano
+const CACHE = 'viaje-%s';
+const TILES = 'viaje-tiles';
+const PRECACHE = %s;
+self.addEventListener('install', (e) => {
+  e.waitUntil((async () => {
+    const c = await caches.open(CACHE);
+    // en lotes y tolerante: una imagen caída no debe tirar la instalación
+    for (let i = 0; i < PRECACHE.length; i += 20) {
+      await Promise.allSettled(PRECACHE.slice(i, i + 20).map((u) => c.add(u)));
+    }
+    self.skipWaiting();
+  })());
+});
+self.addEventListener('activate', (e) => {
+  e.waitUntil((async () => {
+    for (const k of await caches.keys()) {
+      if (k !== CACHE && k !== TILES) await caches.delete(k);
+    }
+    self.clients.claim();
+  })());
+});
+self.addEventListener('fetch', (e) => {
+  const url = new URL(e.request.url);
+  if (e.request.method !== 'GET') return;
+  if (url.hostname.endsWith('cartocdn.com')) {
+    // tiles: red primero, caché de respaldo (offline se ve lo ya visitado)
+    e.respondWith((async () => {
+      const c = await caches.open(TILES);
+      try {
+        const r = await fetch(e.request);
+        c.put(e.request, r.clone());
+        return r;
+      } catch (err) {
+        const hit = await c.match(e.request);
+        if (hit) return hit;
+        throw err;
+      }
+    })());
+    return;
+  }
+  if (url.origin === location.origin) {
+    // el sitio: caché primero (instalado = completo), red de respaldo
+    e.respondWith((async () => {
+      const hit = await caches.match(e.request, { ignoreSearch: true });
+      return hit || fetch(e.request);
+    })());
+  }
+});
+""" % (ver, lista)
+    with open(os.path.join(pages_dir, "sw.js"), "w", encoding="utf-8", newline="\n") as f:
+        f.write(sw)
+    total = sum(s for _f, s in files)
+    print(f"pwa: sw.js v{ver} · {len(files)} archivos precache · {total // 1024 // 1024} MB")
+
+
+def render_root():
+    import common
+    return common.ROOT
+
+
 def main():
     _TRIP[0] = resolve_trip(sys.argv)
-    return render.build_and_verify(_TRIP[0], "plantilla-mapa.html", "mapa.html",
-                                   extra=geo_tokens)
+    rc = render.build_and_verify(_TRIP[0], "plantilla-mapa.html", "mapa.html",
+                                 extra=geo_tokens)
+    if rc == 0:
+        gen_pwa(_TRIP[0])
+    return rc
 
 
 if __name__ == "__main__":

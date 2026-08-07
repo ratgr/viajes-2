@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="itinerario.css">
 <link rel="stylesheet" href="mapa.css">
 <script src="vendor/leaflet.js"></script>
+<link rel="manifest" href="manifest.webmanifest">
 </head>
 <body>
 <aside class="panel">
@@ -39,5 +40,6 @@
 <dialog class="overlay" id="overlay"><button class="overlay-close" type="button" aria-label="Cerrar">×</button><div id="overlay-body"></div></dialog>
 <script src="itinerario.js"></script>
 <script src="mapa.js"></script>
+<script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');</script>
 </body>
 </html>

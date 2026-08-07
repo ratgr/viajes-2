@@ -1,0 +1,14 @@
+{
+  "name": "Japón 2026",
+  "short_name": "Japón 2026",
+  "description": "Itinerario, mapa y guía del viaje familiar — funciona sin red",
+  "start_url": "app.html",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#faf6ef",
+  "theme_color": "#b23a2a",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
