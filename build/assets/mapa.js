@@ -634,9 +634,17 @@
     }
     // des-recorte: autoPan pelea con el vuelo en curso, así que se corrige
     // DESPUÉS de la animación — si el popup quedó bajo el chip/toolbar o
-    // pegado al borde, panear lo mínimo para destaparlo
-    setTimeout(function () {
+    // pegado al borde, panear lo mínimo para destaparlo. OJO: panBy CANCELA
+    // un flyTo en curso — si aún anima (o la pestaña está oculta: rAF
+    // congelado deja el vuelo pendiente), reintentar en vez de matarlo
+    var unclipTries = 0;
+    function unclip() {
       if (!map || !pop.isOpen || !pop.isOpen()) return;
+      if (document.hidden) return;   // pestaña oculta: no tocar la cámara
+      if (map._panAnim && map._panAnim._inProgress) {
+        if (unclipTries++ < 8) setTimeout(unclip, 400);
+        return;
+      }
       var box = pop.getElement && pop.getElement();
       if (!box) return;
       var r = box.getBoundingClientRect();
@@ -647,7 +655,8 @@
       if (r.top < mr.top + 96) dy = r.top - (mr.top + 96);
       else if (r.bottom > mr.bottom - 44) dy = r.bottom - (mr.bottom - 44);
       if (dx || dy) map.panBy([dx, dy], { duration: .25 });
-    }, 620);
+    }
+    setTimeout(unclip, 620);
     return pop;
   }
   var lastShownKey = null;   // repetir click en lo YA elegido acerca el zoom
