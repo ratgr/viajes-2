@@ -1642,8 +1642,8 @@ days:
   - transit: miyajimaguchi-ferry
     title: 3 min a pie al ferry JR
   - {transit: d5-5, time-from: '10:10', title: 'Tomar el @[ferry JR](d5-5) — sale cada 15 min, cruce de 10 (el de :10/:25 pasa junto al torii).'}
-  - {location: isla-de-miyajima, time-from: '10:15', fixed: true, title: '@[Isla de Miyajima](isla-de-miyajima) ★ — 2 h 15 (ventana de Juan): @[Itsukushima](santuario-itsukushima) (¥300) y el torii flotante, venados isleños, calle Omotesando con momiji manju y ostras a la parrilla. Del muelle al santuario: 12 min a pie por la costanera — cuenta como paseo, no traslado.'}
   - {transit: d5-e13, hidden-summary: true, title: Isla de Miyajima → Santuario Itsukushima}
+  - {location: isla-de-miyajima, time-from: '10:15', fixed: true, title: '@[Isla de Miyajima](isla-de-miyajima) ★ — 2 h 15 (ventana de Juan): @[Itsukushima](santuario-itsukushima) (¥300) y el torii flotante, venados isleños, calle Omotesando con momiji manju y ostras a la parrilla. Del muelle al santuario: 12 min a pie por la costanera — cuenta como paseo, no traslado.'}
   - {transit: d5-e14, hidden-summary: true, title: Santuario Itsukushima → Miyajima}
   - {transit: d5-6, time-from: '12:30', title: '@[Ferry](d5-6) de las :30 de regreso — 10 min.'}
   - {transit: d5-7, time-from: '12:45', title: '@[JR San-yo](d5-7) (local Hiroshima) — 28 min a Hiroshima Station.'}
