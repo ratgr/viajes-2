@@ -231,64 +231,50 @@ def check_teleports(steps, sched, ctx=""):
     return sched
 
 
-def derive_schedule(steps, ctx=""):
-    """Horario por paso, completado por SNAP a los vecinos:
-      · sin inicio → snap ARRIBA (fin del paso anterior) o ABAJO (inicio del
-        siguiente − duración propia)
-      · sin duración → snap ABAJO (hueco hasta el próximo inicio explícito)
-    Regla: cada paso debe quedar con 2 de {inicio, fin, duración}. Un LUGAR
-    con solo inicio es un ancla válida (llegas y punto); cualquier otro paso
-    incompleto es un problema del YAML → va a DIAGNOSTICS.
-    Todo lo inferido se marca data-derived al render."""
-    n = len(steps)
-    info = []
-    for i, s in enumerate(steps):
-        if not isinstance(s, dict) or s.get("hidden-summary"):
-            info.append(None)
-            continue
-        beg = hm_min(s.get("time-from"))
-        end_exp = hm_min(s.get("time-to"))
-        raw_dur = s.get("duration")
-        flex = parse_flex(raw_dur)                        # se estira a lo que haya
-        has_dur = raw_dur not in contract.SKIP_DUR and flex is None
-        fo = {"begin": beg, "beg_exp": beg is not None, "beg_derived": False,
-              "dur": dmin(raw_dur) if has_dur else None, "dur_exp": has_dur,
-              "flex": flex is not None,
-              "flex_min": flex[0] if flex else None,
-              "flex_max": flex[1] if flex else None,
-              "end_exp": end_exp,
-              "dur_derived": False, "approx": False, "end": None}
-        is_flex = flex is not None
-        # los 3 fijados e incompatibles → diagnóstico (⚠️ en la fila)
-        if beg is not None and end_exp is not None and has_dur and beg + fo["dur"] != end_exp:
-            title = str(s.get("title", ""))[:52]
-            fo["conflict"] = (f"time-from {fmt_hm(beg)} + {fo['dur']} min no cuadra "
-                              f"con time-to {fmt_hm(end_exp)}")
-            DIAGNOSTICS.append(f"{ctx} paso {i + 1} «{title}»: {fo['conflict']}")
-        if fo["dur"] is None and beg is not None and end_exp is not None and end_exp > beg:
-            fo["dur"], fo["dur_derived"] = end_exp - beg, True   # exacta (sin ~)
-        # caminatas: la geometría dicta la duración (4 km/h + redondeo);
-        # si el YAML trae otra cosa, es un diagnóstico
-        coords = step_walk_geometry(s)
-        wc = walk_calc(coords, f"{ctx} paso {i + 1}") if coords and not is_flex else None
-        if wc:
-            dist, esperado = wc
-            if fo["dur"] is None:
-                fo["dur"], fo["dur_derived"], fo["approx"] = esperado, True, True
-            elif fo["dur_exp"] and fo["dur"] != esperado:
-                title = str(s.get("title", ""))[:52]
-                DIAGNOSTICS.append(f"{ctx} paso {i + 1} «{title}»: caminata dice "
-                                   f"{fo['dur']} min pero el camino mide {dist:.0f} m "
-                                   f"≈ {esperado} min a 4 km/h")
-        info.append(fo)
-
-    def next_begin(i):
-        for j in range(i + 1, n):
-            if info[j] and info[j]["beg_exp"]:
-                return info[j]["begin"]
+def _step_time_fields(s, i, ctx):
+    """campos de horario de UN paso (parse de time-from/time-to/duration/flex
+    + validación de la geometría de caminata) — None si el paso no participa."""
+    if not isinstance(s, dict) or s.get("hidden-summary"):
         return None
+    beg = hm_min(s.get("time-from"))
+    end_exp = hm_min(s.get("time-to"))
+    raw_dur = s.get("duration")
+    flex = parse_flex(raw_dur)                        # se estira a lo que haya
+    has_dur = raw_dur not in contract.SKIP_DUR and flex is None
+    fo = {"begin": beg, "beg_exp": beg is not None, "beg_derived": False,
+          "dur": dmin(raw_dur) if has_dur else None, "dur_exp": has_dur,
+          "flex": flex is not None,
+          "flex_min": flex[0] if flex else None,
+          "flex_max": flex[1] if flex else None,
+          "end_exp": end_exp,
+          "dur_derived": False, "approx": False, "end": None}
+    is_flex = flex is not None
+    # los 3 fijados e incompatibles → diagnóstico (⚠️ en la fila)
+    if beg is not None and end_exp is not None and has_dur and beg + fo["dur"] != end_exp:
+        title = str(s.get("title", ""))[:52]
+        fo["conflict"] = (f"time-from {fmt_hm(beg)} + {fo['dur']} min no cuadra "
+                          f"con time-to {fmt_hm(end_exp)}")
+        DIAGNOSTICS.append(f"{ctx} paso {i + 1} «{title}»: {fo['conflict']}")
+    if fo["dur"] is None and beg is not None and end_exp is not None and end_exp > beg:
+        fo["dur"], fo["dur_derived"] = end_exp - beg, True   # exacta (sin ~)
+    # caminatas: la geometría dicta la duración (4 km/h + redondeo);
+    # si el YAML trae otra cosa, es un diagnóstico
+    coords = step_walk_geometry(s)
+    wc = walk_calc(coords, f"{ctx} paso {i + 1}") if coords and not is_flex else None
+    if wc:
+        dist, esperado = wc
+        if fo["dur"] is None:
+            fo["dur"], fo["dur_derived"], fo["approx"] = esperado, True, True
+        elif fo["dur_exp"] and fo["dur"] != esperado:
+            title = str(s.get("title", ""))[:52]
+            DIAGNOSTICS.append(f"{ctx} paso {i + 1} «{title}»: caminata dice "
+                               f"{fo['dur']} min pero el camino mide {dist:.0f} m "
+                               f"≈ {esperado} min a 4 km/h")
+    return fo
 
-    # pasada adelante: inicio = fin del anterior; duración = hueco al siguiente
+
+def _snap_forward(info, next_begin):
+    """pasada adelante: inicio = fin del anterior; duración = hueco al siguiente."""
     cursor = None
     for i, fo in enumerate(info):
         if fo is None:
@@ -314,10 +300,13 @@ def derive_schedule(steps, ctx=""):
         elif fo["begin"] is not None and fo["dur"]:
             fo["end"] = fo["begin"] + fo["dur"]
         cursor = fo["end"] if fo["end"] is not None else fo["begin"]
-    # pasada atrás: con duración pero sin inicio → fin = inicio del siguiente;
-    # PERO un time-to explícito propio manda: inicio = fin − duración (antes
-    # el snap al siguiente PISABA el fin explícito sin avisar)
-    for i in range(n - 1, -1, -1):
+
+
+def _snap_backward(info, next_begin):
+    """pasada atrás: con duración pero sin inicio → fin = inicio del siguiente;
+    PERO un time-to explícito propio manda: inicio = fin − duración (antes
+    el snap al siguiente PISABA el fin explícito sin avisar)."""
+    for i in range(len(info) - 1, -1, -1):
         fo = info[i]
         if fo is None or fo["begin"] is not None or not fo["dur"]:
             continue
@@ -328,7 +317,17 @@ def derive_schedule(steps, ctx=""):
         if nb is not None:
             fo["end"] = nb
             fo["begin"], fo["beg_derived"] = nb - fo["dur"], True
-    # diagnóstico
+
+
+def _report_gaps(steps, info, ctx):
+    """diagnóstico: pasos que tras los snaps siguen sin 2 de {inicio, fin,
+    duración}, o con los 3 fijados encimándose con el paso siguiente."""
+    def next_begin(i):
+        for j in range(i + 1, len(info)):
+            if info[j] and info[j]["beg_exp"]:
+                return info[j]["begin"]
+        return None
+
     for i, (s, fo) in enumerate(zip(steps, info)):
         if fo is None:
             continue
@@ -346,6 +345,29 @@ def derive_schedule(steps, ctx=""):
                 fo["conflict"] = (f"termina {fmt_hm(fo['begin'] + fo['dur'])} pero lo "
                                   f"siguiente empieza {fmt_hm(nb)} (encimados {exceso} min)")
                 DIAGNOSTICS.append(f"{ctx} paso {i + 1} «{title}»: {fo['conflict']}")
+
+
+def derive_schedule(steps, ctx=""):
+    """Horario por paso, completado por SNAP a los vecinos:
+      · sin inicio → snap ARRIBA (fin del paso anterior) o ABAJO (inicio del
+        siguiente − duración propia)
+      · sin duración → snap ABAJO (hueco hasta el próximo inicio explícito)
+    Regla: cada paso debe quedar con 2 de {inicio, fin, duración}. Un LUGAR
+    con solo inicio es un ancla válida (llegas y punto); cualquier otro paso
+    incompleto es un problema del YAML → va a DIAGNOSTICS.
+    Todo lo inferido se marca data-derived al render."""
+    n = len(steps)
+    info = [_step_time_fields(s, i, ctx) for i, s in enumerate(steps)]
+
+    def next_begin(i):
+        for j in range(i + 1, n):
+            if info[j] and info[j]["beg_exp"]:
+                return info[j]["begin"]
+        return None
+
+    _snap_forward(info, next_begin)
+    _snap_backward(info, next_begin)
+    _report_gaps(steps, info, ctx)
     # tiempo LIBRE tras cada paso: hueco entre su fin y el próximo inicio YA
     # RESUELTO (explícito o derivado — contar solo explícitos duplicaba el
     # hueco cuando en medio había pasos con inicio encadenado)
@@ -550,14 +572,18 @@ def render_options(node, refs, ctx="", row_id=None):
                 render_li(s, refs, f"{row_id}-g{gi}-s{i + 1}" if row_id else None,
                           sc=sched[i], ctx=ctx)
                 for i, s in enumerate(o["steps"]))
-            items.append(f'<li data-kind="plan"><b>{title}</b><ul class="steps">\n{subs}\n</ul></li>')
+            # data-opt: la marca del CONTENEDOR de elección (sufijo 1-based del
+            # id extendido) — mapa.js resuelve la rama elegida sin recorrer el DOM
+            items.append(f'<li data-kind="plan" data-opt="g{gi}"><b>{title}</b>'
+                         f'<ul class="steps">\n{subs}\n</ul></li>')
         else:
             label = html.escape(str(o.get("title", "")))
             extra = f' class="{html.escape(str(o["class"]))}"' if o.get("class") else ""
             # cada opción envuelta (span.option) y separador en span.sep: el
             # itinerario fluye inline; el mapa las apila una por línea
+            # cada opción lleva su data-opt (contenedor de elección, ver arriba)
             inner = '<span class="sep"> · </span>'.join(
-                f'<span class="option">'
+                f'<span class="option" data-opt="g{gi}-o{oi + 1}">'
                 f'{render_option(x, refs, f"{row_id}-g{gi}-o{oi + 1}" if row_id else None)}'
                 f'</span>'
                 for oi, x in enumerate(o.get("options", [])))

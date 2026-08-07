@@ -376,8 +376,15 @@
     }
     return true;
   }
-  // contenedor (opción u li de grupo) DENTRO de set del que cuelga node
+  // contenedor (opción u li de grupo) DENTRO de set del que cuelga node:
+  // primero por la marca data-opt del renderer (el ancestro marcado más
+  // cercano que pertenezca a ESTE conjunto); el recorrido DOM de siempre
+  // queda de respaldo para markup sin la marca
   function chosenContainer(set, node) {
+    for (var c = node.closest('[data-opt]'); c;
+         c = c.parentElement && c.parentElement.closest('[data-opt]')) {
+      if (c.closest('.options') === set) return c;
+    }
     var opt = node.closest('.option');
     if (opt && opt.closest('.options') === set) return opt;
     var li = node;
@@ -753,6 +760,13 @@
     }
     return { prev: prev, next: next };
   }
+  // anclas de una fila: primero las PRECALCULADAS del build (GEO.anchors,
+  // por id de fila — misma regla de rama/día, resuelta en Python); si el id
+  // no está, el rastreo en vivo de neighborAnchors de siempre
+  function anchorsFor(el, list, i, sameDayOnly) {
+    var pre = GEO.anchors && el.id && GEO.anchors[el.id];
+    return pre || neighborAnchors(list, i, sameDayOnly);
+  }
   function syncLayers() {
     if (!map) return;
     var want = {};      // clave → 'full' | 'ghost'
@@ -775,7 +789,7 @@
       if (!el.dataset.transit) return;
       // transporte SIN geometría (referencia sin cumplir) = conector automático:
       // une el punto previo con el siguiente dentro del mismo día
-      var na = neighborAnchors(els, i, true);
+      var na = anchorsFor(el, els, i, true);
       if (na.prev && na.next) autos['auto-' + i + '-' + key] = { a: na.prev, b: na.next, st: st };
     });
     // cronología del día: numerar los LUGARES plenos en orden del documento
@@ -944,7 +958,7 @@
     if (!showOnMap(key, stTitle(el), li.id, true)) {
       // sin geometría (conector automático): encuadrar sus puntos vecinos
       // COMPLETOS (con el mismo tope de acercamiento) y abrir su tarjeta
-      var na = neighborAnchors(stEls, i, false);
+      var na = anchorsFor(el, stEls, i, false);
       var pts = [];
       if (na.prev) pts.push(na.prev);
       if (na.next) pts.push(na.next);
