@@ -202,6 +202,8 @@ places:
   robatayaki-premium: {name: Robatayaki premium, gps: '', maps: '', description: 'Parrilla de carbón teatral, te pasan los platos en pala', info: 'Recomendado por: Sugerencia del plan (Claude)', image: fachadas/robata.jpg}
   ny-grill-park-hyatt: {name: NY Grill (Park Hyatt), gps: '35.685500,139.690739', maps: 'https://www.google.com/maps/search/?api=1&query=35.685500,139.690739', description: 'El piso 52: steak, jazz en vivo y todo Tokio abajo', info: 'Recomendado por: Clásico de todas las guías', image: fachadas/nygrill.jpg, hours: '11:30–14:30 y 17:30–22:00', hours_source: 'https://restaurants.tokyo.park.hyatt.co.jp/en/newyorkgrill/'}
   golden-gai: {name: Golden Gai, gps: '35.694112,139.704761', maps: 'https://www.google.com/maps/search/?api=1&query=35.694112,139.704761', description: '200 barras de 5 asientos — para la sobremesa, los 10 se dispersan solos', info: 'Recomendado por: Clásico de todas las guías', image: fachadas/b_goldengai.jpg}
+  tsukiji-hongwanji: {name: Tsukiji Hongwan-ji, gps: '35.666493,139.771931', maps: 'https://www.google.com/maps/search/?api=1&query=35.666493,139.771931'}
+  jardin-hamarikyu: {name: Jardín Hamarikyu, gps: '35.660157,139.763190', maps: 'https://www.google.com/maps/search/?api=1&query=35.660157,139.763190'}
   tsukiji-outer-market: {name: Tsukiji Outer Market, gps: '35.664770,139.770252', maps: 'https://www.google.com/maps/search/?api=1&query=35.664770,139.770252', description: 'El mercado exterior que sobrevivió a la mudanza: 400 puestos de tamagoyaki, atún, uni y cuchillos — el desayuno más rico de Tokio es de pie, puesto por puesto.', info: 'El mercado nació en 1935 tras el gran terremoto. La subasta de atún se fue a Toyosu en 2018, pero el mercado ''exterior'' — el de a pie — se quedó y está más vivo que nunca.', image: 'fotos/g-f61fa741e1.jpg', hours: '05:00–14:00; cierra Dom/Mié', hours_source: 'https://www.tsukiji.or.jp/english/calendar/'}
   ginza: {name: Ginza, gps: '35.671223,139.766486', maps: 'https://www.google.com/maps/search/?api=1&query=35.671223,139.766486', description: 'La milla de oro de Tokio: flagships de 12 pisos, papelerías legendarias (Itoya), galerías y vitrinas que son museos.', info: Su nombre viene de la casa de moneda de plata (gin-za) de 1612. Tras el incendio de 1872 se reconstruyó 'a la occidental' y se volvió el escaparate de la modernidad japonesa., image: 'fotos/g-74c087dce3.jpg'}
   uniqlo-coffee: {name: Uniqlo Coffee, gps: '', maps: '', description: Café en el flagship de 12 pisos — pausa entre compras, info: 'Recomendado por: Sugerencia del plan (Claude)', image: fachadas/uniqlocafe.jpg}
@@ -235,6 +237,14 @@ transits:
   tour-fuji-a-hakone: {mode: bus, color: '#8fc31f', line: Bus del tour}
   togendai-muelle: {mode: walk, color: '#7a6f63'}
   tour-regreso-tokyo: {mode: bus, color: '#8fc31f', line: Bus del tour}
+  bajar-a-omotesando: {mode: walk, color: '#7a6f63'}
+  bus-shinjuku-kawaguchiko: {mode: bus, color: '#8fc31f', line: Bus Fujikyū (Busta Shinjuku)}
+  bus-oishi-oshino: {mode: bus, color: '#8fc31f', line: Bus local Kawaguchiko}
+  toyosu-a-akihabara: {mode: train, color: '#b5b5ac'}
+  market-a-hongwanji: {mode: walk, color: '#7a6f63'}
+  hongwanji-a-hamarikyu: {mode: walk, color: '#7a6f63'}
+  hamarikyu-a-ginza: {mode: walk, color: '#7a6f63'}
+  ginza-a-kamiyacho: {mode: train, color: '#b5b5ac', line: Metro Hibiya}
   itami-monorail:
     mode: train
     line: Osaka Monorail
@@ -2820,16 +2830,18 @@ days:
   anchor: cruce de Shibuya
   date: '2026-10-15'
   steps:
-  - {location: santuario-meiji, time-from: '05:30', fixed: true, title: 'Arriba — 🏪 konbini ligero; hoy @[Meiji](santuario-meiji) al amanecer, con el bosque vacío. Nota: si la familia vota @[Disney](tokyo-disneyland), este día se intercambia con el viernes (@[Chuo](d15-1) → Tokyo Station → @[Keiyo Line](d15-2) → Maihama, 35 min).'}
+  - {location: rose-garden, time-from: '05:30', fixed: true, title: 'Arriba — 🏪 konbini ligero; hoy @[Meiji](santuario-meiji) al amanecer, con el bosque vacío. Nota: si la familia vota @[Disney](tokyo-disneyland), este día se intercambia con el viernes (@[Chuo](d15-1) → Tokyo Station → @[Keiyo Line](d15-2) → Maihama, 35 min).'}
+  - {transit: hotel-a-shinjuku, time-from: '05:40', duration: 10 min, title: A la estación Shinjuku — 10 min a pie.}
   - {transit: d15-3, time-from: '05:50', title: '@[JR Yamanote](d15-3) → Harajuku — 4 min.'}
+  - {transit: d15-5, time-from: '05:55', title: De Harajuku a la entrada del santuario — 5 min.}
   - {location: santuario-meiji, time-from: '06:00', fixed: true, title: '@[Santuario Meiji](santuario-meiji) 🏴 — 1 h 15: abre al amanecer — el bosque vacío en medio de la ciudad, los barriles de sake, con suerte una boda sintoísta.'}
   - {time-from: '07:15', title: 'Yoyogi Park — 45 min: el parque pegado a Meiji, corredores y el aire del amanecer (siempre abierto).'}
   - {time-from: '08:00', title: 'Desayuno en Omotesandō ☕ — 1 h: cafés y panaderías (bills, % Arabica) mientras despiertan las tiendas.'}
   - {time-from: '09:00', title: '🚶 Cat Street / Ura-Harajuku — 1 h 15: los callejones de moda y vintage (van abriendo ~11; el paseo ya vale).'}
-  - {transit: d15-4, time-from: '10:15', title: 'A @[Takeshita-dōri](takeshita-street-omotesando) — 5 min (ya abriendo).'}
+  - {transit: d15-7, time-from: '10:05', title: 'A @[Takeshita-dōri](takeshita-street-omotesando) — 15 min desde la salida del santuario (ya abriendo).'}
   - {location: takeshita-street-omotesando, time-from: '10:20', title: '@[Takeshita Street](takeshita-street-omotesando) — 45 min: moda kawaii, crepas, el Daiso gigante y el caos colorido.'}
   - {transit: d15-e9, hidden-summary: true, title: Takeshita Street + Omotesandō → Harajuku}
-  - {transit: d15-5, time-from: '11:05', title: 'Bajar a Omotesandō — 5 min, al otro lado de la avenida.'}
+  - {transit: bajar-a-omotesando, time-from: '11:05', duration: 5 min, title: 'Bajar a Omotesandō — 5 min, al otro lado de la avenida.'}
   - {time-from: '11:10', title: 'Omotesandō — 50 min: la avenida arbolada de arquitectura y marcas (Tokyu Plaza y su entrada de espejos).'}
   - time-from: '12:00'
     title: Comida en Harajuku — 1 h.
@@ -2894,24 +2906,23 @@ days:
         - {transit: to-teppan-lunch, title: To Teppan lunch}
         - {location: teppan-lunch}
         - {transit: from-teppan-lunch, title: From Teppan lunch}
-  - {time-from: '13:30', fixed: true, title: 'La hora de los subgrupos — 1 h 30 (cafés con reserva):>'}
-  - time-from: '13:30'
-    title: Elige tu plan del día
+  - {time-from: '13:30', fixed: true, duration: 1 h 30, title: 'La hora de los subgrupos — 1 h 30 (cafés con reserva):>'}
+  - title: Elige tu plan del día
     options:
     - title: Animales ☕
       steps:
-      - {title: 'Subgrupo de Cecy con reservas: erizos HARRY, búhos, o serpientes — 1 h, turnos de 2–4'}
+      - {time-from: '13:30', duration: 1 h, title: 'Subgrupo de Cecy con reservas: erizos HARRY, búhos, o serpientes — 1 h, turnos de 2–4'}
     - title: Compras
       steps:
-      - {title: Cat Street y las tiendas de Omotesandō}
+      - {time-from: '13:30', duration: 1 h 30, title: Cat Street y las tiendas de Omotesandō}
     - title: Café
       steps:
-      - {title: Sentarse en un kissaten a ver pasar la moda}
+      - {time-from: '13:30', duration: 1 h 30, title: Sentarse en un kissaten a ver pasar la moda}
   - {transit: d15-6, time-from: '15:15', title: 'A Shibuya: Cat Street a pie — 20 min, la ruta bonita (o @[Yamanote](d15-6), 1 estación — 2 min).'}
   - {transit: d15-e10, hidden-summary: true, title: Shibuya → Cruce de Shibuya}
-  - {transit: d15-e11, hidden-summary: true, title: Cruce de Shibuya → Shibuya Sky}
   - {location: cruce-de-shibuya, time-from: '15:45', title: '@[Cruce de Shibuya](cruce-de-shibuya) ★ — 40 min: cruzarlo, y la foto desde arriba en el Starbucks del 2º piso (Tsutaya).'}
-  - {transit: d15-7, time-from: '16:25', title: 'Estatua de Hachikō (a 1 min, en la salida de la estación) — 15 min: el perro fiel, la foto obligada.'}
+  - {time-from: '16:25', title: 'Estatua de Hachikō (a 1 min, en la salida de la estación) — 15 min: el perro fiel, la foto obligada.'}
+  - {transit: d15-e11, hidden-summary: true, title: Cruce de Shibuya → Shibuya Sky}
   - {location: shibuya-sky, time-from: '16:45', fixed: true, title: '@[Shibuya Sky](shibuya-sky) 🏴 — slot RESERVADO al atardecer (~17:00, ¥2,700) — 1 h 15.'}
   - {time-from: '18:15', title: Mega Don Quijote / Parco (Nintendo store) (a 5 min a pie del Sky) — 1 h 15.}
   - time-from: '19:30'
@@ -2985,18 +2996,16 @@ days:
         - {transit: to-shibuya-yokocho, title: To Shibuya Yokocho}
         - {location: shibuya-yokocho}
         - {transit: from-shibuya-yokocho, title: From Shibuya Yokocho}
-  - {transit: d15-8, time-from: '21:15', title: '@[Yamanote](d15-8) a Shinjuku — 7 min. 🏪 AVISO PARA MAÑANA: Kamakura y @[Kawaguchiko](lago-kawaguchiko) salen antes del buffet — konbini esta noche; el plan urbano sí desayuna en el hotel.'}
+  - {transit: d15-8, time-from: '21:15', duration: 7 min, title: '@[Yamanote](d15-8) a Shinjuku — 7 min. 🏪 AVISO PARA MAÑANA: Kamakura y @[Kawaguchiko](lago-kawaguchiko) salen antes del buffet — konbini esta noche; el plan urbano sí desayuna en el hotel.'}
 - title: vie 16 · día de subgrupos
   note: cada quien su Japón — 3 planes en paralelo
   anchor: la que elijas
   date: '2026-10-16'
   steps:
   - {location: monte-fuji, time-from: '06:00', fixed: true, title: 'Checar la webcam del @[Fuji](monte-fuji) — si amanece despejado, el plan Kawaguchiko se activa; si no, se cae sin drama.'}
-  - {transit: d16-e6, hidden-summary: true, title: Kamakura → Gran Buda de Kamakura}
-  - {transit: d16-e7, hidden-summary: true, title: Gran Buda de Kamakura → Kamakura}
-  - {time-from: '07:00', title: Tres planes en paralelo — cada quien elige; las 3 comidas del día van por plan y la cena es de TODOS. 👉 Desliza de lado a lado para ver cada plan con su horario. 🏪 A y B salen antes del buffet (konbini anoche); 🏨 C desayuna en el hotel.}
-  - time-from: 07:00
-    title: Elige tu plan del día
+  - time-from: '07:00'
+    duration: 12 h 30
+    title: Tres planes en paralelo — cada quien elige; las 3 comidas del día van por plan y la cena es de TODOS. 👉 Desliza de lado a lado para ver cada plan con su horario. 🏪 A y B salen antes del buffet (konbini anoche); 🏨 C desayuna en el hotel.
     options:
     - title: A · Kamakura 🌊
       steps:
@@ -3008,30 +3017,39 @@ days:
       - {time-from: '12:45', title: Bambú de Hōkoku-ji ★ — 1 h (¥400 con matcha)}
       - {time-from: '13:50', title: Café de shibas ☕ — 45 min}
       - {time-from: '14:40', title: Komachi-dōri — 1 h de compras y paseo}
-      - {time-from: '16:30', fixed: true, title: 🚇 Regreso a Shinjuku — ~1 h (a tiempo para la cena)}
+      - {time-from: '16:30', fixed: true, duration: 1 h, title: 🚇 Regreso a Shinjuku — ~1 h (a tiempo para la cena)}
     - title: B · Fuji · Kawaguchiko 🗻
       steps:
-      - {location: monte-fuji, time-from: '06:00', fixed: true, title: 'Checar la webcam del @[Fuji](monte-fuji): si está despejado, este plan brilla'}
-      - {location: lago-kawaguchiko, time-from: '07:00', title: '🚇 Bus desde Busta Shinjuku (piso 4) — 1 h 45 a @[Kawaguchiko](lago-kawaguchiko)'}
+      - {time-from: '06:00', fixed: true, title: 'Checar la webcam del @[Fuji](monte-fuji): si está despejado, este plan brilla'}
+      - {transit: bus-shinjuku-kawaguchiko, time-from: '07:00', duration: 1 h 45, title: '🚌 Bus desde Busta Shinjuku (piso 4) — 1 h 45 a @[Kawaguchiko](lago-kawaguchiko)'}
       - {time-from: '08:45', title: 'Pagoda Chūreitō ★ — 1 h 15 (400 escalones, LA postal del Fuji)'}
       - {time-from: '10:00', title: 'Lago Kawaguchi + comida de hōtō junto al lago — 2 h (~¥1,500)'}
-      - {time-from: '12:00', fixed: true, title: La tarde se parte por subgrupo 👇 — todos se reencuentran en la cena.}
-      - {time-from: '12:15', title: '🌲 Naturaleza: Ōishi Park ★ — 1 h: el Fuji con jardín de flores y la orilla norte del lago.'}
-      - {transit: d16-3, time-from: '13:30', title: A Oshino Hakkai — 30 min.}
-      - {time-from: '14:00', title: '🌲 Oshino Hakkai — 1 h 30: el pueblo de estanques de manantial con el Fuji atrás (gratis).'}
-      - {time-from: '16:00', fixed: true, title: '🚌 Bus de regreso a Shinjuku — 1 h 45 (llega ~17:45, a la cena).'}
-      - {time-from: ·, title: '🛍️ Compras (opcional): quien quiera, en lugar de la tarde de naturaleza, toma bus a Gotemba Premium Outlets — 4 h (Maps ↗) + shuttle directo a Shinjuku para la cena.'}
+      - time-from: '12:00'
+        fixed: true
+        duration: 4 h
+        title: La tarde se parte por subgrupo 👇 — todos se reencuentran en la cena.
+        options:
+        - title: 🌲 Naturaleza
+          steps:
+          - {time-from: '12:15', duration: 1 h, title: '🌲 Ōishi Park ★ — 1 h: el Fuji con jardín de flores y la orilla norte del lago.'}
+          - {transit: bus-oishi-oshino, time-from: '13:30', duration: 30 min, title: A Oshino Hakkai — 30 min.}
+          - {time-from: '14:00', duration: 1 h 30, title: '🌲 Oshino Hakkai — 1 h 30: el pueblo de estanques de manantial con el Fuji atrás (gratis).'}
+        - title: 🛍️ Compras
+          steps:
+          - {time-from: '12:15', duration: 3 h 45, title: '🛍️ Compras (opcional): quien quiera, en lugar de la tarde de naturaleza, toma bus a Gotemba Premium Outlets — 4 h (Maps ↗) + shuttle directo a Shinjuku para la cena.'}
+      - {time-from: '16:00', fixed: true, duration: 1 h 45, title: '🚌 Bus de regreso a Shinjuku — 1 h 45 (llega ~17:45, a la cena).'}
     - title: C · urbano 🏙️
       steps:
       - {time-from: '09:00', title: 🏨 Desayuno con calma en el hotel}
       - {transit: d16-4, time-from: '10:00', title: '@[Yurikamome](d16-4) a Shin-Toyosu — 30 min'}
       - {location: teamlab-planets, time-from: '10:30', title: '@[teamLab Planets](teamlab-planets) ★ — 2 h (reservar con tiempo)'}
       - {time-from: '12:45', title: Comida en Toyosu (el mercado nuevo) — 1 h 15}
-      - {transit: d16-5, time-from: '14:15', title: '@[Chuo](d16-5) directa a @[Akihabara](akihabara) — 10 min'}
+      - {transit: toyosu-a-akihabara, time-from: '14:15', duration: 10 min, title: 'Metro directo a @[Akihabara](akihabara) — 10 min'}
       - {time-from: '14:30', title: 'Akihabara 🔘 — 2 h: electrónica, anime, gashapon'}
       - {time-from: '16:45', title: Ginza / libre — 1 h 30}
-      - {time-from: '18:30', fixed: true, title: 🚇 Regreso a Shinjuku para la cena}
+      - {transit: d16-5, time-from: '18:30', fixed: true, duration: 30 min, title: '🚇 @[Chuo](d16-5) de regreso a Shinjuku para la cena'}
   - time-from: '19:30'
+    duration: 2 h
     title: 'TODOS: cena juntos en Shinjuku — 2 h, mesa de 10 reservada desde México, a contarse los tres Japones.'
     options:
     - title: Take
@@ -3107,11 +3125,14 @@ days:
   anchor: Tsukiji Outer Market
   date: '2026-10-17'
   steps:
-  - {location: tsukiji-outer-market, time-from: '05:00', fixed: true, title: 'Arriba — hoy el @[desayuno ES el mercado](tsukiji-outer-market), panza vacía. Los papás (Ricardo y Lety) hacen maletas: hoy checan out.'}
+  - {location: rose-garden, time-from: '05:00', fixed: true, title: 'Arriba — hoy el @[desayuno ES el mercado](tsukiji-outer-market), panza vacía. Los papás (Ricardo y Lety) hacen maletas: hoy checan out.'}
+  - {transit: hotel-a-shinjuku, time-from: '05:05', duration: 10 min, title: A la estación Shinjuku — 10 min a pie.}
   - {transit: d17-1, time-from: '05:15', title: '@[Marunouchi Line](d17-1) → @[Ginza](ginza) — 15 min.'}
   - {transit: d17-2, time-from: '05:32', title: 'Transbordo → @[Hibiya Line](d17-2) → Tsukiji, salida 1 — 10 min. Panza vacía obligatoria: hoy el desayuno ES el mercado.'}
+  - {transit: d17-5, time-from: '05:45', title: De la salida 1 al mercado — 5 min.}
   - {location: tsukiji-outer-market, time-from: '06:00', title: '@[Tsukiji Outer Market](tsukiji-outer-market) 🍴 — 1 h 45 puesto por puesto (tamagoyaki, atún, uni para valientes). Reunión en el templo Namiyoke a las 9:45.'}
-  - time-from: 06:00
+  - time-from: '06:00'
+    duration: 1 h 45
     title: Desayuno
     options:
     - title: Take
@@ -3182,29 +3203,28 @@ days:
         - {transit: to-depachika-de-ginza, title: To Depachika de Ginza}
         - {location: depachika-de-ginza}
         - {transit: from-depachika-de-ginza, title: From Depachika de Ginza}
-  - {transit: d17-3, time-from: '07:45', title: 'Tsukiji Hongwan-ji (a 3 min, abre 6:00) — 30 min: el templo budista de estilo indio, único en Tokio.'}
-  - {transit: d17-e14, hidden-summary: true, title: Ginza → Akihabara}
-  - {transit: d17-e9, hidden-summary: true, title: Ginza → Tsukiji}
-  - {transit: d17-4, time-from: '08:20', title: Al Jardín Hamarikyu — 12 min bordeando el canal.}
-  - {transit: d17-e13, hidden-summary: true, title: Ginza → Ginza}
-  - {time-from: '09:00', fixed: true, title: 'Jardín Hamarikyu ★ — 1 h (abre 9:00, ¥300): jardín feudal junto a la bahía, con casa de té en el estanque y rascacielos detrás.'}
-  - {transit: d17-5, time-from: '10:15', title: 'A @[Ginza](ginza) — 10 min (ya abriendo). @[Ginza](ginza) — 1 h 30: Uniqlo de 12 pisos, Itoya, vitrinas.'}
-  - {transit: d17-6, time-from: '12:00', title: '@[Hibiya Line](d17-6) → Kamiyacho — 12 min + 7 a pie a la Torre.'}
+  - {transit: market-a-hongwanji, time-from: '07:45', duration: 3 min, title: Al templo — 3 min.}
+  - {location: tsukiji-hongwanji, time-from: '07:50', duration: 30 min, title: 'Tsukiji Hongwan-ji (abre 6:00) — 30 min: el templo budista de estilo indio, único en Tokio.'}
+  - {transit: hongwanji-a-hamarikyu, time-from: '08:20', duration: 15 min, title: Al Jardín Hamarikyu — 15 min bordeando el canal.}
+  - {location: jardin-hamarikyu, time-from: '09:00', fixed: true, title: 'Jardín Hamarikyu ★ — 1 h (abre 9:00, ¥300): jardín feudal junto a la bahía, con casa de té en el estanque y rascacielos detrás.'}
+  - {transit: hamarikyu-a-ginza, time-from: '10:15', duration: 15 min, title: 'A @[Ginza](ginza) — 15 min (ya abriendo).'}
+  - {location: ginza, time-from: '10:30', duration: 1 h 30, title: '@[Ginza](ginza) — 1 h 30: Uniqlo de 12 pisos, Itoya, vitrinas.'}
+  - {transit: ginza-a-kamiyacho, time-from: '12:00', duration: 12 min, title: '@[Hibiya Line](ginza-a-kamiyacho) → Kamiyacho — 12 min + 7 a pie a la Torre.'}
   - {transit: d17-e10, hidden-summary: true, title: Kamiyachō → Torre de Tokio}
+  - {location: torre-de-tokio, time-from: '12:20', title: '@[Torre de Tokio](torre-de-tokio) ★ + @[Zojoji](zojo-ji) ★ — 1 h 30: la torre roja con el templo enfrente. Torre y Zojoji están uno frente al otro — sin conmutación.'}
   - {transit: d17-e11, hidden-summary: true, title: Torre de Tokio → Zōjō-ji}
   - {transit: d17-e12, hidden-summary: true, title: Zōjō-ji → Kamiyachō}
-  - {location: torre-de-tokio, time-from: '12:20', title: '@[Torre de Tokio](torre-de-tokio) ★ + @[Zojoji](zojo-ji) ★ — 1 h 30: la torre roja con el templo enfrente. Torre y Zojoji están uno frente al otro — sin conmutación.'}
   - {transit: d17-7, time-from: '13:50', title: 'De regreso a Ginza para comer: Kamiyacho → @[Hibiya Line](d17-7) → @[Ginza](ginza) — 12 min.'}
-  - {time-from: '14:00', title: Comida — 1 h 15.}
-  - time-from: '14:00'
-    title: Elige tu plan del día
+  - {transit: d17-e13, hidden-summary: true, title: Ginza → Ginza}
+  - {time-from: '14:00', duration: 1 h 15, title: Comida — 1 h 15.}
+  - title: Elige tu plan del día
     options:
     - title: Odaiba 🔘
       steps:
-      - {title: La Estatua de la Libertad rara y Small Worlds}
+      - {time-from: '15:30', duration: 3 h, title: La Estatua de la Libertad rara y Small Worlds}
     - title: Compras
       steps:
-      - {title: 'El Don Quijote final con la maleta extra en mente🏮 BarrioDepachika-crawl de Ginza — regalos comestibles finos para México (KitKats raros, castella, matcha)'}
+      - {time-from: '15:30', duration: 3 h, title: 'El Don Quijote final con la maleta extra en mente🏮 BarrioDepachika-crawl de Ginza — regalos comestibles finos para México (KitKats raros, castella, matcha)'}
   - time-from: '15:30'
     title: Pendientes por subgrupo — 3 h. Cada subgrupo su ruta — todos los destinos a ≤20 min de metro de Ginza.
     options:
@@ -3268,7 +3288,7 @@ days:
         - {transit: to-barra-con-estrella, title: To Barra con estrella}
         - {location: barra-con-estrella}
         - {transit: from-barra-con-estrella, title: From Barra con estrella}
-  - {transit: d17-8, time-from: '17:00', title: '👋 Ricardo papá y Lety se despiden: checkout adelantado (su reserva de Tokio es 1 noche menos) — duermen junto al aeropuerto para su vuelo de madrugada a China. Abrazo y su taxi a Haneda.'}
+  - {time-from: '17:00', title: '👋 Ricardo papá y Lety se despiden: checkout adelantado (su reserva de Tokio es 1 noche menos) — duermen junto al aeropuerto para su vuelo de madrugada a China. Abrazo y su taxi a Haneda.'}
   - time-from: '19:00'
     title: Cena de despedida (los 8) — 2 h.
     options:
@@ -3332,15 +3352,15 @@ days:
         - {transit: to-barra-con-estrella, title: To Barra con estrella}
         - {location: barra-con-estrella}
         - {transit: from-barra-con-estrella, title: From Barra con estrella}
-  - {time-from: '21:00', title: 'Maletas listas HOY — báscula del hotel: máximo 23 kg por maleta documentada.'}
+  - {time-from: '21:00', duration: 30 min, title: 'Maletas listas HOY — báscula del hotel: máximo 23 kg por maleta documentada.'}
 - title: dom 18 · regreso
   note: sayonara
   anchor: HND 11:55 — fijo
   date: '2026-10-18'
   steps:
   - {time-from: '07:00', title: Desayuno en el hotel 🏨 + checkout — 1 h 15.}
-  - {transit: d18-1, time-from: '08:30', fixed: true, title: '@[Airport Limousine Bus](d18-1) directo desde Shinjuku (reservar 8 asientos el día antes, ~¥1,400 pp) — 45–55 min a la T3. Con maletas y 8 personas, el bus gana sin discusión.'}
-  - {time-from: '09:25', title: 'Check-in AA (2 maletas de 23 kg por persona incluidas), migración, y el último onigiri con lágrima.'}
-  - {time-from: '11:55', fixed: true, title: 'HND → LAX — comida y desayuno a bordo; llegan 6:00 AM del mismo domingo → LAX → GDL 14:52 — la cena ya es en casa 🇲🇽. Fin. ⛩️'}
   - {transit: d18-e2, hidden-summary: true, title: Hotel → Busta Shinjuku}
+  - {transit: d18-1, time-from: '08:30', fixed: true, title: '@[Airport Limousine Bus](d18-1) directo desde Shinjuku (reservar 8 asientos el día antes, ~¥1,400 pp) — 45–55 min a la T3. Con maletas y 8 personas, el bus gana sin discusión.'}
   - {transit: d18-e3, hidden-summary: true, title: Busta Shinjuku → Haneda T3}
+  - {time-from: '09:25', title: 'Check-in AA (2 maletas de 23 kg por persona incluidas), migración, y el último onigiri con lágrima.'}
+  - {time-from: '11:55', fixed: true, duration: 10 h, title: 'HND → LAX — comida y desayuno a bordo; llegan 6:00 AM del mismo domingo → LAX → GDL 14:52 — la cena ya es en casa 🇲🇽. Fin. ⛩️'}
