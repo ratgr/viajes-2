@@ -220,7 +220,18 @@ def geo_tokens():
     # caja del viaje (vista inicial del mapa) + nombre del viaje (identidad
     # para el modo dev, en vez de olfatear la URL)
     pts = list(locs.values()) + [p for t in transits.values() for p in t["coords"]]
+    # POIs de guía: places con `poi: <cluster>` agrupados por su cluster
+    clusters = {}
+    for key, pl in render.PLACES.items():
+        cl = pl.get("poi")
+        if not cl:
+            continue
+        pt = render._place_pt(key)
+        if pt:
+            clusters.setdefault(str(cl), []).append(
+                [pt[0], pt[1], key, pl.get("name", key)])
     geo = {"locations": locs, "transits": transits, "trip": _TRIP[0],
+           "poiClusters": clusters,
            "anchors": anchors_tokens(), "edit": spans_tokens(_TRIP[0]),
            "buildSha": os.environ.get("GITHUB_SHA", "")}
     if pts:

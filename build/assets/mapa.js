@@ -1106,40 +1106,82 @@
     }
   }
 
-  // ---------- capa de POIs en la barra: todos los puntos del viaje ----------
-  var poiLayer = null;
+  // ---------- capa de POIs en la barra: por CLUSTERS de cercanía ----------
+  // GEO.poiClusters = places de guía con `poi: <cluster>`; además, los pois
+  // enganchados a caminatas entran al grupo «En el camino»
+  var poiLayers = {};    // cluster → capa viva
   (function poiControl() {
     if (!map || !panel) return;
-    var all = {};
-    Object.keys(GEO.transits).forEach(function (k) {
-      (GEO.transits[k].pois || []).forEach(function (p) { all[p[2]] = p; });
+    var groups = {};
+    Object.keys(GEO.poiClusters || {}).forEach(function (cl) {
+      groups[cl] = GEO.poiClusters[cl];
     });
-    var keys = Object.keys(all);
-    if (!keys.length) return;
-    var row = document.createElement('label');
-    row.className = 'poi-layer';
-    row.innerHTML = '<input type="checkbox" class="ck"> 📍 Puntos de interés (' + keys.length + ')';
-    var nav = panel.querySelector('.day-nav');
-    nav.parentNode.insertBefore(row, nav.nextSibling);
-    var ck = row.querySelector('input');
-    ck.checked = localStorage.getItem('mapa-pois') === '1';
-    function syncPois() {
-      if (poiLayer) { map.removeLayer(poiLayer); poiLayer = null; }
-      if (!ck.checked) return;
-      poiLayer = L.layerGroup(keys.map(function (k) {
-        var p = all[k];
-        var mk = L.circleMarker([p[0], p[1]], {
-          radius: 4.5, color: '#fff', weight: 1.5, fillColor: '#c9a227', fillOpacity: 1
-        });
-        mk.bindTooltip(p[3], { direction: 'top', offset: [0, -5] });
-        mk.on('click', function () { showOnMap(p[2], p[3]); selectByKey(p[2]); });
-        return mk;
-      })).addTo(map);
+    var camino = {};
+    Object.keys(GEO.transits).forEach(function (k) {
+      (GEO.transits[k].pois || []).forEach(function (p) { camino[p[2]] = p; });
+    });
+    var caminoKeys = Object.keys(camino);
+    if (caminoKeys.length) {
+      groups['En el camino'] = caminoKeys.map(function (k) { return camino[k]; });
     }
-    ck.addEventListener('change', function () {
-      localStorage.setItem('mapa-pois', ck.checked ? '1' : '0');
+    var names = Object.keys(groups).sort();
+    if (!names.length) return;
+    var total = names.reduce(function (n, c) { return n + groups[c].length; }, 0);
+    var box = document.createElement('div');
+    box.className = 'poi-box';
+    box.innerHTML = '<label class="poi-layer"><input type="checkbox" class="ck poi-all"> 📍 Puntos de interés (' + total + ')' +
+      ' <span class="poi-caret">▸</span></label><div class="poi-groups" hidden></div>';
+    var nav = panel.querySelector('.day-nav');
+    nav.parentNode.insertBefore(box, nav.nextSibling);
+    var master = box.querySelector('.poi-all');
+    var caret = box.querySelector('.poi-caret');
+    var wrap = box.querySelector('.poi-groups');
+    var cks = {};
+    names.forEach(function (cl) {
+      var l = document.createElement('label');
+      l.innerHTML = '<input type="checkbox" class="ck"> ' + cl + ' (' + groups[cl].length + ')';
+      wrap.appendChild(l);
+      cks[cl] = l.querySelector('input');
+      cks[cl].checked = localStorage.getItem('mapa-poi-' + cl) === '1';
+      cks[cl].addEventListener('change', function () {
+        localStorage.setItem('mapa-poi-' + cl, cks[cl].checked ? '1' : '0');
+        syncPois();
+      });
+    });
+    caret.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      wrap.hidden = !wrap.hidden;
+      caret.textContent = wrap.hidden ? '▸' : '▾';
+    });
+    master.addEventListener('change', function () {
+      names.forEach(function (cl) {
+        cks[cl].checked = master.checked;
+        localStorage.setItem('mapa-poi-' + cl, master.checked ? '1' : '0');
+      });
       syncPois();
     });
+    function syncPois() {
+      var on = names.filter(function (cl) { return cks[cl].checked; });
+      master.checked = on.length === names.length;
+      master.indeterminate = on.length > 0 && on.length < names.length;
+      names.forEach(function (cl) {
+        var want = cks[cl].checked;
+        if (want && !poiLayers[cl]) {
+          poiLayers[cl] = L.layerGroup(groups[cl].map(function (p) {
+            var mk = L.circleMarker([p[0], p[1]], {
+              radius: 4.5, color: '#fff', weight: 1.5, fillColor: '#c9a227', fillOpacity: 1
+            });
+            mk.bindTooltip(p[3], { direction: 'top', offset: [0, -5] });
+            mk.on('click', function () { showOnMap(p[2], p[3]); selectByKey(p[2]); });
+            return mk;
+          })).addTo(map);
+        } else if (!want && poiLayers[cl]) {
+          map.removeLayer(poiLayers[cl]);
+          delete poiLayers[cl];
+        }
+      });
+    }
     syncPois();
   })();
 

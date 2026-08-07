@@ -252,3 +252,10 @@ body > .app-tabs a { pointer-events: auto; background: var(--card); box-shadow: 
 /* capa de POIs en la barra */
 .panel .poi-layer { display: block; font-size: 12.5px; color: var(--ink-soft); padding: 2px 0 6px; cursor: pointer; user-select: none; }
 .panel .poi-layer .ck { margin-right: 6px; }
+
+/* grupos de POIs */
+.panel .poi-box { padding: 2px 0 6px; }
+.panel .poi-caret { cursor: pointer; color: var(--ink-soft); font-size: 10px; padding: 0 4px; }
+.panel .poi-groups { padding: 2px 0 0 22px; display: flex; flex-direction: column; gap: 2px; }
+.panel .poi-groups label { font-size: 12px; color: var(--ink-soft); cursor: pointer; user-select: none; }
+.panel .poi-groups .ck { margin-right: 6px; }
