@@ -1,3 +1,9 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#b23a2a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
 <title>Japón en familia · 4–18 oct 2026</title>
 <style>
   :root {
@@ -272,7 +278,7 @@
 <div class="wrap">
 <div id="topbar"><nav id="tabbar" aria-label="Secciones"><button data-go="resumen">ℹ️ Info</button><button data-go="hoteles">🏨 Hoteles</button><button data-go="precios">💴 Precios</button><button data-go="itinerario">🗓️ Itinerario</button><button data-go="geomapa">🗺️ Mapa</button><button data-go="deseos">❤ Deseos</button><button data-go="mapa">📋 Resumen</button></nav><button id="btn-buscar" type="button" title="Buscar" aria-label="Buscar">🔍</button><button id="btn-cfg" type="button" title="Configuración" aria-label="Configuración">⚙️</button></div>
 <div id="cfgmenu" hidden><button id="btn-fotos" type="button">📊 Datos</button><button id="btn-zoom" type="button">🔎 Texto</button><button id="btn-upd" type="button">🔄 Buscar actualización</button></div>
-<script>(function(){var u=document.getElementById("btn-upd");if(!u)return;u.addEventListener("click",function(){u.textContent="⏳ Actualizando…";var jobs=[];if(false){jobs.push(navigator.serviceWorker.getRegistrations().then(function(rs){return Promise.all(rs.map(function(r){return r.unregister();}));}));}if("caches" in window){jobs.push(caches.keys().then(function(ks){return Promise.all(ks.map(function(k){return (k==="viajes-fotos"||k==="viajes-cfg")?null:caches.delete(k);}));}));}Promise.all(jobs).catch(function(){}).then(function(){location.replace(location.origin+location.pathname+"?u="+Date.now());});});})();</script>
+<script>(function(){var u=document.getElementById("btn-upd");if(!u)return;u.addEventListener("click",function(){u.textContent="⏳ Actualizando…";var j=("serviceWorker" in navigator)?navigator.serviceWorker.getRegistration().then(function(r){return r&&r.update();}):Promise.resolve();j.catch(function(){}).then(function(){location.reload();});});})();</script>
 <noscript><style>[data-tab]{display:block!important}#tabbar{display:none}</style></noscript>
 <header data-tab="resumen">
   <p class="eyebrow">Familia Torres ×10 · dom 4 oct → dom 18 oct 2026 · de sur a norte</p>

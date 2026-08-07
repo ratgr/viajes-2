@@ -10,7 +10,8 @@
   var SHU = (getComputedStyle(document.documentElement).getPropertyValue('--shu') || '').trim() || '#b23a2a';
   var map = null;
   if (window.L && document.getElementById('map')) {
-    map = L.map('map', { zoomControl: true }).setView([35.0, 135.6], 6);
+    map = L.map('map', { zoomControl: false }).setView([35.0, 135.6], 6);
+    L.control.zoom({ position: 'bottomright' }).addTo(map);   // la izquierda la tapa el panel
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       maxZoom: 20, subdomains: 'abcd', attribution: '© OpenStreetMap © CARTO'
     }).addTo(map);
@@ -106,6 +107,11 @@
   if (panel && splitter) {
     var saved = localStorage.getItem('mapa-panel-w');
     if (saved) panel.style.width = saved + 'px';
+    splitter.style.left = (parseInt(saved, 10) || 380) + 'px';
+    // escritorio: el panel llega ABIERTO (flota sobre el mapa de lado a lado)
+    if (window.matchMedia('(min-width: 821px)').matches) {
+      document.body.classList.add('panel-open');
+    }
     var dragging = false;
     splitter.addEventListener('pointerdown', function (e) {
       dragging = true;
@@ -117,7 +123,7 @@
       if (!dragging) return;
       var w = Math.max(260, Math.min(e.clientX, window.innerWidth * 0.7));
       panel.style.width = w + 'px';
-      if (map) map.invalidateSize();
+      splitter.style.left = w + 'px';
     });
     splitter.addEventListener('pointerup', function () {
       dragging = false;
@@ -126,8 +132,8 @@
     });
     splitter.addEventListener('dblclick', function () {
       panel.style.width = '380px';
+      splitter.style.left = '380px';
       localStorage.removeItem('mapa-panel-w');
-      if (map) map.invalidateSize();
     });
   }
 
