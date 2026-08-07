@@ -49,6 +49,7 @@ body.panel-open .splitter { display: block; }
 .panel .steps > li > .body, .panel .steps li .transit { display: contents; }
 .panel .steps li .title { grid-column: 3; grid-row: 1; }
 .panel .steps li .duration { position: absolute; top: 4px; right: 0; text-align: right; font-size: 10.5px; max-width: 96px; background: inherit; }
+.panel .steps li .no-geo { position: absolute; top: 19px; right: 2px; font-size: 10px; color: var(--ink-soft); opacity: .75; cursor: help; }
 .panel .steps li .title { padding-right: 74px; }   /* que el título no choque con la duración */
 .panel .steps li .options { grid-column: 1 / -1; grid-row: 3; }
 .panel .sep { display: none; }

@@ -168,6 +168,19 @@ def spans_tokens(trip):
             "steps": steps, "entities": ents}
 
 
+def _poi_entry(key, pt):
+    """tupla de POI para el GEO: [lat, lon, clave, nombre, zona?] — la zona
+    (polígono `zone:` del place: calle/barrio) va como 5º elemento opcional."""
+    pl = render.PLACES.get(key, {})
+    entry = [pt[0], pt[1], key, pl.get("name", key)]
+    zone = pl.get("zone")
+    if zone:
+        zp = render.parse_pts(str(zone), f"places[{key}].zone")
+        if zp and len(zp) >= 3:
+            entry.append([[a, b] for a, b in zp])
+    return entry
+
+
 def geo_tokens():
     """geometría por clave YAML para el mapa: gps de places, coords de transits.
     (Se inyecta como JSON aparte: las coordenadas no son parte de las filas.)"""
@@ -212,8 +225,7 @@ def geo_tokens():
                 for pk in str(pois).split():
                     pt = render._place_pt(pk)
                     if pt:
-                        lst.append([pt[0], pt[1], pk,
-                                    render.PLACES.get(pk, {}).get("name", pk)])
+                        lst.append(_poi_entry(pk, pt))
                 if lst:
                     entry["pois"] = lst
             transits[key] = entry
@@ -228,8 +240,7 @@ def geo_tokens():
             continue
         pt = render._place_pt(key)
         if pt:
-            clusters.setdefault(str(cl), []).append(
-                [pt[0], pt[1], key, pl.get("name", key)])
+            clusters.setdefault(str(cl), []).append(_poi_entry(key, pt))
     geo = {"locations": locs, "transits": transits, "trip": _TRIP[0],
            "poiClusters": clusters,
            "anchors": anchors_tokens(), "edit": spans_tokens(_TRIP[0]),

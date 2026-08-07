@@ -268,13 +268,17 @@
       });
     }
     // puntos de interés del tramo: puntitos ámbar con nombre, click = tarjeta
+    // (si el POI es calle/barrio trae zona → polígono dorado en vez de punto)
     g._pois = [];
     (tr.pois || []).forEach(function (p) {
-      var mk = L.circleMarker([p[0], p[1]], {
-        radius: 4.5, color: '#fff', weight: 1.5,
-        fillColor: '#c9a227', fillOpacity: 1, interactive: !inert
-      });
-      mk.bindTooltip(p[3], { direction: 'top', offset: [0, -5] });
+      var mk = p[4]
+        ? L.polygon(p[4], { color: '#c9a227', weight: 1.5, dashArray: '5 4',
+                            fillColor: '#c9a227', fillOpacity: .14, interactive: !inert })
+        : L.circleMarker([p[0], p[1]], {
+            radius: 4.5, color: '#fff', weight: 1.5,
+            fillColor: '#c9a227', fillOpacity: 1, interactive: !inert
+          });
+      mk.bindTooltip(p[3], p[4] ? { sticky: true } : { direction: 'top', offset: [0, -5] });
       if (!inert) {
         mk.on('click', function () { showOnMap(p[2], p[3]); selectByKey(p[2]); });
       }
@@ -1196,10 +1200,14 @@
         var want = cks[cl].checked;
         if (want && !poiLayers[cl]) {
           poiLayers[cl] = L.layerGroup(groups[cl].map(function (p) {
-            var mk = L.circleMarker([p[0], p[1]], {
-              radius: 4.5, color: '#fff', weight: 1.5, fillColor: '#c9a227', fillOpacity: 1
-            });
-            mk.bindTooltip(p[3], { direction: 'top', offset: [0, -5] });
+            // p[4] = zona (calle/barrio): polígono dorado en vez de punto
+            var mk = p[4]
+              ? L.polygon(p[4], { color: '#c9a227', weight: 1.5, dashArray: '5 4',
+                                  fillColor: '#c9a227', fillOpacity: .14 })
+              : L.circleMarker([p[0], p[1]], {
+                  radius: 4.5, color: '#fff', weight: 1.5, fillColor: '#c9a227', fillOpacity: 1
+                });
+            mk.bindTooltip(p[3], p[4] ? { sticky: true } : { direction: 'top', offset: [0, -5] });
             mk.on('click', function () { showOnMap(p[2], p[3]); selectByKey(p[2]); });
             return mk;
           })).addTo(map);
@@ -1210,6 +1218,26 @@
       });
     }
     syncPois();
+  })();
+
+  // ---------- ∅ bajo la duración: filas SIN geometría en el mapa ----------
+  // (paso-nota o transit sin trazo propio — para cazarlos al editar)
+  (function markNoGeo() {
+    if (!panel) return;
+    panel.querySelectorAll('.steps li').forEach(function (li) {
+      if (li.querySelector('li')) return;   // solo filas hoja
+      var isRow = li.querySelector(':scope > time') || li.classList.contains('hidden-summary');
+      if (!isRow) return;
+      var key = li.dataset.location || li.dataset.transit;
+      var has = key && (GEO.locations[key] ||
+        (GEO.transits[key] && GEO.transits[key].coords && GEO.transits[key].coords.length));
+      if (has) return;
+      var s = document.createElement('span');
+      s.className = 'no-geo';
+      s.title = 'sin geometría en el mapa';
+      s.textContent = '∅';
+      li.appendChild(s);
+    });
   })();
 
   // ---------- chip de DEPLOY: la página vigila su propia Action ----------
@@ -2006,16 +2034,26 @@
     if (overlayEl && overlayEl.open) overlayEl.close();
     var li = m[2] ? document.getElementById(m[2]) : null;
     if (li) {
-      openDayOf(li);
-      // el día de la fila del hash llega ACTIVO (visible en el mapa)
-      var liDay = li.closest('section.day');
-      if (liDay) {
-        setDayChecked(liDay, true);
-        activeDay = days.indexOf(liDay);
+      // llegar EXACTO a ese paso con el caminador (día activo, vuelo y
+      // tarjeta incluidos); antes solo se marcaba la fila y el encuadre de
+      // arranque + stepper por defecto PISABAN la restauración
+      var ji = -1;
+      for (var jj = 0; jj < stEls.length; jj++) {
+        if (stEls[jj] === li || li.contains(stEls[jj])) { ji = jj; break; }
       }
-      selectRow(li);
-      stSyncTo(li);
-      li.scrollIntoView({ block: 'center' });
+      if (ji >= 0) {
+        stGoTo(ji);
+        restoredView = true;
+      } else {
+        openDayOf(li);
+        var liDay = li.closest('section.day');
+        if (liDay) {
+          setDayChecked(liDay, true);
+          activeDay = days.indexOf(liDay);
+        }
+        selectRow(li);
+        li.scrollIntoView({ block: 'center' });
+      }
       schedSync();
     } else if (!m[1]) {
       // fila del hash ya no existe (ids renumerados) y no hay modal → defecto
