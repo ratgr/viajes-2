@@ -1246,7 +1246,9 @@
   var TRIP = (GEO && GEO.trip) || location.pathname.split('/').slice(-2, -1)[0] || '';
   // llamada al dev_server: sin body = GET tal cual; con body = POST JSON con
   // trip incluido — siempre devuelve la promesa del JSON de respuesta
+  var devVia = 'server';   // 'server' (dev_server local) | 'github' (contents API)
   function api(path, body) {
+    if (devVia === 'github' && window.DevGH) return DevGH.api(path, body);
     if (body === undefined) {
       return fetch(path).then(function (r) { return r.json(); });
     }
@@ -1282,7 +1284,36 @@
       devBtn.classList.toggle('on', devMode);
       if (!devMode) closeDrawer();
     });
-  }).catch(function () { /* sin dev server (Pages): nada que hacer */ });
+  }).catch(function () {
+    // sin dev server: modo GITHUB si el build trae spans (GEO.edit) — las
+    // MISMAS herramientas visuales, guardando por contents API con tu PAT
+    if (!(window.DevGH && DevGH.available())) return;
+    devVia = 'github';
+    devAuth = DevGH.hasToken() ? 'ok' : 'required';
+    var devBtn = document.createElement('button');
+    devBtn.className = 'dev-toggle';
+    devBtn.type = 'button';
+    devBtn.textContent = '🛠';
+    devBtn.title = devAuth === 'ok'
+      ? 'Modo dev (GitHub): edita y cada Guardar COMMITEA; el sitio se republica solo'
+      : 'Modo dev (GitHub): pega tu PAT para editar';
+    document.body.appendChild(devBtn);
+    devMode = devAuth === 'ok' && localStorage.getItem('mapa-dev') === '1';
+    devBtn.classList.toggle('on', devMode);
+    devBtn.addEventListener('click', function () {
+      if (devAuth !== 'ok') {
+        DevGH.promptToken().then(function (user) {
+          devAuth = 'ok';
+          devBtn.title = 'Modo dev (GitHub) — sesión: ' + user;
+        }).catch(function (e) { alert('PAT inválido: ' + (e.message || e)); });
+        return;
+      }
+      devMode = !devMode;
+      localStorage.setItem('mapa-dev', devMode ? '1' : '0');
+      devBtn.classList.toggle('on', devMode);
+      if (!devMode) closeDrawer();
+    });
+  });
   // login por DEVICE FLOW: el server habla con GitHub; aquí solo se enseña el
   // código y se sondea hasta que la sesión queda puesta (cookie)
   function devLogin(devBtn) {
